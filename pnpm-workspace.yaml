@@ -1,0 +1,10 @@
+allowBuilds:
+    '@parcel/watcher': set this to true or false
+    '@swc/core': set this to true or false
+    sharp: true
+    unrs-resolver: true
+ignoredBuiltDependencies:
+    - sharp
+    - unrs-resolver
+
+minimumReleaseAge: 10080 # 7 days in minutes
