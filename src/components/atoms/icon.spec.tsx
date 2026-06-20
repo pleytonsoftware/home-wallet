@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react'
 import { Heart } from 'lucide-react'
+
+import { render, screen } from '@testing-library/react'
 
 import { Icon } from './icon'
 

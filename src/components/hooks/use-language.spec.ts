@@ -1,3 +1,5 @@
+import { useLocale } from 'next-intl'
+
 import { renderHook } from '@testing-library/react'
 
 import { useLanguage } from './use-language'
@@ -5,8 +7,6 @@ import { useLanguage } from './use-language'
 vi.mock('next-intl', () => ({
 	useLocale: vi.fn(),
 }))
-
-import { useLocale } from 'next-intl'
 
 describe('useLanguage', () => {
 	it('returns the current locale as Languages type', () => {

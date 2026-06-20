@@ -7,8 +7,10 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "eslint",
-		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
+		"format": "prettier --write \"**/*.{ts,tsx}\"",
 		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:ui": "vitest --ui",
 		"coverage": "vitest run --coverage",
 		"prepare": "husky"
 	},
