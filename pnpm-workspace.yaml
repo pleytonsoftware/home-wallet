@@ -1,18 +1,20 @@
 allowBuilds:
     '@parcel/watcher': true
+    '@prisma/engines': true
     '@swc/core': true
     esbuild: true
+    prisma: true
     sharp: true
     unrs-resolver: true
 ignoredBuiltDependencies:
     - sharp
     - unrs-resolver
 
-minimumReleaseAge: 10080 # 7 days in minutes
+minimumReleaseAge: 7200 # 5 days in minutes
 
 strictDepBuilds: true
 
-trustPolicy: no-downgrade
+# trustPolicy: no-downgrade
 
 savePrefix: ''
 
@@ -21,6 +23,7 @@ nodeLinker: isolated
 preferWorkspacePackages: true
 
 sharedWorkspaceLockfile: true
+resolutionMode: highest
 
 overrides:
     'semver@<7': 7.7.0

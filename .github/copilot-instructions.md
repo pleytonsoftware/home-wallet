@@ -36,63 +36,7 @@ home-wallet is a high-end, multi-user household financial management platform. I
 
 ### 3.3 Database Schema (Prisma/PostgreSQL)
 
-[SCHEMA DEFINITION]
-
-model User {
-id String @id @default(cuid())
-name String?
-email String @unique
-emailVerified DateTime?
-image String?
-role Role @default(MEMBER)
-householdId String?
-household Household? @relation(fields: [householdId], references: [id])
-transactions Transaction[]
-accounts Account[]
-sessions Session[]
-}
-
-model Household {
-id String @id @default(cuid())
-name String
-splitStrategy SplitStrategy @default(PROPORTIONAL)
-members User[]
-transactions Transaction[]
-createdAt DateTime @default(now())
-}
-
-model Transaction {
-id String @id @default(cuid())
-amount Decimal
-type Type // INCOME, EXPENSE, SHARED_EXPENSE
-category String // e.g., "Rent", "Groceries", "Salary"
-date DateTime @default(now())
-userId String
-user User @relation(fields: [userId], references: [id])
-householdId String?
-household Household? @relation(fields: [householdId], references: [id])
-isRecurring Boolean @default(false)
-isInstallment Boolean @default(false)
-installment Installment?
-}
-
-model Installment {
-id String @id @default(cuid())
-transactionId String @unique
-transaction Transaction @relation(fields: [transactionId], references: [id])
-totalAmount Decimal
-monthlyAmount Decimal
-remainingPayments Int
-endDate DateTime
-}
-
-enum Role { ADMIN; MEMBER }
-enum Type { INCOME; EXPENSE; SHARED_EXPENSE }
-enum SplitStrategy { FIXED_50_50; PROPORTIONAL; MANUAL }
-
-[END SCHEMA DEFINITION]
-
----
+Can be found at `prisma/schema.prisma`.
 
 ## 4. FEATURE SPECIFICATIONS & LOGIC
 

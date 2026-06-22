@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "./src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  name        String
+  image       String?
+  role        String    @default("MEMBER")
+  householdId String
+  createdAt   DateTime  @default(now())
+  accounts    Account[]
+  sessions    Session[]
+}
+
+model Household {
+  id            String   @id @default(uuid())
+  name          String
+  splitStrategy String   @default("PROPORTIONAL")
+  createdAt     DateTime @default(now())
+}
+
+model Transaction {
+  id            String   @id @default(uuid())
+  amount        Decimal
+  type          String
+  category      String
+  userId        String
+  householdId   String?
+  date          DateTime
+  isRecurring   Boolean
+  isInstallment Boolean
+  description   String?
+  createdAt     DateTime @default(now())
+}
+
+model Installment {
+  id                String   @id @default(uuid())
+  transactionId     String
+  totalAmount       Decimal
+  monthlyAmount     Decimal
+  remainingPayments Int
+  endDate           DateTime
+  createdAt         DateTime @default(now())
+}
+
+model Account {
+  adapter           String   @id @default(cuid())
+  userId            String
+  type              String // e.g., "google"
+  provider          String // e.g., "google"
+  providerAccountId String // The unique ID provided by Google
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  // Relation: One user can have multiple accounts (e.g., Google and GitHub)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
