@@ -29,7 +29,8 @@
 			"@locales/*": ["./locales/*"],
 			"@assets/*": ["./src/assets/*"],
 			"@navigation": ["./src/i18n/navigation.ts"],
-			"@hooks/*": ["./src/components/hooks/*"]
+			"@hooks/*": ["./src/components/hooks/*"],
+			"@hw-prisma/*": ["./src/lib/generated/prisma/*"]
 		}
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts", "**/*.mts"],

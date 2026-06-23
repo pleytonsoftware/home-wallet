@@ -21,3 +21,21 @@ services:
       - ./data/homewallet-db/postgres:/var/lib/postgresql/data
     ports:
       - "5555:5432"
+
+  # SMTP Server (Mailpit) for email testing
+  smtp:
+    image: axllent/mailpit:latest
+    restart: always
+    volumes:
+      - ./data/smtp:/data
+    environment:
+      - MP_DATABASE=/data/mailpit.db
+    healthcheck:
+      test: ["CMD", "nc", "-zv", "127.0.0.1", "1025"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    ports:
+      - "6000:1025" # SMTP port
+      - "6002:8025" # Web UI

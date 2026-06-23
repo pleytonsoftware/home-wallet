@@ -70,7 +70,7 @@ const Button = React.forwardRef<
 			data-variant={variant}
 			data-size={size}
 			role={role}
-			className={cn(buttonVariants({ variant, size, shape, className }))}
+			className={cn('hover:cursor-pointer', buttonVariants({ variant, size, shape, className }))}
 			{...props}
 		>
 			{loading ? <Spinner /> : icon}

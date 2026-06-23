@@ -1,10 +1,36 @@
-import { ProxyConfig } from 'next/server'
+import type { NextRequest, ProxyConfig } from 'next/server'
 
+import { getToken } from 'next-auth/jwt'
 import createMiddleware from 'next-intl/middleware'
 
 import { routing } from './i18n/routing'
 
-export default createMiddleware(routing)
+const intlMiddleware = createMiddleware(routing)
+
+const PUBLIC_ROUTES = ['/', '/signin', '/auth', '/api/auth']
+
+export default async function proxy(request: NextRequest) {
+	const pathname = request.nextUrl.pathname
+
+	const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.includes(route))
+
+	if (isPublicRoute) {
+		return intlMiddleware(request)
+	}
+
+	const token = await getToken({ req: request })
+	if (!token) {
+		// Redirect to signin if no token
+		const signInUrl = new URL('/signin', request.nextUrl.origin)
+		signInUrl.searchParams.set('callbackUrl', pathname)
+		return new Response(null, {
+			status: 307,
+			headers: { Location: signInUrl.toString() },
+		})
+	}
+
+	return intlMiddleware(request)
+}
 
 export const config = {
 	matcher: [
@@ -12,8 +38,5 @@ export const config = {
 		// - … if they start with `/api`, `/trpc`, `/_next` or `/_vercel`
 		// - … the ones containing a dot (e.g. `favicon.ico`)
 		'/((?!api|trpc|_next|_vercel|.*\\..*).*)',
-
-		// //* Match all pathnames within `{/:locale}/users`
-		// '/([\\w-]+)?/users/(.+)',
 	],
 } satisfies ProxyConfig

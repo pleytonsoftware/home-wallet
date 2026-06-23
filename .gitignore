@@ -42,6 +42,6 @@ next-env.d.ts
 
 coverage/
 .vitest/
-/prisma/src/generated/prisma
+/src/lib/generated/prisma
 
 /data
