@@ -12,7 +12,7 @@ home-wallet is a high-end, multi-user household financial management platform. I
 - **Internationalization:** `next-intl` (Cookie-based detection, Middleware routing)
 - **Authentication:** `next-auth` (Auth.js) with `Prisma Adapter`
 - **Database:** PostgreSQL via Prisma ORM
-- **AI Engine:** Vercel AI SDK with OpenAI (GPT-4o-mini)
+- **AI Engine:** Ollama Small LLM (local LLM inference for predictive insights)
 - **Styling:** Tailwind CSS, Shadcn/UI, Tremor (Data Visualization)
 
 ---

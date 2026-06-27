@@ -94,4 +94,20 @@ components/sidebar/
 | Organisms — verb+noun or builder | `nav-builder.tsx`, `app-sidebar.tsx`                 |
 | Renderer atoms (shadcn wrappers) | `nav-group.tsx` → export `NavGroupRenderer`          |
 | Types file                       | always `types.ts`                                    |
-| Utils file                       | always `utils.ts`                                    |
+| Utils file                       | always `*.utils.ts`                                  |
+
+## Custom Usage
+
+Every component must be declared as const, unless it needs to be a function due to high-order components like `forwardRef`. Use FC type, and PropsWithChildren if it has children:
+
+```ts
+import type { FC, PropsWithChildren } from 'react'
+
+export const MyComponent: FC<PropsWithChildren<MyProps>> = ({ children, ...props }) => {
+  return <div {...props}>{children}</div>
+}
+```
+
+Components must be exported as named exports, never default exports. This allows for better tree-shaking and easier refactoring.
+
+Components should be split into smaller components if they are too large or have multiple responsibilities. Each component should have a single responsibility and be easy to understand in isolation.
