@@ -2,5 +2,14 @@
 	"common": {},
 	"home-page": {
 		"title": "Hello world!"
+	},
+	"signin-page": {
+		"title": "Welcome back",
+		"subtitle": "Sign in to your account to get started",
+		"sign-or": "Or",
+		"signing-in": "Signing in...",
+		"sign-with-google": "Sign in with Google",
+		"failed-to-sign-in": "Failed to sign in",
+		"sign-with-email": "Sign in with Magic Link"
 	}
 }
