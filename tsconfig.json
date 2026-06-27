@@ -31,7 +31,8 @@
 			"@navigation": ["./src/i18n/navigation.ts"],
 			"@hooks/*": ["./src/components/hooks/*"],
 			"@hw-prisma/*": ["./src/lib/generated/prisma/*"],
-			"@lib/*": ["./src/lib/*"]
+			"@lib/*": ["./src/lib/*"],
+			"@emails/*": ["./src/emails/*"]
 		}
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts", "**/*.mts"],

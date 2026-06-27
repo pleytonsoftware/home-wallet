@@ -1,0 +1,11 @@
+{
+	"magic-link": {
+		"subject": "Iniciar sesión en {appName}",
+		"greeting": "Hola {emailName},",
+		"body": "Haga clic en el botón de abajo para acceder de manera segura a su cuenta.",
+		"expiration-time": "Este enlace mágico expira en {expirationTime}.",
+		"button": "Iniciar sesión",
+		"button-note": "Si el botón de arriba no funciona, copie y pegue el siguiente enlace en su navegador:",
+		"footer": "Si no solicitó este correo electrónico, puede ignorarlo de manera segura."
+	}
+}

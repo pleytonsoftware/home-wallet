@@ -1,14 +1,18 @@
 import type { NextAuthOptions } from 'next-auth'
 
+import { DEFAULT_LANGUAGE, type Languages } from '@/i18n/languages'
+
 import ms from 'ms'
 import NextAuth, { getServerSession } from 'next-auth'
 import EmailProvider, { type SendVerificationRequestParams } from 'next-auth/providers/email'
 import GoogleProvider from 'next-auth/providers/google'
+import { createTranslator } from 'next-intl'
 import nodemailer from 'nodemailer'
 
+import { MagicLinkEmail } from '@emails/verify-magic-link'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import { render } from '@react-email/render'
 
-import { html, text } from './auth-html'
 import { Role } from './constants/role.enum'
 import { ROUTES } from './constants/routes.const'
 import { prisma } from './prisma'
@@ -22,16 +26,31 @@ const createMailerTransporter = (provider?: SendVerificationRequestParams['provi
 	return transporter
 }
 
-async function sendVerificationRequest(params: SendVerificationRequestParams) {
-	const { identifier, url, provider, theme } = params
-	const { host } = new URL(url)
+async function sendVerificationRequest({ identifier, url, provider }: SendVerificationRequestParams) {
+	const { cookies } = await import('next/headers')
+	const sessionCookies = await cookies()
+	const language = (sessionCookies.get('NEXT_LOCALE')?.value || DEFAULT_LANGUAGE) as Languages
 	const transport = createMailerTransporter(provider)
+	const t = createTranslator({
+		locale: language,
+		messages: (await import(`../../locales/emails/${language}.json`)).default,
+		namespace: 'magic-link',
+	})
+	const appName = process.env.APP_NAME!
+
 	const result = await transport.sendMail({
 		to: identifier,
 		from: provider.from,
-		subject: `Sign in to ${host}`,
-		text: text({ url, host }),
-		html: html({ url, host, theme }),
+		subject: t('subject', { appName }),
+		html: await render(
+			MagicLinkEmail({
+				appName,
+				emailName: identifier.split('@')[0],
+				loginUrl: url,
+				expirationTime: ms(magicLinkMaxAge, { long: true }),
+				locale: language,
+			}),
+		),
 	})
 	const failed = result.rejected.concat(result.pending).filter(Boolean)
 	if (failed.length) {
@@ -39,12 +58,13 @@ async function sendVerificationRequest(params: SendVerificationRequestParams) {
 	}
 }
 
+const magicLinkMaxAge = ms('24h')
 export const authOptions: NextAuthOptions = {
 	adapter: PrismaAdapter(prisma),
 	secret: process.env.NEXTAUTH_SECRET,
 	session: {
 		strategy: 'jwt',
-		maxAge: ms('30d'), // 30 days
+		maxAge: ms('30d'),
 	},
 	pages: {
 		signIn: ROUTES.SIGNIN,
@@ -61,7 +81,7 @@ export const authOptions: NextAuthOptions = {
 			server: process.env.EMAIL_SERVER_URL,
 			from: process.env.EMAIL_FROM || 'noreply@homewallet.local',
 			sendVerificationRequest,
-			maxAge: ms('24h'),
+			maxAge: magicLinkMaxAge,
 		}),
 	],
 	callbacks: {
