@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
-import type { Role } from '@/lib/constants/role.enum'
+
 import type { Session as HWSession, User as HWUser } from '@hw-prisma/client'
+import type { Role } from '@lib/constants/role.enum'
 
 import 'next-auth/jwt'
 
-type UserWithRole = HWUser & { role: Role }
+type UserWithRole = HWUser & { role: Role; householdIds?: string[] }
 
 declare module 'next-auth' {
 	interface Session extends HWSession {
@@ -15,5 +16,7 @@ declare module 'next-auth' {
 }
 
 declare module 'next-auth/jwt' {
-	interface JWT extends HWUser {}
+	interface JWT extends HWUser {
+		householdIds?: string[]
+	}
 }

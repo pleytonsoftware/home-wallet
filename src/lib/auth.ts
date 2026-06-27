@@ -1,79 +1,55 @@
-import type { PrismaClient as PrismaClientType } from '@prisma/client'
 import type { NextAuthOptions } from 'next-auth'
 
 import ms from 'ms'
-import EmailProvider from 'next-auth/providers/email'
+import NextAuth, { getServerSession } from 'next-auth'
+import EmailProvider, { type SendVerificationRequestParams } from 'next-auth/providers/email'
 import GoogleProvider from 'next-auth/providers/google'
 import nodemailer from 'nodemailer'
-import { Pool } from 'pg'
 
-import { PrismaClient } from '@hw-prisma/client'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
-import { PrismaPg } from '@prisma/adapter-pg'
 
+import { html, text } from './auth-html'
 import { Role } from './constants/role.enum'
+import { ROUTES } from './constants/routes.const'
+import { prisma } from './prisma'
 
-let prisma: PrismaClient | null = null
-
-function getPrismaClient(): PrismaClientType {
-	if (prisma) return prisma as unknown as PrismaClientType
-
-	const connectionString = process.env.DATABASE_URL
-
-	if (!connectionString) {
-		throw new Error('DATABASE_URL is not set')
-	}
-
-	const pool = new Pool({
-		connectionString,
-	})
-
-	const adapter = new PrismaPg(pool)
-
-	prisma = new PrismaClient({
-		adapter,
-		errorFormat: 'minimal',
-	})
-
-	return prisma as unknown as PrismaClientType
+const createMailerTransporter = (provider?: SendVerificationRequestParams['provider']) => {
+	const transporter = nodemailer.createTransport(
+		provider?.server || {
+			url: process.env.EMAIL_SERVER_URL,
+		},
+	)
+	return transporter
 }
 
-const prismaInstance = (() => {
-	try {
-		return getPrismaClient()
-	} catch (e) {
-		if (process.env.NODE_ENV !== 'production') {
-			// eslint-disable-next-line no-console
-			console.warn('Database not available:', e)
-			return null
-		}
-		throw e
+async function sendVerificationRequest(params: SendVerificationRequestParams) {
+	const { identifier, url, provider, theme } = params
+	const { host } = new URL(url)
+	const transport = createMailerTransporter(provider)
+	const result = await transport.sendMail({
+		to: identifier,
+		from: provider.from,
+		subject: `Sign in to ${host}`,
+		text: text({ url, host }),
+		html: html({ url, host, theme }),
+	})
+	const failed = result.rejected.concat(result.pending).filter(Boolean)
+	if (failed.length) {
+		throw new Error(`Email(s) (${failed.join(', ')}) could not be sent`)
 	}
-})()
-
-const transporter = nodemailer.createTransport({
-	host: process.env.EMAIL_SERVER_HOST,
-	port: parseInt(process.env.EMAIL_SERVER_PORT || '587'),
-	secure: process.env.EMAIL_SERVER_SECURE === 'true',
-	auth: process.env.EMAIL_SERVER_USER
-		? {
-				user: process.env.EMAIL_SERVER_USER,
-				pass: process.env.EMAIL_SERVER_PASSWORD,
-			}
-		: undefined,
-})
+}
 
 export const authOptions: NextAuthOptions = {
-	adapter: prismaInstance ? PrismaAdapter(prismaInstance) : undefined,
+	adapter: PrismaAdapter(prisma),
 	secret: process.env.NEXTAUTH_SECRET,
 	session: {
 		strategy: 'jwt',
-		maxAge: 30 * 24 * 60 * 60, // 30 days
+		maxAge: ms('30d'), // 30 days
 	},
 	pages: {
-		signIn: '/signin',
-		verifyRequest: '/auth/verify-request',
-		error: '/auth/error',
+		signIn: ROUTES.SIGNIN,
+		verifyRequest: ROUTES.VERIFY_REQUEST,
+		error: ROUTES.AUTH.ERROR,
 	},
 	providers: [
 		GoogleProvider({
@@ -82,40 +58,30 @@ export const authOptions: NextAuthOptions = {
 			allowDangerousEmailAccountLinking: true,
 		}),
 		EmailProvider({
-			server: transporter,
+			server: process.env.EMAIL_SERVER_URL,
 			from: process.env.EMAIL_FROM || 'noreply@homewallet.local',
+			sendVerificationRequest,
 			maxAge: ms('24h'),
 		}),
 	],
 	callbacks: {
-		async jwt({ token, user, account: _ }) {
+		async jwt({ token, user }) {
 			if (user) {
 				token.id = user.id
+				token.sub = user.id
 				token.email = user.email
 				token.name = user.name
 				token.image = user.image || null
-				token.role = user.role || Role.MEMBER
-				token.householdId = user.householdId
-			}
+				token.role = user.role ?? Role.MEMBER
+				token.picture = user.image || null
+				token.createdAt = user.createdAt
 
-			// Refresh token data from database on every request
-			if (token.id && prismaInstance) {
-				try {
-					const dbUser = await prismaInstance.user.findUnique({
-						where: { id: token.id },
-					})
-
-					if (dbUser) {
-						token.email = dbUser.email
-						token.name = dbUser.name
-						token.image = dbUser.image || null
-						token.role = dbUser.role
-						token.householdId = dbUser.householdId
-					}
-				} catch (error) {
-					// eslint-disable-next-line no-console
-					console.warn('Failed to refresh user data from database:', error)
-				}
+				// Fetch household memberships
+				const memberships = await prisma.householdMember.findMany({
+					where: { userId: user.id },
+					select: { householdId: true },
+				})
+				token.householdIds = memberships.map((m) => m.householdId)
 			}
 
 			return token
@@ -132,23 +98,34 @@ export const authOptions: NextAuthOptions = {
 				session.user.name = token.name
 				session.user.image = token.image
 				session.user.role = token.role as Role
-				session.user.householdId = token.householdId
+				session.user.householdIds = (token.householdIds as string[]) || []
 			}
 
 			return session
 		},
 
 		async signIn({ user, account }) {
-			if (account?.type === 'oauth' && !user.householdId) {
+			if (account?.type === 'oauth') {
 				return true
 			}
 
 			if (account?.type === 'email') {
-				// Email magic link sign in
+				if (!user.name && user.email) {
+					user.name = `${user.email.split('@')[0]}`
+				} else if (!user.name && !user.email) {
+					return false
+				}
+
 				return true
 			}
 
 			return true
 		},
 	},
+}
+
+export const nextAuthHandler = NextAuth(authOptions)
+
+export function auth() {
+	return getServerSession(authOptions)
 }
