@@ -1,0 +1,41 @@
+name: homewallet-app
+services:
+  # Database
+  db:
+    image: postgres:17-alpine3.20
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: homewallet
+    healthcheck:
+      # $${POSTGRES_DB} uses Docker Compose's $$ escape so the literal ${POSTGRES_DB}
+      # is passed to the container shell, which resolves it from the container's environment.
+      # Derived configs can override POSTGRES_DB and this healthcheck adapts automatically.
+      test: ["CMD-SHELL", "pg_isready -U postgres -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    volumes:
+      - ./data/homewallet-db/postgres:/var/lib/postgresql/data
+    ports:
+      - "5555:5432"
+
+  # SMTP Server (Mailpit) for email testing
+  smtp:
+    image: axllent/mailpit:latest
+    restart: always
+    volumes:
+      - ./data/smtp:/data
+    environment:
+      - MP_DATABASE=/data/mailpit.db
+    healthcheck:
+      test: ["CMD", "nc", "-zv", "127.0.0.1", "1025"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    ports:
+      - "6000:1025" # SMTP port
+      - "6002:8025" # Web UI

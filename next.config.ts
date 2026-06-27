@@ -32,6 +32,9 @@ const nextConfig: NextConfig = {
 			},
 		},
 	},
+	env: {
+		NEXT_PUBLIC_APP_NAME: process.env.APP_NAME,
+	},
 }
 
 const withNextIntl = createNextIntlPlugin()

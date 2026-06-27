@@ -24,12 +24,15 @@
 			"@cn": ["./src/lib/utils/cn.ts"],
 			"@atoms/*": ["./src/components/atoms/*"],
 			"@molecules/*": ["./src/components/molecules/*"],
-			"@organism/*": ["./src/components/ui/organism/*"],
-			"@pages/*": ["./src/components/ui/pages/*"],
+			"@organisms/*": ["./src/components/organisms/*"],
+			"@auth/*": ["./src/components/auth/*"],
 			"@locales/*": ["./locales/*"],
 			"@assets/*": ["./src/assets/*"],
 			"@navigation": ["./src/i18n/navigation.ts"],
-			"@hooks/*": ["./src/components/hooks/*"]
+			"@hooks/*": ["./src/components/hooks/*"],
+			"@hw-prisma/*": ["./src/lib/generated/prisma/*"],
+			"@lib/*": ["./src/lib/*"],
+			"@emails/*": ["./src/emails/*"]
 		}
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts", "**/*.mts"],

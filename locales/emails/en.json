@@ -1,0 +1,11 @@
+{
+	"magic-link": {
+		"subject": "Sign in to {appName}",
+		"greeting": "Hi {emailName},",
+		"body": "Click the button below to securely access your account.",
+		"expiration-time": "This magic link expires in {expirationTime}.",
+		"button": "Sign in",
+		"button-note": "If the button above does not work, copy and paste the following link into your browser:",
+		"footer": "If you didn't request this email, you can safely ignore it."
+	}
+}

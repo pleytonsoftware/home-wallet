@@ -48,36 +48,44 @@ const buttonVariants = cva(
 	},
 )
 
-const Button = React.forwardRef<
-	HTMLButtonElement | HTMLAnchorElement,
-	React.ComponentProps<'button'> &
-		React.ComponentProps<'a'> &
-		VariantProps<typeof buttonVariants> & {
-			asChild?: boolean
-			as?: React.ElementType
-			icon?: React.ReactNode
-			loading?: boolean
-			colour?: string
-			role?: string
-		}
->(({ className, variant = 'default', size = 'default', shape = 'none', asChild = false, as, icon, loading, role, children, ...props }, ref) => {
-	const Comp = (as || (asChild ? Slot.Root : 'button')) as React.ElementType
+type ButtonBaseProps = React.ComponentProps<'button'> &
+	React.ComponentProps<'a'> &
+	VariantProps<typeof buttonVariants> & {
+		as?: React.ElementType
+		icon?: React.ReactNode
+		colour?: string
+		role?: string
+	}
 
-	return (
-		<Comp
-			ref={ref}
-			data-slot='button'
-			data-variant={variant}
-			data-size={size}
-			role={role}
-			className={cn(buttonVariants({ variant, size, shape, className }))}
-			{...props}
-		>
-			{loading ? <Spinner /> : icon}
-			{children}
-		</Comp>
-	)
-})
+type ButtonAsChild = ButtonBaseProps & { asChild: true; loading?: never }
+type ButtonNotChild = ButtonBaseProps & {
+	asChild?: false | undefined
+	loading?: boolean
+}
+
+type ButtonProps = ButtonAsChild | ButtonNotChild
+
+const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
+	({ className, variant = 'default', size = 'default', shape = 'none', asChild = false, as, icon, loading, role, children, ...props }, ref) => {
+		const Comp = (as || (asChild ? Slot.Root : 'button')) as React.ElementType
+		const loadingSpinner = !asChild ? loading ? <Spinner /> : icon : undefined
+		const renderedChild = !asChild ? [loadingSpinner, children] : children
+
+		return (
+			<Comp
+				ref={ref}
+				data-slot='button'
+				data-variant={variant}
+				data-size={size}
+				role={role}
+				className={cn(buttonVariants({ variant, size, shape, className }))}
+				{...props}
+			>
+				{renderedChild}
+			</Comp>
+		)
+	},
+)
 
 Button.displayName = 'Button'
 
