@@ -41,6 +41,9 @@ importers:
       dotenv:
         specifier: 17.4.2
         version: 17.4.2
+      http-status-codes:
+        specifier: 2.3.0
+        version: 2.3.0
       lucide-react:
         specifier: 1.20.0
         version: 1.20.0(react@19.2.4)
