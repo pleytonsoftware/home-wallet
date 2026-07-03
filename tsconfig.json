@@ -32,7 +32,8 @@
 			"@hooks/*": ["./src/components/hooks/*"],
 			"@hw-prisma/*": ["./src/lib/generated/prisma/*"],
 			"@lib/*": ["./src/lib/*"],
-			"@emails/*": ["./src/emails/*"]
+			"@emails/*": ["./src/emails/*"],
+			"@actions/*": ["./src/app/actions/*"]
 		}
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts", "**/*.mts"],

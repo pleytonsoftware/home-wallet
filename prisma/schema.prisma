@@ -12,98 +12,20 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id            String            @id @default(uuid())
-  email         String            @unique
-  emailVerified DateTime?         @map("email_verified")
-  name          String
-  image         String?
-  role          String            @default("MEMBER")
-  createdAt     DateTime          @map("created_at") @default(now())
-  
-  accounts      Account[]
-  sessions      Session[]
-  memberships   HouseholdMember[]
-  transactions   Transaction[]
-
-  @@map("users")
-}
-
-model Household {
-  id            String            @id @default(uuid())
-  name          String
-  splitStrategy String            @map("split_strategy") @default("PROPORTIONAL")
-  createdAt     DateTime          @map("created_at") @default(now())
-  
-  members       HouseholdMember[]
-  transactions  Transaction[]
-
-  @@map("households")
-}
-
-model HouseholdMember {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
-  householdId String   @map("household_id")
-  role        String   @default("MEMBER")
-  joinedAt    DateTime @map("joined_at") @default(now())
-
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, householdId])
-  @@map("household_members")
-}
-
-model Transaction {
-  id            String   @id @default(uuid())
-  amount        Decimal
-  type          String
-  category      String
-  userId        String   @map("user_id")
-  householdId   String?  @map("household_id")
-  date          DateTime
-  isRecurring   Boolean  @map("is_recurring")
-  isInstallment Boolean  @map("is_installment")
-  installmentId String?  @map("installment_id")
-  description   String?
-  createdAt     DateTime @map("created_at") @default(now())
-
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  household Household? @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  installment Installment?
-
-  @@map("transactions")
-}
-
-model Installment {
-  id                String    @id @default(uuid())
-  transactionId     String    @unique @map("transaction_id")
-  totalAmount       Decimal   @map("total_amount")
-  monthlyAmount     Decimal   @map("monthly_amount")
-  remainingPayments Int       @map("remaining_payments")
-  endDate           DateTime  @map("end_date")
-  createdAt         DateTime  @map("created_at") @default(now())
-
-  transaction Transaction @relation(fields: [transactionId], references: [id])
-
-  @@map("installments")
-}
-
 model Account {
-  adapter           String    @id @default(cuid())
-  userId            String    @map("user_id")
+  adapter           String   @id @default(cuid())
+  userId            String   @map("user_id")
   type              String
   provider          String
-  providerAccountId String    @map("provider_account_id")
-  refreshToken      String?   @db.Text @map("refresh_token")
-  accessToken       String?   @db.Text @map("access_token")
-  expiresAt         Int?      @map("expires_at")
-  tokenType         String?   @map("token_type")
+  providerAccountId String   @map("provider_account_id")
+  refreshToken      String?  @map("refresh_token") @db.Text
+  accessToken       String?  @map("access_token") @db.Text
+  expiresAt         Int?     @map("expires_at")
+  tokenType         String?  @map("token_type")
   scope             String?
-  idToken           String?   @db.Text @map("id_token")
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
+  idToken           String?  @map("id_token") @db.Text
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -128,4 +50,232 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  name          String
+  image         String?
+  role          String    @default("MEMBER")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  accounts     Account[]
+  sessions     Session[]
+  memberships  HouseholdMember[]
+  transactions Transaction[]
+  households   Household[]
+
+  @@map("users")
+}
+
+model Household {
+  id          String   @id @default(cuid())
+  name        String
+  fullAddress String?  @map("full_address")
+  code        String   @unique
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String   @map("created_by_id")
+
+  config       HouseholdConfig?
+  members      HouseholdMember[]
+  bankAccounts BankAccount[]
+  categories   Category[]
+  budgets      MonthlyBudget[]
+  transactions Transaction[]
+  tags         Tag[]
+  aisummaries  AISummary[]
+  user         User?             @relation(fields: [createdById], references: [id])
+
+  @@unique([name, createdById])
+  @@index([id])
+  @@map("households")
+}
+
+model HouseholdConfig {
+  id                   String    @id @default(cuid())
+  householdId          String    @unique @map("household_id")
+  household            Household @relation(fields: [householdId], references: [id])
+  currency             String    @default("USD")
+  defaultSplitStrategy String    @default("equal") @map("default_split_strategy") // TS enum: SPLIT_STRATEGY
+  autoCategorize       Boolean   @default(true) @map("auto_categorize")
+  aiAssistEnabled      Boolean   @default(true) @map("ai_assist_enabled")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  @@index([householdId])
+  @@map("household_configs")
+}
+
+model HouseholdMember {
+  id          String    @id @default(cuid())
+  householdId String    @map("household_id")
+  household   Household @relation(fields: [householdId], references: [id])
+  userId      String    @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        String    @default("member") // TS enum: MEMBER_ROLE
+  // monthlyIncome Float?    @map("monthly_income") // Used for proportional_to_income split // ! MAKE IT VIRTUALLY CALCULATED FROM HouseholdMemberPayroll for each MonthlyBudget
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  payments       Payment[]
+  bankAccounts   BankAccount[]
+  payrolls       HouseholdMemberPayroll[]
+  monthlyBudgets MonthlyBudget[]
+
+  @@index([householdId])
+  @@map("household_members")
+}
+
+model HouseholdMemberPayroll {
+  id                String          @id @default(cuid())
+  householdMemberId String          @map("household_member_id")
+  householdMember   HouseholdMember @relation(fields: [householdMemberId], references: [id])
+  name              String
+  amount            Float
+  startDate         DateTime        @map("start_date")
+  endDate           DateTime?       @map("end_date")
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  @@index([householdMemberId])
+  @@map("household_member_payrolls")
+}
+
+model BankAccount {
+  id                String          @id @default(cuid())
+  householdId       String          @map("household_id")
+  household         Household       @relation(fields: [householdId], references: [id])
+  householdMemberId String          @map("household_member_id")
+  householdMember   HouseholdMember @relation(fields: [householdMemberId], references: [id])
+  name              String
+  lastFourDigits    String?         @map("last_four_digits")
+  type              String          @default("bank") // TS enum: ACCOUNT_TYPE
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  sourcePayments Payment[] @relation("SourcePayments")
+  destPayments   Payment[] @relation("DestPayments")
+
+  @@index([householdId])
+  @@map("bank_accounts")
+}
+
+model MonthlyBudget {
+  id                String           @id @default(cuid())
+  householdId       String           @map("household_id")
+  household         Household        @relation(fields: [householdId], references: [id])
+  householdMemberId String?          @map("household_member_id")
+  householdMember   HouseholdMember? @relation(fields: [householdMemberId], references: [id])
+  month             DateTime // Format: YYYY-MM-01
+  type              String           @default("personal") // TS enum: BUDGET_TYPE
+  status            String           @default("draft") // TS enum: BUDGET_STATUS
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+
+  payments     Payment[]
+  transactions Transaction[]
+  aiSummary    AISummary?
+
+  @@index([householdId, householdMemberId, month])
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  householdId String?
+  household   Household? @relation(fields: [householdId], references: [id])
+  name        String
+  isBase      Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+
+  transactions Transaction[]
+  payments     Payment[]
+
+  @@unique([name, householdId])
+}
+
+model Transaction {
+  id              String         @id @default(cuid())
+  householdId     String         @map("household_id")
+  household       Household      @relation(fields: [householdId], references: [id])
+  monthlyBudgetId String?        @map("monthly_budget_id")
+  monthlyBudget   MonthlyBudget? @relation(fields: [monthlyBudgetId], references: [id])
+  name            String
+  amount          Float
+  type            String         @default("expense") // TS enum: PAYMENT_TYPE
+  categoryId      String?        @map("category_id")
+  category        Category?      @relation(fields: [categoryId], references: [id])
+  sourceAccountId String?        @map("source_account_id")
+  destAccountId   String?        @map("dest_account_id")
+  note            String?
+  date            DateTime
+  isRecurring     Boolean        @default(false) @map("is_recurring")
+  recurrenceRule  Json?          @map("recurrence_rule") // Stores schedule/installment config
+  createdAt       DateTime       @default(now()) @map("created_at")
+
+  payments Payment[] // Links to monthly budget instances
+  userId   String?
+  user     User?     @relation(fields: [userId], references: [id])
+
+  @@index([householdId])
+  @@index([isRecurring])
+  @@map("transactions")
+}
+
+model Payment {
+  id                String           @id @default(cuid())
+  monthlyBudgetId   String           @map("monthly_budget_id")
+  monthlyBudget     MonthlyBudget    @relation(fields: [monthlyBudgetId], references: [id])
+  transactionId     String?          @map("transaction_id")
+  transaction       Transaction?     @relation(fields: [transactionId], references: [id])
+  householdMemberId String?          @map("household_member_id")
+  householdMember   HouseholdMember? @relation(fields: [householdMemberId], references: [id])
+
+  amount          Float
+  type            String       @default("expense") // TS enum: PAYMENT_TYPE
+  categoryId      String?      @map("category_id")
+  category        Category?    @relation(fields: [categoryId], references: [id])
+  sourceAccountId String?      @map("source_account_id")
+  sourceAccount   BankAccount? @relation("SourcePayments", fields: [sourceAccountId], references: [id])
+  destAccountId   String?      @map("dest_account_id")
+  destAccount     BankAccount? @relation("DestPayments", fields: [destAccountId], references: [id])
+
+  note        String?
+  date        DateTime
+  splitConfig Json?    @map("split_config") // only for monthlyBudget as shared budget type => Stores strategy + per-member breakdown
+  tags        Tag[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([monthlyBudgetId])
+  @@index([transactionId])
+  @@index([householdMemberId])
+  @@index([categoryId])
+  @@map("payments")
+}
+
+model Tag {
+  id          String    @id @default(cuid())
+  name        String
+  householdId String    @map("household_id")
+  household   Household @relation(fields: [householdId], references: [id])
+
+  payments Payment[]
+
+  @@unique([name, householdId])
+  @@map("tags")
+}
+
+model AISummary {
+  id              String        @id @default(cuid())
+  monthlyBudgetId String        @unique @map("monthly_budget_id")
+  monthlyBudget   MonthlyBudget @relation(fields: [monthlyBudgetId], references: [id])
+  aiTask          String        @default("summarize_current") @map("ai_task") // TS enum: AI_TASK
+  summary         String
+  suggestions     String[]
+  predictions     Json?         @map("predictions") // Structured JSON for next-month draft
+  createdAt       DateTime      @default(now()) @map("created_at")
+  household       Household?    @relation(fields: [householdId], references: [id])
+  householdId     String?
+
+  @@map("ai_summaries")
 }
