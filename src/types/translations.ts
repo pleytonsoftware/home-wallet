@@ -1,5 +1,5 @@
 import type LocaleKeys from '@locales/en.json'
-import type { MessageKeys, NamespaceKeys, NestedKeyOf, NestedValueOf } from 'next-intl'
+import type { MessageKeys, Messages, NamespaceKeys, NestedKeyOf, NestedValueOf } from 'next-intl'
 
 import { formats } from '@/i18n/request'
 import { routing } from '@/i18n/routing'
@@ -34,4 +34,6 @@ declare module 'next-intl' {
 		AppConfig['Messages'],
 		Namespace
 	>
+
+	type NestedKey = NamespaceKeys<Messages, NestedKeyOf<Messages>>
 }

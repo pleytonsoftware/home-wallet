@@ -12,4 +12,7 @@ export const ROUTES = {
 		ROOT: '/onboarding',
 		HOUSEHOLD: '/onboarding/household',
 	},
+	HOUSEHOLD: {
+		ROOT: '/household/:id',
+	},
 } as const

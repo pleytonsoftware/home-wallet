@@ -10,12 +10,12 @@ import { createTranslator } from 'next-intl'
 import nodemailer from 'nodemailer'
 
 import { MagicLinkEmail } from '@emails/verify-magic-link'
+import { UserRole } from '@lib/constants/role.enum'
+import { ROUTES } from '@lib/constants/routes.const'
+import { authLogger } from '@lib/logger'
+import { prisma } from '@lib/prisma'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { render } from '@react-email/render'
-
-import { Role } from './constants/role.enum'
-import { ROUTES } from './constants/routes.const'
-import { prisma } from './prisma'
 
 const createMailerTransporter = (provider?: SendVerificationRequestParams['provider']) => {
 	const transporter = nodemailer.createTransport(
@@ -33,7 +33,7 @@ async function sendVerificationRequest({ identifier, url, provider }: SendVerifi
 	const transport = createMailerTransporter(provider)
 	const t = createTranslator({
 		locale: language,
-		messages: (await import(`../../locales/emails/${language}.json`)).default,
+		messages: (await import(`../../../locales/emails/${language}.json`)).default,
 		namespace: 'magic-link',
 	})
 	const appName = process.env.APP_NAME!
@@ -92,16 +92,9 @@ export const authOptions: NextAuthOptions = {
 				token.email = user.email
 				token.name = user.name
 				token.image = user.image || null
-				token.role = user.role ?? Role.MEMBER
+				token.role = user.role ?? UserRole.MEMBER
 				token.picture = user.image || null
 				token.createdAt = user.createdAt
-
-				// Fetch household memberships
-				const memberships = await prisma.householdMember.findMany({
-					where: { userId: user.id },
-					select: { householdId: true },
-				})
-				token.householdIds = memberships.map((m) => m.householdId)
 			}
 
 			return token
@@ -117,7 +110,7 @@ export const authOptions: NextAuthOptions = {
 				session.user.email = token.email
 				session.user.name = token.name
 				session.user.image = token.image
-				session.user.role = token.role as Role
+				session.user.role = token.role as UserRole
 				session.user.householdIds = (token.householdIds as string[]) || []
 			}
 
@@ -140,6 +133,26 @@ export const authOptions: NextAuthOptions = {
 			}
 
 			return true
+		},
+	},
+	events: {
+		signIn(message) {
+			authLogger.info('User signed in: {user}, account: {account}, profile: {profile}, isNewUser: {isNewUser}', message)
+		},
+		session(message) {
+			authLogger.info('Session event: {message}', { message })
+		},
+		signOut(message) {
+			authLogger.info('Sign out event: {message}', { message })
+		},
+		createUser({ user }) {
+			authLogger.info('New user created: {user}', { user })
+		},
+		updateUser({ user }) {
+			authLogger.info('User updated: {user}', { user })
+		},
+		linkAccount({ user, account }) {
+			authLogger.info('Account linked: {user}, account: {account}', { user, account })
 		},
 	},
 }
