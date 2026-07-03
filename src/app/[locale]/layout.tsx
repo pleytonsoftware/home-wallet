@@ -2,7 +2,7 @@ import type { LayoutProps } from '@/types/app'
 import type { Metadata } from 'next'
 import type { HTMLProps, PropsWithChildren } from 'react'
 
-import { Geist, Geist_Mono, Inter } from 'next/font/google'
+import { Montserrat, Quicksand } from 'next/font/google'
 
 import { NextIntlClientProvider } from 'next-intl'
 
@@ -19,16 +19,16 @@ type LocaleLayoutProps<T = unknown> = ResolveLocaleLayoutProps<PropsWithChildren
 	htmlProps?: HTMLProps<HTMLHtmlElement> & Record<`data-${string}`, string>
 }
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
-
-const geistSans = Geist({
-	variable: '--font-geist-sans',
+const montserrat = Montserrat({
+	variable: '--font-montserrat',
 	subsets: ['latin'],
+	style: ['italic', 'normal'],
 })
 
-const geistMono = Geist_Mono({
-	variable: '--font-geist-mono',
+const quicksand = Quicksand({
+	variable: '--font-quicksand',
 	subsets: ['latin'],
+	display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -39,10 +39,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children, params }: Readonly<LocaleLayoutProps>) {
 	return (
 		<NextIntlClientProvider>
-			<html
-				lang={(await params).locale}
-				className={cn('h-full', 'antialiased', geistSans.variable, geistMono.variable, 'font-sans', inter.variable)}
-			>
+			<html lang={(await params).locale} className={cn('h-full', 'antialiased', montserrat.variable, quicksand.variable, 'font-sans')}>
 				<body className='min-h-full flex flex-col'>
 					{children}
 					<FloatingControls theme={''} />

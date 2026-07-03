@@ -3,5 +3,6 @@
 		".github/instructions": true,
 		"~/.copilot/instructions": false,
 		".github/copilot-instructions.md": false
-	}
+	},
+	"tailwindCSS.experimental.classRegex": [["\\b\\w*(?:[cC]lassName)\\s*=\\s*[\"'`]([^\"'`]*)[\"'`]", "([^\"'`]*)"]]
 }
