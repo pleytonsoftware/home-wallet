@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl'
 
 import GoogleIcon from '@assets/icons/google.svg'
 import { Button } from '@atoms/button'
-import { Spinner } from '@atoms/spinner'
 import { getCallbackUrl } from '@auth/callback-url.utils'
 
 interface SignWithGoogleProps {
@@ -33,20 +32,8 @@ export const SignWithGoogle: FC<SignWithGoogleProps> = ({ isLoading, setIsLoadin
 	}, [callbackUrl, t])
 
 	return (
-		<Button onClick={handleGoogleSignIn} disabled={isLoading || disabled} size='lg' className='w-full'>
-			<span className='flex items-center justify-center gap-2'>
-				{isLoading ? (
-					<>
-						<Spinner />
-						{t('signing-in')}
-					</>
-				) : (
-					<>
-						<GoogleIcon />
-						{t('sign-with-google')}
-					</>
-				)}
-			</span>
+		<Button onClick={handleGoogleSignIn} disabled={disabled} size='lg' className='w-full' loading={isLoading} icon={<GoogleIcon />}>
+			<span className='flex items-center justify-center gap-2 capitalize'>{isLoading ? t('signing-in') : t('sign-with-google')}</span>
 		</Button>
 	)
 }

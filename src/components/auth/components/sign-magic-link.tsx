@@ -51,14 +51,8 @@ export const SignMagicLink: FC<SignMagicLinkProps> = ({ setError, disabled, form
 					</>
 				)}
 			/>
-			<Button type='submit' disabled={disabled || formState.isSubmitting} variant='outline' size='lg' className='w-full'>
-				{formState.isSubmitting ? (
-					<>
-						<Spinner /> {t('signing-in')}
-					</>
-				) : (
-					<span className='capitalize'>{t('sign-with-email')}</span>
-				)}
+			<Button type='submit' disabled={disabled} loading={formState.isSubmitting} variant='outline' size='lg' className='w-full'>
+				{formState.isSubmitting ? t('signing-in') : <span className='capitalize'>{t('sign-with-email')}</span>}
 			</Button>
 		</form>
 	)

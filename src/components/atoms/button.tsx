@@ -69,7 +69,14 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
 	({ className, variant = 'default', size = 'default', shape = 'none', asChild = false, as, icon, loading, role, children, ...props }, ref) => {
 		const Comp = (as || (asChild ? Slot.Root : 'button')) as React.ElementType
 		const loadingSpinner = !asChild ? loading ? <Spinner /> : icon : undefined
-		const renderedChild = !asChild ? [loadingSpinner, children] : children
+		const renderedChild = !asChild ? (
+			<>
+				{loadingSpinner}
+				{children}
+			</>
+		) : (
+			children
+		)
 
 		return (
 			<Comp
