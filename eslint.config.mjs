@@ -27,7 +27,14 @@ const eslintConfig = defineConfig([
 		rules: {
 			'react/react-in-jsx-scope': 'off',
 			'prettier/prettier': 'warn',
-			'no-console': 'warn',
+			'no-console': 'off',
+			'no-restricted-syntax': [
+				'error',
+				{
+					selector: "CallExpression[callee.object.name='console']",
+					message: "Do not use console.*. Import and use '@lib/logger' instead.",
+				},
+			],
 			'no-debugger': 'warn',
 			'@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
 			'react-hooks/exhaustive-deps': 'off',
