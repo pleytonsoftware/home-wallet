@@ -34,6 +34,10 @@ const eslintConfig = defineConfig([
 					selector: "CallExpression[callee.object.name='console']",
 					message: "Do not use console.*. Import and use '@lib/logger' instead.",
 				},
+				{
+					selector: 'ImportDeclaration[source.value=/^@\\/components\\/atoms/]',
+					message: "Use '@atoms/...' instead of '@/components/atoms/...'",
+				},
 			],
 			'no-debugger': 'warn',
 			'@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],

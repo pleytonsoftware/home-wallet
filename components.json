@@ -14,9 +14,8 @@
 	"rtl": false,
 	"aliases": {
 		"components": "@/components",
+		"ui": "@/components/atoms",
 		"utils": "@/lib/utils",
-		"atoms": "@atoms",
-		"molecules": "@molecules",
 		"lib": "@/lib",
 		"hooks": "@/hooks"
 	},

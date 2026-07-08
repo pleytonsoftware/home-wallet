@@ -11,7 +11,8 @@ export default async function Home() {
 		<div className='flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black'>
 			<main className='flex flex-1 w-full max-w-full flex-col items-center justify-between py-32 px-16 sm:items-start'>
 				<div>
-					{t('title')}
+					<h1 className='text-4xl font-bold'>{process.env.NEXT_PUBLIC_APP_NAME}</h1>
+					<p>{t('title')}</p>
 					<p>Landing Page</p>
 					<p>
 						<Button asChild variant='default' size='lg'>

@@ -1,5 +1,53 @@
 {
-	"common": {},
+	"common": {
+		"sign-out": "Sign Out",
+		"fields": {
+			"split-strategy": {
+				"label": "Split Strategy",
+				"options": {
+					"equal": {
+						"name": "Equal split",
+						"description": "Split the total amount equally among all members."
+					},
+					"proportional_to_income": {
+						"name": "Proportional to income",
+						"description": "Split the total amount based on each member's income."
+					},
+					"custom_percentages": {
+						"name": "Custom percentages",
+						"description": "Split the total amount based on custom percentages for each member."
+					},
+					"round_robin": {
+						"name": "Round robin",
+						"description": "Split the total amount in a round-robin fashion among members."
+					},
+					"custom_amounts": {
+						"name": "Custom amounts",
+						"description": "Split the total amount based on custom amounts for each member."
+					}
+				}
+			},
+			"currency": {
+				"placeholder": "Select currency",
+				"search-placeholder": "Search currency...",
+				"empty": "No currency found."
+			}
+		},
+		"error": {
+			"conflict": "Unknown conflict occurred. Please try again later.",
+			"internal": "An internal error occurred. Please try again later.",
+			"not-found": "The requested resource was not found.",
+			"bad-request": "The request was invalid. Please check your input and try again.",
+			"unauthorized": "You are not authorized to perform this action.",
+			"forbidden": "You do not have permission to access this resource.",
+			"household": {
+				"join": {
+					"not-found": "Invitation code not valid. Please check with your household admin.",
+					"already-member": "You are already a member of this household."
+				}
+			}
+		}
+	},
 	"home-page": {
 		"title": "Hello world!"
 	},
@@ -11,5 +59,133 @@
 		"sign-with-google": "Sign in with Google",
 		"failed-to-sign-in": "Failed to sign in",
 		"sign-with-email": "Sign in with Magic Link"
+	},
+	"onboarding": {
+		"title": "Welcome to {appName}",
+		"create": {
+			"description": "Create a household to get started managing shared expenses",
+			"form": {
+				"name": {
+					"label": "Household name",
+					"placeholder": "e.g., My House, Our Apartment",
+					"description": "This is the name of your shared household",
+					"error": {
+						"required": "Household name is required",
+						"min-length": "Household name must be at least 3 characters long",
+						"already-exists": "A household with this name already exists in your account"
+					}
+				},
+				"error": {
+					"invalid-invite-code": "The generated invite code is invalid. Please try again.",
+					"generic": "Failed to create household. Please try again later."
+				},
+				"submit-button": "Create household"
+			},
+			"note": "Once created, you can invite other household members to share expenses.",
+			"invite-code": "Already have an invite code? Join a household"
+		},
+		"join": {
+			"description": "Enter an invite code to join an existing household",
+			"form": {
+				"invite-code": {
+					"label": "Invite code",
+					"placeholder": "Enter your invite code",
+					"description": "Enter the code provided by your household admin",
+					"error": {
+						"required": "Invite code is required",
+						"invalid": "Invalid invite code",
+						"max-length": "Invite code must be at most {max} characters long"
+					}
+				},
+				"submit-button": "Join household",
+				"error": {
+					"not-found": "Invitation code not valid. Please check with your household admin.",
+					"generic": "Failed to join household. Please try again later."
+				}
+			},
+			"create-new": "Want to create your own? Create a household"
+		}
+	},
+	"households-page": {
+		"eyebrow": "Your households",
+		"title": "Where would you like to go?",
+		"description": "Select a household to view its dashboard, transactions, and insights.",
+		"active": "Active",
+		"open": "Open",
+		"members-count": "{count, plural, one {# member} other {# members}}",
+		"stats": {
+			"balance": "Balance",
+			"income": "Income",
+			"spent": "Spent"
+		},
+		"add-household": {
+			"title": "Add new",
+			"description": "Create a household"
+		},
+		"join-banner": {
+			"title": "Have an invite code?",
+			"description": "Join an existing household instantly.",
+			"cta": "Join Household"
+		},
+		"create-form": {
+			"title": "Create a household",
+			"description": "Set up your household and its default settings.",
+			"name": {
+				"label": "Household name",
+				"placeholder": "e.g., My House, Our Apartment",
+				"error": {
+					"required": "Household name is required",
+					"max-length": "Name must be less than {max} characters"
+				}
+			},
+			"currency": {
+				"label": "Currency",
+				"error": {
+					"required": "Please select a currency"
+				}
+			},
+			"split-strategy": {
+				"label": "Default split strategy"
+			},
+			"auto-categorize": {
+				"label": "Auto-categorize transactions",
+				"description": "Automatically assign categories to new transactions using AI."
+			},
+			"full-address": {
+				"label": "Full address",
+				"placeholder": "e.g., 123 Main St, Springfield",
+				"description": "Optional — used for reference only.",
+				"error": {
+					"max-length": "Address must be less than {max} characters"
+				}
+			},
+			"submit-button": "Create household",
+			"error": {
+				"generic": "Failed to create household. Please try again later."
+			}
+		},
+		"join-form": {
+			"title": "Join a household",
+			"description": "Enter an invite code to join an existing household.",
+			"invite-code": {
+				"label": "Invite code",
+				"placeholder": "Enter your invite code",
+				"error": {
+					"required": "Invite code is required",
+					"invalid": "Invalid invite code",
+					"max-length": "Invite code must be at most {max} characters long"
+				}
+			},
+			"error": {
+				"not-found": "Invitation code not valid. Please check with your household admin.",
+				"generic": "Failed to join household. Please try again later."
+			},
+			"submit-button": "Join household"
+		}
+	},
+	"verify-request": {
+		"title": "Check your email",
+		"subtitle": "We've sent you a magic sign-in link.",
+		"back-to-sign-in": "Back to sign in"
 	}
 }
