@@ -4,8 +4,29 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+	--breakpoint-*: initial;
+	--breakpoint-sm: 40rem;
+	--breakpoint-md: 48rem;
+	--breakpoint-lg: 64rem;
+	--breakpoint-xl: 80rem;
+	--breakpoint-2xl: 96rem;
+}
+
 @theme inline {
+	/**
+	 * ! Leave these commented out. They are rendered as variables in the document root
+	 * @description These are the default breakpoints for the theme.
+	 * @see https://tailwindcss.com/docs/responsive-design#default-breakpoints
+	 */
+	/* --breakpoint-sm: var(--breakpoint-sm);
+	--breakpoint-md: var(--breakpoint-md);
+	--breakpoint-lg: var(--breakpoint-lg);
+	--breakpoint-xl: var(--breakpoint-xl);
+	--breakpoint-2xl: var(--breakpoint-2xl); */
+
 	--color-background: var(--background);
+	--color-background-2: var(--background-2);
 	--color-foreground: var(--foreground);
 	--font-sans: var(--font-body);
 	--font-title: var(--font-title);
@@ -53,19 +74,20 @@
 	--font-body: var(--font-montserrat), 'sans-serif';
 
 	--background: oklch(1 0 0);
+	--background-2: oklch(0.9928 0.0042 56.38);
 	--foreground: oklch(0.145 0 0);
 	--card: oklch(1 0 0);
 	--card-foreground: oklch(0.145 0 0);
 	--popover: oklch(1 0 0);
 	--popover-foreground: oklch(0.145 0 0);
-	--primary: oklch(0.205 0 0);
+	--primary: oklch(0.7713 0.0731 51.77);
 	--primary-foreground: oklch(0.985 0 0);
-	--secondary: oklch(0.97 0 0);
+	--secondary: oklch(0.96 0.006 51.77);
 	--secondary-foreground: oklch(0.205 0 0);
-	--muted: oklch(0.97 0 0);
-	--muted-foreground: oklch(0.556 0 0);
-	--accent: oklch(0.97 0 0);
-	--accent-foreground: oklch(0.205 0 0);
+	--muted: oklch(0.965 0.008 51.77);
+	--muted-foreground: oklch(0.47 0.01 51.77);
+	--accent: oklch(0.955 0.012 51.77);
+	--accent-foreground: oklch(0.205 0.015 51.77);
 	--destructive: oklch(0.577 0.245 27.325);
 	--border: oklch(0.922 0 0);
 	--input: oklch(0.922 0 0);
@@ -88,6 +110,7 @@
 
 .dark {
 	--background: oklch(0.145 0 0);
+	--background-2: oklch(0.205 0 0);
 	--foreground: oklch(0.985 0 0);
 	--card: oklch(0.205 0 0);
 	--card-foreground: oklch(0.985 0 0);
