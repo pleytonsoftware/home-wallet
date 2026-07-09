@@ -52,6 +52,50 @@ describe('Button', () => {
 		expect(screen.getByText('With Icon')).toBeInTheDocument()
 	})
 
+	it('renders icon at start by default', () => {
+		const { container } = render(<Button icon={<span data-testid='icon'>I</span>}>Label</Button>)
+		const html = container.innerHTML
+		expect(html.indexOf('data-testid="icon"')).toBeLessThan(html.indexOf('Label'))
+	})
+
+	it('renders icon at start when iconPosition=start', () => {
+		const { container } = render(
+			<Button icon={<span data-testid='icon'>I</span>} iconPosition='start'>
+				Label
+			</Button>,
+		)
+		const html = container.innerHTML
+		expect(html.indexOf('data-testid="icon"')).toBeLessThan(html.indexOf('Label'))
+	})
+
+	it('renders icon at end when iconPosition=end', () => {
+		const { container } = render(
+			<Button icon={<span data-testid='icon'>I</span>} iconPosition='end'>
+				Label
+			</Button>,
+		)
+		const html = container.innerHTML
+		expect(html.indexOf('Label')).toBeLessThan(html.indexOf('data-testid="icon"'))
+	})
+
+	it('renders loading spinner at start by default', () => {
+		render(<Button loading>Loading</Button>)
+		const button = screen.getByRole('button')
+		const spinner = screen.getByRole('status')
+		expect(button.firstElementChild).toBe(spinner)
+	})
+
+	it('renders loading spinner at end when iconPosition=end', () => {
+		render(
+			<Button loading iconPosition='end'>
+				Loading
+			</Button>,
+		)
+		const button = screen.getByRole('button')
+		const spinner = screen.getByRole('status')
+		expect(button.lastElementChild).toBe(spinner)
+	})
+
 	it('shows loading spinner instead of icon', () => {
 		render(
 			<Button loading icon={<span data-testid='icon'>Icon</span>}>

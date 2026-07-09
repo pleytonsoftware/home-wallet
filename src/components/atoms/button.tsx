@@ -17,6 +17,7 @@ const buttonVariants = cva(
 				secondary:
 					'bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground',
 				ghost: 'hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50',
+				'ghost-no-hover': 'aria-expanded:bg-muted aria-expanded:text-foreground',
 				destructive:
 					'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40',
 				link: 'text-primary underline-offset-4 hover:underline',
@@ -53,6 +54,7 @@ type ButtonBaseProps = React.ComponentProps<'button'> &
 	VariantProps<typeof buttonVariants> & {
 		as?: React.ElementType
 		icon?: React.ReactNode
+		iconPosition?: 'start' | 'end'
 		colour?: string
 		role?: string
 	}
@@ -63,16 +65,33 @@ type ButtonNotChild = ButtonBaseProps & {
 	loading?: boolean
 }
 
-type ButtonProps = ButtonAsChild | ButtonNotChild
+export type ButtonProps = ButtonAsChild | ButtonNotChild
 
 const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
-	({ className, variant = 'default', size = 'default', shape = 'none', asChild = false, as, icon, loading, role, children, ...props }, ref) => {
+	(
+		{
+			className,
+			variant = 'default',
+			size = 'default',
+			shape = 'none',
+			asChild = false,
+			as,
+			icon,
+			iconPosition = 'start',
+			loading,
+			role,
+			children,
+			...props
+		},
+		ref,
+	) => {
 		const Comp = (as || (asChild ? Slot.Root : 'button')) as React.ElementType
 		const loadingSpinner = !asChild ? loading ? <Spinner /> : icon : undefined
 		const renderedChild = !asChild ? (
 			<>
-				{loadingSpinner}
+				{iconPosition === 'start' && loadingSpinner}
 				{children}
+				{iconPosition === 'end' && loadingSpinner}
 			</>
 		) : (
 			children

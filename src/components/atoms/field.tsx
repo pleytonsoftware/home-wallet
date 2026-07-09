@@ -65,7 +65,7 @@ function FieldContent({ className, ...props }: React.ComponentProps<'div'>) {
 	return <div data-slot='field-content' className={cn('group/field-content flex flex-1 flex-col gap-1 leading-snug', className)} {...props} />
 }
 
-function FieldLabel({ className, ...props }: React.ComponentProps<typeof Label>) {
+function FieldLabel({ className, children, required, ...props }: React.ComponentProps<typeof Label> & { required?: boolean }) {
 	return (
 		<Label
 			data-slot='field-label'
@@ -75,7 +75,10 @@ function FieldLabel({ className, ...props }: React.ComponentProps<typeof Label>)
 				className,
 			)}
 			{...props}
-		/>
+		>
+			{children}
+			{required && <span className='text-destructive'> *</span>}
+		</Label>
 	)
 }
 

@@ -84,4 +84,35 @@ describe('Field', () => {
 		expect(ft).toBeInTheDocument()
 		expect(ft).toHaveTextContent('Title')
 	})
+
+	it('renders FieldLabel without required indicator by default', () => {
+		const { container } = render(<FieldLabel>Email</FieldLabel>)
+		const label = container.querySelector('[data-slot="field-label"]') as HTMLElement
+		expect(label).toBeInTheDocument()
+		expect(label).toHaveTextContent('Email')
+		expect(label.querySelector('.text-destructive')).not.toBeInTheDocument()
+	})
+
+	it('renders required indicator when required=true', () => {
+		const { container } = render(<FieldLabel required>Email</FieldLabel>)
+		const label = container.querySelector('[data-slot="field-label"]') as HTMLElement
+		expect(label).toHaveTextContent('Email *')
+		const indicator = label.querySelector('.text-destructive')
+		expect(indicator).toBeInTheDocument()
+		expect(indicator).toHaveTextContent('*')
+	})
+
+	it('does not render required indicator when required=false', () => {
+		const { container } = render(<FieldLabel required={false}>Email</FieldLabel>)
+		const label = container.querySelector('[data-slot="field-label"]') as HTMLElement
+		expect(label).toHaveTextContent('Email')
+		expect(label.querySelector('.text-destructive')).not.toBeInTheDocument()
+	})
+
+	it('renders required indicator with destructive class', () => {
+		const { container } = render(<FieldLabel required>Name</FieldLabel>)
+		const indicator = container.querySelector('.text-destructive')
+		expect(indicator).toBeInTheDocument()
+		expect(indicator).toHaveClass('text-destructive')
+	})
 })
