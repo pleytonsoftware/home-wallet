@@ -5,11 +5,16 @@ import type { UserRole } from '@lib/constants/role.enum'
 
 import 'next-auth/jwt'
 
-type UserWithRole = HWUser & { role: UserRole; householdIds?: string[] }
+export enum UserGenderType {
+	male = 'male',
+	female = 'female',
+}
+type UserWithRole = HWUser & { role: UserRole; householdIds?: string[]; gender?: UserGenderType }
 
 declare module 'next-auth' {
 	interface Session extends HWSession {
 		user: UserWithRole
+		isAuthenticated: boolean
 	}
 
 	interface User extends UserWithRole {}
