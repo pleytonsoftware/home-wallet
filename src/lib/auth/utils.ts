@@ -8,7 +8,7 @@ import { UNAUTHORIZED } from '@lib/errors/unauthorized'
 export async function authorizedSession() {
 	const session = await auth()
 
-	if (!session?.user?.id) {
+	if (!session?.isAuthenticated) {
 		return {
 			session: null,
 			error: UNAUTHORIZED,

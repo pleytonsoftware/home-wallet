@@ -7,7 +7,7 @@ export const ROUTES = {
 		ERROR: '/auth/error',
 	},
 	API_AUTH: '/api/auth',
-	DASHBOARD: '/dashboard',
+	HOUSEHOLDS: '/households',
 	ONBOARDING: {
 		ROOT: '/onboarding',
 		HOUSEHOLD: '/onboarding/household',

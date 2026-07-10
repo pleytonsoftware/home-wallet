@@ -89,18 +89,18 @@ export const authOptions: NextAuthOptions = {
 			if (user) {
 				token.id = user.id
 				token.sub = user.id
-				token.email = user.email
-				token.name = user.name
-				token.image = user.image || null
 				token.role = user.role ?? UserRole.MEMBER
 				token.picture = user.image || null
-				token.createdAt = user.createdAt
+
+				Object.assign(token, user)
 			}
 
 			return token
 		},
 
 		async session({ session, token }) {
+			session.isAuthenticated = !!token?.sub
+
 			if (session.user) {
 				if (!token.email || !token.name) {
 					throw new Error('Token is missing required user information')
@@ -111,6 +111,7 @@ export const authOptions: NextAuthOptions = {
 				session.user.name = token.name
 				session.user.image = token.image
 				session.user.role = token.role as UserRole
+				session.user.gender = token.gender as typeof session.user.gender
 				session.user.householdIds = (token.householdIds as string[]) || []
 			}
 
@@ -135,30 +136,33 @@ export const authOptions: NextAuthOptions = {
 			return true
 		},
 	},
-	events: {
-		signIn(message) {
-			authLogger.info('User signed in: {user}, account: {account}, profile: {profile}, isNewUser: {isNewUser}', message)
-		},
-		session(message) {
-			authLogger.info('Session event: {message}', { message })
-		},
-		signOut(message) {
-			authLogger.info('Sign out event: {message}', { message })
-		},
-		createUser({ user }) {
-			authLogger.info('New user created: {user}', { user })
-		},
-		updateUser({ user }) {
-			authLogger.info('User updated: {user}', { user })
-		},
-		linkAccount({ user, account }) {
-			authLogger.info('Account linked: {user}, account: {account}', { user, account })
-		},
-	},
+	// events: {
+	// 	signIn(message) {
+	// 		authLogger.info('User signed in: {user}, account: {account}, profile: {profile}, isNewUser: {isNewUser}', message)
+	// 	},
+	// 	session(message) {
+	// 		authLogger.info('Session event: {message}', { message })
+	// 	},
+	// 	signOut(message) {
+	// 		authLogger.info('Sign out event: {message}', { message })
+	// 	},
+	// 	createUser({ user }) {
+	// 		authLogger.info('New user created: {user}', { user })
+	// 	},
+	// 	updateUser({ user }) {
+	// 		authLogger.info('User updated: {user}', { user })
+	// 	},
+	// 	linkAccount({ user, account }) {
+	// 		authLogger.info('Account linked: {user}, account: {account}', { user, account })
+	// 	},
+	// },
 }
 
 export const nextAuthHandler = NextAuth(authOptions)
+type AuthSessionPromise<IsAuthenticated extends boolean = false> = IsAuthenticated extends true
+	? Promise<NonNullable<Awaited<ReturnType<typeof getServerSession<typeof authOptions>>>>>
+	: Promise<Awaited<ReturnType<typeof getServerSession<typeof authOptions>>>>
 
-export function auth() {
-	return getServerSession(authOptions)
+export function auth<IsAuthenticated extends boolean = false>() {
+	return getServerSession(authOptions) as AuthSessionPromise<IsAuthenticated>
 }

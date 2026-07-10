@@ -2,4 +2,6 @@ import type { FullErrorResult } from './types'
 
 import { StatusCodes } from 'http-status-codes'
 
-export const NOT_FOUND = { status: StatusCodes.NOT_FOUND, success: false, error: 'not-found' } satisfies FullErrorResult
+export function NOT_FOUND(message: string): FullErrorResult<string> {
+	return { status: StatusCodes.NOT_FOUND, success: false, error: message }
+}
