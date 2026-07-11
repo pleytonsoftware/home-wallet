@@ -5,5 +5,5 @@ import { ROUTES } from '@lib/constants/routes.const'
  */
 export function getCallbackUrl(searchParams: URLSearchParams): string {
 	const callbackUrl = searchParams.get('callbackUrl')
-	return callbackUrl && callbackUrl.startsWith(ROUTES.LANDING) ? callbackUrl : ROUTES.DASHBOARD
+	return callbackUrl && callbackUrl.startsWith(ROUTES.LANDING) ? callbackUrl : ROUTES.HOUSEHOLDS
 }

@@ -1,7 +1,5 @@
 'use client'
 
-import { useIsMobile } from '@/hooks/use-mobile'
-
 import * as React from 'react'
 
 import { cva, type VariantProps } from 'class-variance-authority'
@@ -15,6 +13,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { Skeleton } from '@atoms/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@atoms/tooltip'
 import { cn } from '@cn'
+import { useIsMobile } from '@hooks/use-mobile'
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state'
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7

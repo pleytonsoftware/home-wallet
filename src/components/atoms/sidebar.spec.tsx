@@ -1,5 +1,4 @@
-import { useIsMobile } from '@/hooks/use-mobile'
-
+import { useIsMobile } from '@hooks/use-mobile'
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -30,7 +29,7 @@ import {
 	useSidebar,
 } from './sidebar'
 
-vi.mock('@/hooks/use-mobile', () => ({
+vi.mock('@hooks/use-mobile', () => ({
 	useIsMobile: vi.fn(() => false),
 }))
 
