@@ -1,6 +1,5 @@
 import type { Session } from 'next-auth'
 
-import { useIsMobile } from '@/hooks/use-mobile'
 import { UserGenderType } from '@/types/auth'
 
 import { useSession } from 'next-auth/react'
@@ -8,13 +7,14 @@ import { useSession } from 'next-auth/react'
 import { SidebarProvider } from '@atoms/sidebar'
 import { TooltipProvider } from '@atoms/tooltip'
 import { useSignOut } from '@auth/hooks/use-signout.hook'
+import { useIsMobile } from '@hooks/use-mobile'
 import { UserRole } from '@lib/constants/role.enum'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { AppSidebar } from './app-sidebar'
 
-vi.mock('@/hooks/use-mobile', () => ({
+vi.mock('@hooks/use-mobile', () => ({
 	useIsMobile: vi.fn(() => false),
 }))
 

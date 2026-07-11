@@ -1,14 +1,13 @@
 import type { NavGroup } from './types'
 
-import { useIsMobile } from '@/hooks/use-mobile'
-
 import { SidebarProvider } from '@atoms/sidebar'
+import { useIsMobile } from '@hooks/use-mobile'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { NavGroupRenderer } from './nav-group'
 
-vi.mock('@/hooks/use-mobile', () => ({
+vi.mock('@hooks/use-mobile', () => ({
 	useIsMobile: vi.fn(() => false),
 }))
 

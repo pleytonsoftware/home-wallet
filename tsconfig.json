@@ -29,7 +29,7 @@
 			"@locales/*": ["./locales/*"],
 			"@assets/*": ["./src/assets/*"],
 			"@navigation": ["./src/i18n/navigation.ts"],
-			"@hooks/*": ["./src/components/hooks/*"],
+			"@hooks/*": ["./src/hooks/*"],
 			"@hw-prisma/*": ["./src/lib/generated/prisma/*"],
 			"@lib/*": ["./src/lib/*"],
 			"@emails/*": ["./src/emails/*"],
