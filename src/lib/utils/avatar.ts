@@ -13,7 +13,7 @@ const GENDER_TO_AVATAR_PATH: Record<UserGenderType, string> = {
  */
 export const getRandomUniqueAvatar = (email: string, gender?: UserGenderType): string => {
 	const avatarId = email.split('@')[0]
-	const genderPath = gender ? GENDER_TO_AVATAR_PATH[gender] : ''
+	const genderPath = (gender && GENDER_TO_AVATAR_PATH[gender]) || ''
 
 	const url = new URL(`https://avatarapi.runflare.run/public${genderPath}`)
 	url.searchParams.set('username', avatarId)

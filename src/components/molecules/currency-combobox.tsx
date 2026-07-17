@@ -22,6 +22,7 @@ interface CurrencyComboboxProps extends Pick<ComponentProps<typeof ComboboxConte
 	placeholder?: string
 	emptyLabel?: string
 	disabled?: boolean
+	value?: CurrencyCode | null
 }
 
 const POPULAR_CURRENCIES: CurrencyCode[] = ['USD', 'EUR', 'GBP'] satisfies CurrencyCode[]
@@ -34,7 +35,7 @@ const currencyDetailsList = [
 	amount: Math.random() * 100000, // Random amount for demonstration purposes
 }))
 
-export const CurrencyCombobox: FC<CurrencyComboboxProps> = ({ id, name, onChange, placeholder, emptyLabel, disabled, container }) => {
+export const CurrencyCombobox: FC<CurrencyComboboxProps> = ({ id, name, onChange, placeholder, emptyLabel, disabled, container, value }) => {
 	const [query, setQuery] = useState('')
 	const lang = useLanguage()
 	const t = useTranslations('common.fields.currency')
@@ -72,6 +73,7 @@ export const CurrencyCombobox: FC<CurrencyComboboxProps> = ({ id, name, onChange
 			onValueChange={(next) => next && onChange(next.code)}
 			disabled={disabled}
 			modal={!!container}
+			value={value ? (getCurrencyDetails(value) ?? null) : null}
 		>
 			<ComboboxInput id={id} name={name} placeholder={placeholder || t('placeholder')} onChange={(e) => setQuery(e.target.value)} />
 			<ComboboxContent container={container}>
