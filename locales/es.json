@@ -46,6 +46,59 @@
 					"already-member": "Ya eres miembro de este hogar."
 				}
 			}
+		},
+		"forms": {
+			"households": {
+				"create": {
+					"title": "Crear un hogar",
+					"description": "Configura tu hogar y sus ajustes predeterminados.",
+					"name": {
+						"label": "Nombre del hogar",
+						"description": "Este es el nombre de tu hogar compartido",
+						"placeholder": "e.g., Mi Casa, Nuestro Apartamento",
+						"error": {
+							"required": "El nombre del hogar es obligatorio",
+							"max-length": "El nombre debe tener menos de {max} caracteres",
+							"already-exists": "Ya existe un hogar con este nombre en tu cuenta"
+						}
+					},
+					"currency": {
+						"label": "Moneda",
+						"description": "Selecciona la moneda para tu hogar",
+						"error": {
+							"required": "Por favor selecciona una moneda"
+						}
+					},
+					"split-strategy": {
+						"label": "Estrategia de división predeterminada",
+						"description": "Elige cómo se dividirán los gastos entre los miembros del hogar de manera predeterminada.",
+						"options": {
+							"equal": "División equitativa",
+							"proportional_to_income": "Proporcional al ingreso",
+							"custom_percentages": "Porcentajes personalizados",
+							"round_robin": "Rotativo",
+							"custom_amounts": "Montos personalizados"
+						}
+					},
+					"auto-categorize": {
+						"label": "Categorizar transacciones automáticamente",
+						"description": "Asigna automáticamente categorías a las nuevas transacciones usando IA."
+					},
+					"full-address": {
+						"label": "Dirección completa",
+						"placeholder": "e.g., Calle Principal 123, Springfield",
+						"description": "Opcional — solo como referencia.",
+						"error": {
+							"max-length": "La dirección debe tener menos de {max} caracteres"
+						}
+					},
+					"submit-button": "Crear hogar",
+					"error": {
+						"invalid-invite-code": "El código de invitación generado no es válido. Por favor, inténtalo de nuevo.",
+						"generic": "No se pudo crear el hogar. Por favor, inténtalo de nuevo más tarde."
+					}
+				}
+			}
 		}
 	},
 	"home-page": {
@@ -64,23 +117,7 @@
 		"title": "Bienvenido a {appName}",
 		"create": {
 			"description": "Crea un hogar para comenzar a gestionar los gastos compartidos",
-			"form": {
-				"name": {
-					"label": "Nombre del hogar",
-					"placeholder": "e.g., Mi Casa, Nuestro Apartamento",
-					"description": "Este es el nombre de tu hogar compartido",
-					"error": {
-						"required": "El nombre es obligatorio",
-						"min-length": "El nombre debe tener al menos 3 caracteres",
-						"already-exists": "Ya existe un hogar con este nombre en tu cuenta"
-					}
-				},
-				"error": {
-					"invalid-invite-code": "El código de invitación generado no es válido. Por favor, inténtalo de nuevo.",
-					"generic": "No se pudo crear el hogar. Por favor, inténtalo de nuevo más tarde."
-				},
-				"submit-button": "Crear hogar"
-			},
+			"customize": "Personalizar",
 			"note": "Una vez creado, puedes invitar a otros miembros del hogar para compartir los gastos.",
 			"invite-code": "¿Ya tienes un código de invitación? Únete a un hogar"
 		},
@@ -126,50 +163,6 @@
 			"title": "¿Tienes un código de invitación?",
 			"description": "Únete a un hogar existente al instante.",
 			"cta": "Unirse al hogar"
-		},
-		"create-form": {
-			"title": "Crear un hogar",
-			"description": "Configura tu hogar y sus ajustes predeterminados.",
-			"name": {
-				"label": "Nombre del hogar",
-				"placeholder": "e.g., Mi Casa, Nuestro Apartamento",
-				"error": {
-					"required": "El nombre del hogar es obligatorio",
-					"max-length": "El nombre debe tener menos de {max} caracteres"
-				}
-			},
-			"currency": {
-				"label": "Moneda",
-				"error": {
-					"required": "Por favor selecciona una moneda"
-				}
-			},
-			"split-strategy": {
-				"label": "Estrategia de división predeterminada",
-				"options": {
-					"equal": "División equitativa",
-					"proportional_to_income": "Proporcional al ingreso",
-					"custom_percentages": "Porcentajes personalizados",
-					"round_robin": "Rotativo",
-					"custom_amounts": "Montos personalizados"
-				}
-			},
-			"auto-categorize": {
-				"label": "Categorizar transacciones automáticamente",
-				"description": "Asigna automáticamente categorías a las nuevas transacciones usando IA."
-			},
-			"full-address": {
-				"label": "Dirección completa",
-				"placeholder": "e.g., Calle Principal 123, Springfield",
-				"description": "Opcional — solo como referencia.",
-				"error": {
-					"max-length": "La dirección debe tener menos de {max} caracteres"
-				}
-			},
-			"submit-button": "Crear hogar",
-			"error": {
-				"generic": "No se pudo crear el hogar. Por favor, inténtalo de nuevo más tarde."
-			}
 		},
 		"join-form": {
 			"title": "Unirse a un hogar",

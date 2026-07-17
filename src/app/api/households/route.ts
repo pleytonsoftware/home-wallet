@@ -1,42 +1,71 @@
+import type { HouseholdSummary } from '@households/types'
+
 import { NextResponse } from 'next/server'
 
-import { auth } from '@lib/auth'
+import { StatusCodes } from 'http-status-codes'
+
+import { authorizedSession } from '@lib/auth/utils'
+import { MemberRole } from '@lib/constants/role.enum'
+import { householdLogger } from '@lib/logger'
 import { prisma } from '@lib/prisma'
 
-export async function POST(request: Request) {
+export async function GET() {
 	try {
-		const session = await auth()
+		const { session, error: authError } = await authorizedSession()
 
-		if (!session?.user?.id) {
-			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+		if (authError) {
+			return NextResponse.json({ error: authError }, { status: authError.status })
 		}
 
-		const body = await request.json()
-		const { name } = body
-
-		if (!name || typeof name !== 'string' || name.trim().length === 0) {
-			return NextResponse.json({ error: 'Household name is required' }, { status: 400 })
-		}
-
-		// Create household and add user as admin member
-		const household = await prisma.household.create({
-			data: {
-				name: name.trim(),
+		const households = await prisma.household.findMany({
+			where: {
 				members: {
-					create: {
-						userId: session.user.id,
-						role: 'ADMIN',
+					some: {
+						userId: session!.user.id,
 					},
 				},
 			},
 			include: {
-				members: true,
+				config: true,
+				members: {
+					include: {
+						user: {
+							select: {
+								id: true,
+								name: true,
+								image: true,
+							},
+						},
+					},
+				},
 			},
 		})
 
-		return NextResponse.json(household, { status: 201 })
+		const householdData: HouseholdSummary[] = households.map((household) => {
+			const activeMemberRole = household.members.find((member) => member.user.id === session.user.id)?.role as
+				| keyof typeof MemberRole
+				| undefined
+			const members = household.members.map((member) => member.user)
+
+			return {
+				...household,
+				id: household.id,
+				name: household.name,
+				code: activeMemberRole === MemberRole.ADMIN ? household.code : undefined,
+				role: activeMemberRole ? MemberRole[activeMemberRole] : MemberRole.MEMBER,
+				members,
+				balance: 0,
+				income: 0,
+				spent: 0,
+				currency: household.config?.currency,
+			} satisfies HouseholdSummary
+		})
+
+		return NextResponse.json(householdData)
 	} catch (error) {
-		console.error('[households POST]', error)
-		return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal server error' }, { status: 500 })
+		householdLogger.error('Failed to fetch households: {error}', { error })
+		return NextResponse.json({ error: 'Internal server error' }, { status: StatusCodes.INTERNAL_SERVER_ERROR })
 	}
 }
+
+export const dynamic = 'force-dynamic'

@@ -3,14 +3,13 @@
 import type { FullErrorResult, ResponseResult } from '@lib/errors/types'
 import type { $ZodIssue } from 'zod/v4/core'
 
-import { SplitStrategy } from '@/lib/constants/split-strategy.enum'
-
 import { getTranslations } from 'next-intl/server'
 
 import { PrismaClientKnownRequestError } from '@hw-prisma/internal/prismaNamespace'
 import { authorizedSession } from '@lib/auth/utils'
 import { PRISMA_ERRORS } from '@lib/constants/prisma-errors.const'
 import { MemberRole } from '@lib/constants/role.enum'
+import { SplitStrategy } from '@lib/constants/split-strategy.enum'
 import { BAD_REQUEST } from '@lib/errors/bad-request'
 import { CONFLICT } from '@lib/errors/conflict'
 import { CREATED } from '@lib/errors/created'
@@ -24,7 +23,14 @@ import { to } from '@lib/utils/to.utils'
 type HouseholdWithMembers = Prisma.HouseholdGetPayload<{ include: { members: true } }>
 export type CreateHouseholdResult = ResponseResult<HouseholdWithMembers, $ZodIssue[] | string>
 
-export async function createHousehold(name: string): Promise<CreateHouseholdResult | FullErrorResult> {
+export interface CreateHouseholdConfig {
+	currency?: string
+	splitStrategy?: SplitStrategy
+	autoCategorize?: boolean
+	fullAddress?: string
+}
+
+export async function createHousehold(name: string, config?: CreateHouseholdConfig): Promise<CreateHouseholdResult | FullErrorResult> {
 	try {
 		const { session, error } = await authorizedSession()
 
@@ -32,21 +38,24 @@ export async function createHousehold(name: string): Promise<CreateHouseholdResu
 			return error
 		}
 
-		const [commonTrans, onboardingTrans] = await Promise.all([getTranslations('common.error'), getTranslations('onboarding.create.form')])
-		const validation = await createHouseholdSchema.safeParseAsync({ name })
+		const [commonTrans, onboardingTrans] = await Promise.all([getTranslations('common.error'), getTranslations('common.forms.households.create')])
+		const validation = await createHouseholdSchema(onboardingTrans).safeParseAsync({ name, ...config })
 
 		if (!validation.success) {
 			return BAD_REQUEST(validation.error.issues)
 		}
+
+		const { data } = validation
 
 		const inviteCode = generateInviteCode(DEFAULT_INVITE_CODE_LENGTH)
 
 		const [householdError, household] = await to(
 			prisma.household.create({
 				data: {
-					name: name.trim(),
+					name: data.name.trim(),
 					code: inviteCode,
 					createdById: session.user.id,
+					fullAddress: data.fullAddress,
 					members: {
 						create: {
 							userId: session.user.id,
@@ -55,8 +64,9 @@ export async function createHousehold(name: string): Promise<CreateHouseholdResu
 					},
 					config: {
 						create: {
-							currency: 'USD', // TODO make this configurable by the user in the future
-							defaultSplitStrategy: SplitStrategy.EQUAL, // TODO make this configurable by the user in the future
+							currency: data.currency,
+							defaultSplitStrategy: data.splitStrategy,
+							autoCategorize: data.autoCategorize,
 						},
 					},
 				},

@@ -9,7 +9,6 @@ import { Controller } from 'react-hook-form'
 import { Button } from '@atoms/button'
 import { FieldError } from '@atoms/field'
 import { Input } from '@atoms/input'
-import { Spinner } from '@atoms/spinner'
 import { ROUTES } from '@lib/constants/routes.const'
 
 interface SignMagicLinkProps {
@@ -28,7 +27,7 @@ export const SignMagicLink: FC<SignMagicLinkProps> = ({ setError, disabled, form
 
 		await signIn('email', {
 			email: data.email,
-			callbackUrl: ROUTES.DASHBOARD,
+			callbackUrl: ROUTES.HOUSEHOLDS,
 		})
 	}, [])
 

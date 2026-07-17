@@ -175,3 +175,24 @@
 @custom-variant h-lg (@media (min-height: 1024px));
 @custom-variant h-xl (@media (min-height: 1280px));
 @custom-variant h-2xl (@media (min-height: 1536px));
+
+@keyframes collapsible-down {
+	from {
+		height: 0;
+		opacity: 0;
+	}
+	to {
+		height: var(--radix-collapsible-content-height);
+		opacity: 1;
+	}
+}
+@keyframes collapsible-up {
+	from {
+		height: var(--radix-collapsible-content-height);
+		opacity: 1;
+	}
+	to {
+		height: 0;
+		opacity: 0;
+	}
+}

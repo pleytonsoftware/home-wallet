@@ -46,6 +46,52 @@
 					"already-member": "You are already a member of this household."
 				}
 			}
+		},
+		"forms": {
+			"households": {
+				"create": {
+					"title": "Create a household",
+					"description": "Set up your household and its default settings.",
+					"name": {
+						"label": "Household name",
+						"description": "This is the name of your shared household",
+						"placeholder": "e.g., My House, Our Apartment",
+						"error": {
+							"required": "Household name is required",
+							"max-length": "Name must be less than {max} characters",
+							"already-exists": "A household with this name already exists in your account"
+						}
+					},
+					"currency": {
+						"label": "Currency",
+						"description": "Select the currency for your household.",
+						"error": {
+							"required": "Please select a currency"
+						}
+					},
+					"split-strategy": {
+						"label": "Default split strategy",
+						"description": "Choose how expenses will be split among household members by default."
+					},
+					"auto-categorize": {
+						"label": "Auto-categorize transactions",
+						"description": "Automatically assign categories to new transactions using AI."
+					},
+					"full-address": {
+						"label": "Full address",
+						"placeholder": "e.g., 123 Main St, Springfield",
+						"description": "Optional — used for reference only.",
+						"error": {
+							"max-length": "Address must be less than {max} characters"
+						}
+					},
+					"submit-button": "Create household",
+					"error": {
+						"invalid-invite-code": "The generated invite code is invalid. Please try again.",
+						"generic": "Failed to create household. Please try again later."
+					}
+				}
+			}
 		}
 	},
 	"home-page": {
@@ -64,23 +110,7 @@
 		"title": "Welcome to {appName}",
 		"create": {
 			"description": "Create a household to get started managing shared expenses",
-			"form": {
-				"name": {
-					"label": "Household name",
-					"placeholder": "e.g., My House, Our Apartment",
-					"description": "This is the name of your shared household",
-					"error": {
-						"required": "Household name is required",
-						"min-length": "Household name must be at least 3 characters long",
-						"already-exists": "A household with this name already exists in your account"
-					}
-				},
-				"error": {
-					"invalid-invite-code": "The generated invite code is invalid. Please try again.",
-					"generic": "Failed to create household. Please try again later."
-				},
-				"submit-button": "Create household"
-			},
+			"customize": "Customize",
 			"note": "Once created, you can invite other household members to share expenses.",
 			"invite-code": "Already have an invite code? Join a household"
 		},
@@ -126,43 +156,6 @@
 			"title": "Have an invite code?",
 			"description": "Join an existing household instantly.",
 			"cta": "Join Household"
-		},
-		"create-form": {
-			"title": "Create a household",
-			"description": "Set up your household and its default settings.",
-			"name": {
-				"label": "Household name",
-				"placeholder": "e.g., My House, Our Apartment",
-				"error": {
-					"required": "Household name is required",
-					"max-length": "Name must be less than {max} characters"
-				}
-			},
-			"currency": {
-				"label": "Currency",
-				"error": {
-					"required": "Please select a currency"
-				}
-			},
-			"split-strategy": {
-				"label": "Default split strategy"
-			},
-			"auto-categorize": {
-				"label": "Auto-categorize transactions",
-				"description": "Automatically assign categories to new transactions using AI."
-			},
-			"full-address": {
-				"label": "Full address",
-				"placeholder": "e.g., 123 Main St, Springfield",
-				"description": "Optional — used for reference only.",
-				"error": {
-					"max-length": "Address must be less than {max} characters"
-				}
-			},
-			"submit-button": "Create household",
-			"error": {
-				"generic": "Failed to create household. Please try again later."
-			}
 		},
 		"join-form": {
 			"title": "Join a household",

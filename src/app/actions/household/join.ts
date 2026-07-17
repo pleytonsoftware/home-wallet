@@ -30,6 +30,7 @@ export async function joinHousehold(code: string): Promise<JoinHouseholdResult> 
 			return error
 		}
 
+		const t = await getTranslations('common.error')
 		const validation = await joinHouseholdSchema(await getTranslations('onboarding.join.form')).safeParseAsync({ code })
 
 		if (!validation.success) {
@@ -50,10 +51,32 @@ export async function joinHousehold(code: string): Promise<JoinHouseholdResult> 
 
 		if (findError) {
 			if (findError.code === PRISMA_ERRORS.NOT_FOUND) {
-				return NOT_FOUND
+				return NOT_FOUND(t('household.join.not-found'))
 			} else {
 				throw findError
 			}
+		}
+
+		// TODO: move to a new file for reusability
+		// if user already a member, return error
+		const [membershipError, existingMembership] = await to(
+			prisma.householdMember.findFirst({
+				where: {
+					householdId: foundHousehold.id,
+					userId: session.user.id,
+				},
+				select: {
+					id: true,
+				},
+			}),
+		)
+
+		if (membershipError) {
+			throw membershipError
+		}
+
+		if (existingMembership) {
+			return BAD_REQUEST(t('household.join.already-member'))
 		}
 
 		// TODO maybe send a request to household admin to approve the join request instead of automatically adding the user to the household

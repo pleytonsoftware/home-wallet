@@ -30,6 +30,7 @@
 			"@assets/*": ["./src/assets/*"],
 			"@navigation": ["./src/i18n/navigation.ts"],
 			"@hooks/*": ["./src/hooks/*"],
+			"@contexts/*": ["./src/contexts/*"],
 			"@hw-prisma/*": ["./src/lib/generated/prisma/*"],
 			"@lib/*": ["./src/lib/*"],
 			"@emails/*": ["./src/emails/*"],

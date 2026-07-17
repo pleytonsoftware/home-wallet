@@ -1,13 +1,23 @@
 'use client'
 
-import { signOut } from 'next-auth/react'
+import { useCallback, type ComponentProps, type FC } from 'react'
 
-import { Button } from '@atoms/button'
+import { useTranslations } from 'next-intl'
 
-export const SignOutButton = () => {
-	const handleSignOut = async () => {
-		await signOut({ callbackUrl: '/signin' })
-	}
+import { Button, type ButtonProps } from '@atoms/button'
+import { useSignOut } from '@auth/hooks/use-signout.hook'
 
-	return <Button onClick={handleSignOut}>Sign Out</Button>
+export const SignOutButton: FC<ButtonProps> = (props) => {
+	const t = useTranslations('common')
+	const signOut = useSignOut()
+	const handleSignOut = useCallback((evt: React.MouseEvent<HTMLButtonElement>) => {
+		signOut()
+		props.onClick?.(evt)
+	}, [])
+
+	return (
+		<Button onClick={handleSignOut as ButtonProps['onClick']} {...(props as ComponentProps<typeof Button>)}>
+			{t('sign-out')}
+		</Button>
+	)
 }

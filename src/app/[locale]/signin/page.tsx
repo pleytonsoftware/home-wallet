@@ -14,7 +14,7 @@ export default async function SignInPage() {
 	const session = await getServerSession(authOptions)
 
 	if (session?.user) {
-		redirect(ROUTES.DASHBOARD)
+		redirect(ROUTES.HOUSEHOLDS)
 	}
 
 	return <SignPage />

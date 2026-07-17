@@ -32,7 +32,14 @@ export const SignWithGoogle: FC<SignWithGoogleProps> = ({ isLoading, setIsLoadin
 	}, [callbackUrl, t])
 
 	return (
-		<Button onClick={handleGoogleSignIn} disabled={disabled} size='lg' className='w-full' loading={isLoading} icon={<GoogleIcon />}>
+		<Button
+			onClick={handleGoogleSignIn}
+			disabled={disabled}
+			size='lg'
+			className='w-full bg-[#171717] hover:bg-[#171717]/90 focus:bg-[#171717]/90'
+			loading={isLoading}
+			icon={<GoogleIcon />}
+		>
 			<span className='flex items-center justify-center gap-2 capitalize'>{isLoading ? t('signing-in') : t('sign-with-google')}</span>
 		</Button>
 	)
