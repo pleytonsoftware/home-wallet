@@ -100,6 +100,7 @@
 	"signin-page": {
 		"title": "Welcome back",
 		"subtitle": "Sign in to your account to get started",
+		"no-account-needed": "No account yet? No problem — signing in creates one automatically.",
 		"sign-or": "Or",
 		"signing-in": "Signing in...",
 		"sign-with-google": "Sign in with Google",

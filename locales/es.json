@@ -107,6 +107,7 @@
 	"signin-page": {
 		"title": "Bienvenido de vuelta",
 		"subtitle": "Inicia sesión en tu cuenta para comenzar",
+		"no-account-needed": "¿No tienes cuenta? No hay problema — se crea una automáticamente al iniciar sesión.",
 		"sign-or": "O",
 		"signing-in": "Iniciando sesión...",
 		"sign-with-google": "Inicia sesión con Google",
