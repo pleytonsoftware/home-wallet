@@ -22,9 +22,9 @@
 		"paths": {
 			"@/*": ["./src/*"],
 			"@cn": ["./src/lib/utils/cn.ts"],
-			"@atoms/*": ["./src/components/atoms/*"],
-			"@molecules/*": ["./src/components/molecules/*"],
-			"@organisms/*": ["./src/components/organisms/*"],
+			"@atoms/*": ["./src/components/common/atoms/*"],
+			"@molecules/*": ["./src/components/common/molecules/*"],
+			"@organisms/*": ["./src/components/common/organisms/*"],
 			"@auth/*": ["./src/components/auth/*"],
 			"@locales/*": ["./locales/*"],
 			"@assets/*": ["./src/assets/*"],

@@ -30,7 +30,7 @@ export const OnboardingBody = <TFieldValues extends FieldValues = FieldValues, T
 
 				{form.formState.errors.root && <FieldError>{form.formState.errors.root.message}</FieldError>}
 
-				<Button type='submit' disabled={form.formState.isSubmitting} className='w-full' loading={form.formState.isSubmitting}>
+				<Button type='submit' disabled={!form.formState.isValid} className='w-full' loading={form.formState.isSubmitting}>
 					{submitLabel}
 				</Button>
 			</form>

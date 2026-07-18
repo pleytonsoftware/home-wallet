@@ -11,9 +11,8 @@ import { useTranslations } from 'next-intl'
 import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from '@atoms/combobox'
 import { Item, ItemContent, ItemDescription, ItemTitle } from '@atoms/item'
 import { useLanguage } from '@hooks/use-language'
+import { formatCurrency, getCurrencyName, getCurrencySymbol } from '@households/utils'
 import { capitalize } from '@lib/utils/string'
-
-import { formatCurrency, getCurrencyName, getCurrencySymbol } from '../households/utils'
 
 interface CurrencyComboboxProps extends Pick<ComponentProps<typeof ComboboxContent>, 'container'> {
 	id?: string
