@@ -13,6 +13,14 @@ vi.mock('@hooks/use-language', () => ({
 	useLanguage: () => 'en-US',
 }))
 
+vi.mock('./household-card-stat', () => ({
+	HouseholdCardStats: ({ text, amount, currency, locale }: { text: string; amount: number; currency?: string; locale?: string }) => (
+		<div data-testid='household-card-stat' data-currency={currency} data-locale={locale}>
+			{text}: {amount}
+		</div>
+	),
+}))
+
 function makeHousehold(overrides: Partial<HouseholdSummary> = {}): HouseholdSummary {
 	return {
 		id: 'household-1',
@@ -66,11 +74,17 @@ describe('HouseholdCard', () => {
 		expect(screen.queryByText('active')).not.toBeInTheDocument()
 	})
 
-	it('formats and renders balance, income, and spent', () => {
+	it('renders a stat card for balance, income, and spent with the household currency and locale', () => {
 		render(<HouseholdCard household={makeHousehold({ balance: 100, income: 500, spent: 400, currency: 'USD' })} href='/household/household-1' />)
-		expect(screen.getByText('$100')).toBeInTheDocument()
-		expect(screen.getByText('$500')).toBeInTheDocument()
-		expect(screen.getByText('$400')).toBeInTheDocument()
+		const stats = screen.getAllByTestId('household-card-stat')
+		expect(stats).toHaveLength(3)
+		expect(screen.getByText('stats.balance: 100')).toBeInTheDocument()
+		expect(screen.getByText('stats.income: 500')).toBeInTheDocument()
+		expect(screen.getByText('stats.spent: 400')).toBeInTheDocument()
+		stats.forEach((stat) => {
+			expect(stat).toHaveAttribute('data-currency', 'USD')
+			expect(stat).toHaveAttribute('data-locale', 'en-US')
+		})
 	})
 
 	it('renders an avatar fallback for each member', () => {

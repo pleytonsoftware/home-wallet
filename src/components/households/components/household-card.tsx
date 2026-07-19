@@ -11,18 +11,23 @@ import { useTranslations } from 'next-intl'
 import { Avatar, AvatarFallback, AvatarGroup, AvatarImage } from '@atoms/avatar'
 import { Icon } from '@atoms/icon'
 import { cn } from '@cn'
-import { formatCurrency } from '@households/utils'
 import { getInitials } from '@lib/utils/avatar'
+
+import { HouseholdCardStats } from './household-card-stat'
 
 interface HouseholdCardProps {
 	household: HouseholdSummary
 	href: string
 }
 
-export const HouseholdCard: FC<PropsWithChildren<HouseholdCardProps>> = ({ household, href }) => {
+const stats = ['balance', 'income', 'spent'] as const
+
+export const HouseholdCard: FC<PropsWithChildren<HouseholdCardProps>> = ({
+	household: { name, code, members, currency, isActive, ...household },
+	href,
+}) => {
 	const t = useTranslations('households-page')
 	const locale = useLanguage()
-	const { name, code, members, balance, income, spent, currency, isActive } = household
 
 	return (
 		<Link
@@ -50,25 +55,16 @@ export const HouseholdCard: FC<PropsWithChildren<HouseholdCardProps>> = ({ house
 				<div className='min-w-0'>
 					<p className='truncate font-semibold'>{name}</p>
 					<p className='text-sm text-muted-foreground'>
-						{t('members-count', { count: household.members.length })}
+						{t('members-count', { count: members.length })}
 						{code ? ` · ${code}` : ''}
 					</p>
 				</div>
 			</div>
 
 			<div className='grid grid-cols-3 gap-2'>
-				<div className='rounded-lg bg-muted/60 p-2.5'>
-					<p className='text-xs text-muted-foreground'>{t('stats.balance')}</p>
-					<p className='truncate text-sm font-semibold'>{formatCurrency(balance, currency, locale)}</p>
-				</div>
-				<div className='rounded-lg bg-muted/60 p-2.5'>
-					<p className='text-xs text-muted-foreground'>{t('stats.income')}</p>
-					<p className='truncate text-sm font-semibold'>{formatCurrency(income, currency, locale)}</p>
-				</div>
-				<div className='rounded-lg bg-muted/60 p-2.5'>
-					<p className='text-xs text-muted-foreground'>{t('stats.spent')}</p>
-					<p className='truncate text-sm font-semibold'>{formatCurrency(spent, currency, locale)}</p>
-				</div>
+				{stats.map((stat) => (
+					<HouseholdCardStats key={stat} amount={household[stat]} currency={currency} locale={locale} text={t(`stats.${stat}`)} />
+				))}
 			</div>
 
 			<div className='flex items-center justify-between'>

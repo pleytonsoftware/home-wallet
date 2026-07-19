@@ -50,8 +50,8 @@ describe('HouseholdsLayoutHeader', () => {
 		await userSession.click(screen.getByText('JD'))
 
 		expect(screen.getByRole('menu')).toBeInTheDocument()
-		expect(screen.getByText('Profile')).toBeInTheDocument()
-		expect(screen.getByText('Settings')).toBeInTheDocument()
+		expect(screen.queryByText('Profile')).not.toBeInTheDocument()
+		expect(screen.queryByText('Settings')).not.toBeInTheDocument()
 		expect(screen.getByText('sign-out')).toBeInTheDocument()
 	})
 
