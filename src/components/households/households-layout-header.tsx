@@ -41,12 +41,12 @@ export const HouseholdsLayoutHeader: FC<HouseholdsLayoutHeaderProps> = ({ maxWid
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent className='w-32'>
-						<DropdownMenuGroup>
-							{/* // TODO */}
+						{/* // TODO */}
+						{/* <DropdownMenuGroup>
 							<DropdownMenuItem>Profile</DropdownMenuItem>
 							<DropdownMenuItem>Settings</DropdownMenuItem>
 						</DropdownMenuGroup>
-						<DropdownMenuSeparator />
+						<DropdownMenuSeparator /> */}
 						<DropdownMenuGroup>
 							<DropdownMenuItem variant='destructive' onClick={handleSignOut}>
 								{t('sign-out')}
