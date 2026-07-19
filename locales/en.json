@@ -181,5 +181,37 @@
 		"title": "Check your email",
 		"subtitle": "We've sent you a magic sign-in link.",
 		"back-to-sign-in": "Back to sign in"
+	},
+	"status": {
+		"cta": {
+			"home": "Back home",
+			"households": "My households",
+			"signin": "Sign in",
+			"retry": "Try again"
+		},
+		"not-found": {
+			"title": "This page slipped away",
+			"description": "We couldn't find the page you were looking for. It may have moved, or the link might be out of date."
+		},
+		"error": {
+			"title": "Something went off budget",
+			"description": "An unexpected error occurred on our end. You can try again, or head back home."
+		},
+		"app-error": {
+			"title": "This section didn't load",
+			"description": "Something went wrong while loading this part of your workspace. You're still signed in — try again, or jump back to your households."
+		},
+		"forbidden": {
+			"title": "This door is locked",
+			"description": "You don't have permission to view this page. If you think that's a mistake, check with your household admin."
+		},
+		"household-forbidden": {
+			"title": "Admins only",
+			"description": "This part of the household is limited to admins. If you think that's a mistake, check with your household admin."
+		},
+		"not-authorized": {
+			"title": "You need to sign in",
+			"description": "You have to be signed in to access this page. Sign in to continue where you left off."
+		}
 	}
 }

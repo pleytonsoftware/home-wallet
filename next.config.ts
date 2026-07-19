@@ -36,6 +36,9 @@ const nextConfig: NextConfig = {
 		NEXT_PUBLIC_APP_NAME: process.env.APP_NAME,
 		NEXT_PUBLIC_BASE_URL: process.env.BASE_URL,
 	},
+	experimental: {
+		authInterrupts: true,
+	},
 }
 
 const withNextIntl = createNextIntlPlugin()

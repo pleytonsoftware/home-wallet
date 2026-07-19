@@ -9,7 +9,6 @@ import { prisma } from '@lib/prisma'
 
 export default async function HouseholdPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
 	const { session } = await authorizedSession()
-
 	const householdId = (await params).id
 
 	// TODO: Temporarily using `findFirstOrThrow` to check if the household exists and if the user is a member of it. This should be replaced moved to a more appropriate place, for reusability and to avoid code duplication.

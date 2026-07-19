@@ -187,5 +187,37 @@
 		"title": "Revisa tu correo",
 		"subtitle": "Te hemos enviado un enlace mágico para iniciar sesión.",
 		"back-to-sign-in": "Volver a iniciar sesión"
+	},
+	"status": {
+		"cta": {
+			"home": "Volver al inicio",
+			"households": "Mis hogares",
+			"signin": "Iniciar sesión",
+			"retry": "Intentar de nuevo"
+		},
+		"not-found": {
+			"title": "Esta página se esfumó",
+			"description": "No pudimos encontrar la página que buscabas. Es posible que se haya movido o que el enlace ya no sea válido."
+		},
+		"error": {
+			"title": "Algo se salió del presupuesto",
+			"description": "Ocurrió un error inesperado de nuestro lado. Puedes intentarlo de nuevo o volver al inicio."
+		},
+		"app-error": {
+			"title": "Esta sección no se cargó",
+			"description": "Algo salió mal al cargar esta parte de tu espacio. Sigues con la sesión iniciada — inténtalo de nuevo o vuelve a tus hogares."
+		},
+		"forbidden": {
+			"title": "Esta puerta está cerrada",
+			"description": "No tienes permiso para ver esta página. Si crees que es un error, consulta con el administrador de tu hogar."
+		},
+		"household-forbidden": {
+			"title": "Solo para administradores",
+			"description": "Esta parte del hogar está limitada a los administradores. Si crees que es un error, consulta con el administrador de tu hogar."
+		},
+		"not-authorized": {
+			"title": "Necesitas iniciar sesión",
+			"description": "Debes iniciar sesión para acceder a esta página. Inicia sesión para continuar donde lo dejaste."
+		}
 	}
 }
