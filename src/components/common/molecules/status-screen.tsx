@@ -23,6 +23,8 @@ interface StatusScreenProps {
 	variant?: StatusVariant
 	/** CTA buttons row. */
 	children?: ReactNode
+
+	contentUnderTitleNode?: ReactNode
 }
 
 const toneStyles: Record<StatusTone, { badge: string; numeral: string }> = {
@@ -36,7 +38,16 @@ const toneStyles: Record<StatusTone, { badge: string; numeral: string }> = {
 	},
 }
 
-export const StatusScreen: FC<StatusScreenProps> = ({ code, icon, title, description, tone = 'default', variant = 'hero', children }) => {
+export const StatusScreen: FC<StatusScreenProps> = ({
+	code,
+	icon,
+	title,
+	description,
+	tone = 'default',
+	variant = 'hero',
+	children,
+	contentUnderTitleNode,
+}) => {
 	const tones = toneStyles[tone]
 
 	const content = (
@@ -48,6 +59,7 @@ export const StatusScreen: FC<StatusScreenProps> = ({ code, icon, title, descrip
 			<div className='space-y-2'>
 				<h1 className='text-2xl font-bold tracking-tight'>{title}</h1>
 				<p className='text-sm text-muted-foreground'>{description}</p>
+				{contentUnderTitleNode}
 			</div>
 
 			{children && <div className='flex flex-col justify-center gap-3 sm:flex-row'>{children}</div>}
@@ -76,7 +88,7 @@ export const StatusScreen: FC<StatusScreenProps> = ({ code, icon, title, descrip
 				</span>
 			)}
 
-			<div className='relative z-10 w-full max-w-md space-y-6 text-center'>{content}</div>
+			<div className='relative z-10 w-full max-w-xl space-y-6 text-center'>{content}</div>
 		</div>
 	)
 }

@@ -40,6 +40,6 @@ describe('Logo', () => {
 
 	it('renders the image with the expected source path', () => {
 		render(<Logo />)
-		expect(screen.getByRole('img')).toHaveAttribute('src', expect.stringContaining('home-wallet.png'))
+		expect(screen.getByRole('img')).toHaveAttribute('src', expect.stringContaining('logo.svg'))
 	})
 })

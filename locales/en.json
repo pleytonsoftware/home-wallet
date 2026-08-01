@@ -31,7 +31,27 @@
 				"placeholder": "Select currency",
 				"search-placeholder": "Search currency...",
 				"empty": "No currency found."
+			},
+			"roles": {
+				"members": {
+					"member": "Member",
+					"admin": "Admin"
+				}
 			}
+		},
+		"confirm": {
+			"save": {
+				"title": "Are you sure you'd like to save these changes?",
+				"cancel": "Cancel",
+				"confirm": "Confirm",
+				"save": "Save changes",
+				"saved": "Settings saved"
+			}
+		},
+		"sidebar": {
+			"transactions": "Transactions",
+			"settings": "Settings",
+			"households": "My households"
 		},
 		"error": {
 			"conflict": "Unknown conflict occurred. Please try again later.",
@@ -86,6 +106,7 @@
 						}
 					},
 					"submit-button": "Create household",
+					"success": "Household created.",
 					"error": {
 						"invalid-invite-code": "The generated invite code is invalid. Please try again.",
 						"generic": "Failed to create household. Please try again later."
@@ -129,6 +150,7 @@
 					}
 				},
 				"submit-button": "Join household",
+				"success": "You've joined the household.",
 				"error": {
 					"not-found": "Invitation code not valid. Please check with your household admin.",
 					"generic": "Failed to join household. Please try again later."
@@ -144,6 +166,7 @@
 		"active": "Active",
 		"open": "Open",
 		"members-count": "{count, plural, one {# member} other {# members}}",
+		"copied-clipboard": "Copied to clipboard",
 		"stats": {
 			"balance": "Balance",
 			"income": "Income",
@@ -174,6 +197,7 @@
 				"not-found": "Invitation code not valid. Please check with your household admin.",
 				"generic": "Failed to join household. Please try again later."
 			},
+			"success": "You've joined the household.",
 			"submit-button": "Join household"
 		}
 	},
@@ -212,6 +236,86 @@
 		"not-authorized": {
 			"title": "You need to sign in",
 			"description": "You have to be signed in to access this page. Sign in to continue where you left off."
+		}
+	},
+	"settings": {
+		"title": "Settings",
+		"subtitle": "Manage this household's configuration, members and more.",
+		"sections": {
+			"general": "General",
+			"members": "Members",
+			"danger": "Danger zone"
+		},
+		"general": {
+			"subtitle": "General information and defaults for this household.",
+			"name": {
+				"label": "Household name",
+				"description": "The display name shown to every member of this household."
+			},
+			"currency": {
+				"label": "Currency",
+				"description": "The currency used across budgets, transactions and reports."
+			},
+			"split-strategy": {
+				"label": "Default split strategy",
+				"description": "How shared expenses are divided among members unless overridden."
+			},
+			"auto-categorize": {
+				"label": "Auto-categorize transactions",
+				"description": "Automatically assign a category to new transactions."
+			},
+			"ai-assist": {
+				"label": "AI assistance",
+				"description": "Enable AI-powered summaries, suggestions and budget drafts."
+			},
+			"full-address": {
+				"label": "Address",
+				"description": "Optional physical address for this household."
+			},
+			"saved": "Household settings saved.",
+			"error": "Something went wrong while saving. Please try again."
+		},
+		"members": {
+			"title": "House Members",
+			"subtitle": "Admins can manage settings, members and roles. Members have limited access.",
+			"member-column": "Members",
+			"admin-column": "Admins",
+			"you": "You",
+			"help": {
+				"title": "How to change roles",
+				"body": "Select one or more people, then use the arrow buttons to move them between columns — or drag a person onto the other column. Save to apply your changes."
+			},
+			"last-admin-error": "A household must keep at least one admin.",
+			"unknown-member-error": "One or more selected people are not members of this household.",
+			"save": "Save roles",
+			"saved": "Roles updated",
+			"error": "Something went wrong while updating roles. Please try again."
+		},
+		"danger": {
+			"subtitle": "Irreversible and destructive actions.",
+			"error": "Something went wrong. Please try again.",
+			"regenerate-code": {
+				"label": "Regenerate invite code",
+				"description": "Create a new invite code. The previous code will stop working immediately.",
+				"confirm": "Are you sure? Anyone using the current code will no longer be able to join.",
+				"cooldown-error": "You can only regenerate the invite code once every 30 days.",
+				"success": "Invite code regenerated."
+			},
+			"leave": {
+				"label": "Leave household",
+				"description": "Remove yourself from this household. You'll need a new invite to rejoin.",
+				"confirm": "Are you sure you want to leave this household?",
+				"last-admin-error": "You are the last admin. Promote another member to admin before leaving.",
+				"success": "You've left the household."
+			},
+			"delete": {
+				"label": "Delete household",
+				"description": "Permanently delete this household and all of its data. This cannot be undone.",
+				"confirm": "This permanently deletes the household and all of its budgets, transactions and members.",
+				"confirm-name-prompt": "Type “{name}” to confirm.",
+				"name-mismatch-error": "The name you typed does not match the household name.",
+				"success": "Household deleted."
+			}
 		}
 	}
 }

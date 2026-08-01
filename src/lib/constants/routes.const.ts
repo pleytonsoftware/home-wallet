@@ -14,5 +14,11 @@ export const ROUTES = {
 	},
 	HOUSEHOLD: {
 		ROOT: '/household/:id',
+		SETTINGS: {
+			ROOT: '/household/:id/settings',
+			GENERAL: '/household/:id/settings/general',
+			MEMBERS: '/household/:id/settings/members',
+			DANGER: '/household/:id/settings/danger',
+		},
 	},
 } as const

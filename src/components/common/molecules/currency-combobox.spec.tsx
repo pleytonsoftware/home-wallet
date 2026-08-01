@@ -33,6 +33,7 @@ describe('CurrencyCombobox', () => {
 	it('marks the input as data-disabled when disabled is true', () => {
 		render(<CurrencyCombobox name='currency' onChange={vi.fn()} disabled />)
 		expect(screen.getByRole('combobox')).toHaveAttribute('data-disabled')
+		expect(screen.getByTestId('currencybox-input')).toHaveAttribute('data-disabled')
 	})
 
 	it('does not mark the input as disabled by default', () => {

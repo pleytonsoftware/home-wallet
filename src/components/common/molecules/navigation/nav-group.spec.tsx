@@ -2,6 +2,7 @@ import type { NavGroup } from './types'
 
 import { SidebarProvider } from '@atoms/sidebar'
 import { useIsMobile } from '@hooks/use-mobile'
+import { MemberRole } from '@lib/constants/role.enum'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -9,6 +10,16 @@ import { NavGroupRenderer } from './nav-group'
 
 vi.mock('@hooks/use-mobile', () => ({
 	useIsMobile: vi.fn(() => false),
+}))
+
+const { currentRole } = vi.hoisted(() => ({ currentRole: { value: 'ADMIN' as MemberRole } }))
+
+vi.mock('@households/context/household.context', () => ({
+	useHouseholdContext: () => ({ household: { role: currentRole.value } }),
+}))
+
+vi.mock('@navigation', () => ({
+	Link: (props: React.ComponentProps<'a'>) => <a {...props} />,
 }))
 
 function GroupActionIcon(props: React.ComponentProps<'svg'>) {
@@ -34,6 +45,7 @@ function renderGroup(group: NavGroup) {
 describe('NavGroupRenderer', () => {
 	beforeEach(() => {
 		vi.mocked(useIsMobile).mockReturnValue(false)
+		currentRole.value = MemberRole.ADMIN
 	})
 
 	describe('static group', () => {
@@ -141,6 +153,31 @@ describe('NavGroupRenderer', () => {
 			const action = screen.getByTestId('group-action-icon').closest('[data-slot="sidebar-group-action"]') as HTMLElement
 			await user.click(action)
 			expect(onClick).toHaveBeenCalledTimes(1)
+		})
+	})
+
+	describe('role-based item visibility', () => {
+		function makeGatedGroup(): NavGroup {
+			return makeGroup({
+				items: [
+					{ title: 'Everyone', url: '/everyone' },
+					{ title: 'Admins only', url: '/admins', allowedRoles: [MemberRole.ADMIN] },
+				],
+			})
+		}
+
+		it('renders admin-gated items for an admin', () => {
+			currentRole.value = MemberRole.ADMIN
+			renderGroup(makeGatedGroup())
+			expect(screen.getByText('Everyone')).toBeInTheDocument()
+			expect(screen.getByText('Admins only')).toBeInTheDocument()
+		})
+
+		it('hides admin-gated items from a member', () => {
+			currentRole.value = MemberRole.MEMBER
+			renderGroup(makeGatedGroup())
+			expect(screen.getByText('Everyone')).toBeInTheDocument()
+			expect(screen.queryByText('Admins only')).not.toBeInTheDocument()
 		})
 	})
 })

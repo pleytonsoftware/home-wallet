@@ -4,11 +4,11 @@ import type { FC } from 'react'
 import { cn } from '@cn'
 
 const ICON_SIZES = {
-	xs: 'size-3',
-	sm: 'size-4',
+	xs: 'size-3!',
+	sm: 'size-4!',
 	md: 'size-5',
-	lg: 'size-6',
-	xl: 'size-8',
+	lg: 'size-6!',
+	xl: 'size-8!',
 } as const
 
 type IconSize = keyof typeof ICON_SIZES

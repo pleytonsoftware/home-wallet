@@ -1,6 +1,7 @@
 import nextVitals from 'eslint-config-next/core-web-vitals'
 import nextTs from 'eslint-config-next/typescript'
 import prettier from 'eslint-plugin-prettier'
+import unusedImports from 'eslint-plugin-unused-imports'
 import { defineConfig, globalIgnores } from 'eslint/config'
 import globals from 'globals'
 
@@ -23,6 +24,7 @@ const eslintConfig = defineConfig([
 		},
 		plugins: {
 			prettier,
+			'unused-imports': unusedImports,
 		},
 		rules: {
 			'react/react-in-jsx-scope': 'off',
@@ -39,13 +41,52 @@ const eslintConfig = defineConfig([
 					message: "Use '@atoms/...' instead of '@/components/atoms/...'",
 				},
 			],
-			'no-debugger': 'warn',
+			'no-debugger': 'error',
 			'@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
 			'react-hooks/exhaustive-deps': 'off',
 			'import/order': 'off',
 			'import/first': 'off',
 			'import/newline-after-import': 'off',
 			'no-shadow': 'off',
+
+			// Exports
+			'import/no-default-export': 'error',
+
+			// Imports
+			'@typescript-eslint/consistent-type-imports': [
+				'error',
+				{
+					prefer: 'type-imports',
+				},
+			],
+
+			// Cleanse
+			'unused-imports/no-unused-imports': 'error',
+			// Architecture
+			'import/no-cycle': 'error',
+			'import/no-unresolved': 'error',
+
+			// Avoid long routes
+			'no-restricted-imports': [
+				'error',
+				{
+					patterns: ['../*', '../../*', '../../../*', '../../../../*', '@/components/*/*'],
+				},
+			],
+		},
+	},
+	{
+		files: [
+			'src/app/**/page.tsx',
+			'src/app/**/layout.tsx',
+			'src/app/**/loading.tsx',
+			'src/app/**/error.tsx',
+			'src/app/**/not-found.tsx',
+			'*.config.ts',
+			'src/proxy.ts',
+		],
+		rules: {
+			'import/no-default-export': 'off',
 		},
 	},
 ])

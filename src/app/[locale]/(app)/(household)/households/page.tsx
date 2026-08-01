@@ -5,7 +5,7 @@ import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 
 const queryClient = getQueryClient()
 
-export default async function DashboardPage() {
+export default async function HouseholdsDashboardPage() {
 	const households = await queryClient.fetchQuery(getHouseholdsOptions())
 
 	return (

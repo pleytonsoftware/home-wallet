@@ -1,6 +1,6 @@
 import { Pool } from 'pg'
 
-import { PrismaClient, Prisma } from '@hw-prisma/client'
+import { PrismaClient, type Prisma } from '@hw-prisma/client'
 import { prismaLogger } from '@lib/logger'
 import { PrismaPg } from '@prisma/adapter-pg'
 

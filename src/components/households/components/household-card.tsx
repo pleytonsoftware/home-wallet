@@ -1,17 +1,21 @@
 import type { HouseholdSummary } from '@households/types'
-import type { FC, PropsWithChildren } from 'react'
 
 import { useLanguage } from '@/hooks/use-language'
 
 import Link from 'next/link'
+import { useState, type FC, type PropsWithChildren } from 'react'
 
-import { ChevronRight, Home } from 'lucide-react'
+import { ChevronRight, ClipboardCopyIcon, Home, CheckIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
+import { useCopyToClipboard, useDebounceCallback } from 'usehooks-ts'
 
-import { Avatar, AvatarFallback, AvatarGroup, AvatarImage } from '@atoms/avatar'
+import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage } from '@atoms/avatar'
+import { Button } from '@atoms/button'
 import { Icon } from '@atoms/icon'
 import { cn } from '@cn'
 import { getInitials } from '@lib/utils/avatar'
+import { pd } from '@lib/utils/events'
 
 import { HouseholdCardStats } from './household-card-stat'
 
@@ -21,6 +25,7 @@ interface HouseholdCardProps {
 }
 
 const stats = ['balance', 'income', 'spent'] as const
+const MEMBER_MAX_DISPLAY = 3
 
 export const HouseholdCard: FC<PropsWithChildren<HouseholdCardProps>> = ({
 	household: { name, code, members, currency, isActive, ...household },
@@ -28,6 +33,15 @@ export const HouseholdCard: FC<PropsWithChildren<HouseholdCardProps>> = ({
 }) => {
 	const t = useTranslations('households-page')
 	const locale = useLanguage()
+	const [, setCopytoClipboard] = useCopyToClipboard()
+	const [isCopied, setIsCopied] = useState<boolean>(false)
+	const debounceCopied = useDebounceCallback(() => setIsCopied(false), 3000)
+	const copyToClipboardEvent = pd(() => {
+		setCopytoClipboard(code!)
+		setIsCopied(true)
+		toast.success(t('copied-clipboard'))
+		debounceCopied()
+	})
 
 	return (
 		<Link
@@ -56,7 +70,31 @@ export const HouseholdCard: FC<PropsWithChildren<HouseholdCardProps>> = ({
 					<p className='truncate font-semibold'>{name}</p>
 					<p className='text-sm text-muted-foreground'>
 						{t('members-count', { count: members.length })}
-						{code ? ` · ${code}` : ''}
+						{code && (
+							<span className='inline-flex ml-2 gap-2 items-center'>
+								<span>·</span>
+								<span>{code}</span>
+								{
+									<Button
+										size='icon-xs'
+										variant={isCopied ? 'ghost-no-hover' : 'ghost'}
+										className='-ml-1'
+										onClick={isCopied ? undefined : copyToClipboardEvent}
+									>
+										<Icon
+											key={isCopied ? 'copied' : 'copy'}
+											className={cn('size-3.5 animate-[flip-in_300ms_ease-out]', isCopied && 'text-green-500')}
+											IconComponent={isCopied ? CheckIcon : ClipboardCopyIcon}
+										/>
+									</Button>
+								}
+								{/* // ) : (
+									// <Button size='icon-xs' variant='ghost' className='-ml-1' onClick={copyToClipboardEvent}>
+									// 	<Icon className='size-3.5' IconComponent={} />
+									// </Button>
+								// )} */}
+							</span>
+						)}
 					</p>
 				</div>
 			</div>
@@ -69,12 +107,13 @@ export const HouseholdCard: FC<PropsWithChildren<HouseholdCardProps>> = ({
 
 			<div className='flex items-center justify-between'>
 				<AvatarGroup>
-					{members.map((member) => (
+					{members.slice(0, MEMBER_MAX_DISPLAY).map((member) => (
 						<Avatar key={member.id} size='sm'>
 							<AvatarImage src={member.image ?? undefined} alt={member.name} />
 							<AvatarFallback>{getInitials(member.name)}</AvatarFallback>
 						</Avatar>
 					))}
+					{members.length > MEMBER_MAX_DISPLAY && <AvatarGroupCount>+{members.length - MEMBER_MAX_DISPLAY}</AvatarGroupCount>}
 				</AvatarGroup>
 				<span className={cn('flex items-center gap-0.5 text-sm font-medium', isActive ? 'text-primary' : 'text-muted-foreground')}>
 					{t('open')}

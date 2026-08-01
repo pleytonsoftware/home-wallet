@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
 		config.module.rules.push(
 			{
 				...fileLoaderRule,
-				type: 'javascript/auto',
+				// type: 'javascript/auto',
 				test: /\.svg$/i,
 				resourceQuery: /url/, // *.svg?url
 			},
@@ -22,14 +22,24 @@ const nextConfig: NextConfig = {
 			},
 		)
 
+		// Modify the file loader rule to ignore *.svg, since we have it handled now.
+		fileLoaderRule.exclude = /\.svg$/i
+
 		return config
 	},
 	turbopack: {
 		rules: {
-			'*.svg': {
-				loaders: ['@svgr/webpack'],
-				as: '*.js',
-			},
+			'*.svg': [
+				{
+					loaders: ['@svgr/webpack'],
+					as: '*.js',
+					condition: { not: { query: /url/ } },
+				},
+				{
+					type: 'asset',
+					condition: { query: /url/ },
+				},
+			],
 		},
 	},
 	env: {

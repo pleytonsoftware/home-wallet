@@ -1,13 +1,15 @@
-import { authorizedSession } from '@/lib/auth/utils'
-import { MemberRole } from '@/lib/constants/role.enum'
-import { logger } from '@/lib/logger'
+import type { EmptyObject, LayoutProps } from '@/types/app'
 
 import { redirect } from 'next/navigation'
 
+import { authorizedSession } from '@lib/auth/utils'
+import { MemberRole } from '@lib/constants/role.enum'
 import { ROUTES } from '@lib/constants/routes.const'
+import { logger } from '@lib/logger'
 import { prisma } from '@lib/prisma'
 
-export default async function HouseholdPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
+// TODO: This will be the dashboard page in the future
+export default async function HouseholdPage({ params }: LayoutProps<EmptyObject, { id: string }>) {
 	const { session } = await authorizedSession()
 	const householdId = (await params).id
 

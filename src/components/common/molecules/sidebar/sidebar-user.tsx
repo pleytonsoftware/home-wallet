@@ -1,4 +1,6 @@
-import { BadgeCheck, Bell, ChevronsUpDown, LogOut } from 'lucide-react'
+import Link from 'next/link'
+
+import { BadgeCheck, Bell, Building2Icon, CornerDownLeftIcon, ChevronsUpDown, LogOut } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import {
@@ -9,7 +11,9 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@atoms/dropdown-menu'
+import { Icon } from '@atoms/icon'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@atoms/sidebar'
+import { ROUTES } from '@lib/constants/routes.const'
 import { UserAvatar, type UserAvatarProps } from '@molecules/user-avatar'
 
 type NavUserProps = {
@@ -31,6 +35,17 @@ export function SidebarUser({ user, onSignout }: NavUserProps) {
 		<SidebarMenu>
 			<SidebarMenuItem>
 				<DropdownMenu>
+					<DropdownMenuSeparator />
+					<SidebarMenuButton asChild>
+						<Link href={ROUTES.HOUSEHOLDS} className='px-3'>
+							<span className='relative p-2 pl-0'>
+								<Icon className='' IconComponent={Building2Icon} />
+								<Icon className='absolute right-1 top-5' size='xs' IconComponent={CornerDownLeftIcon} />
+							</span>
+							{t('sidebar.households')}
+						</Link>
+					</SidebarMenuButton>
+					<DropdownMenuSeparator />
 					<DropdownMenuTrigger asChild>
 						<SidebarMenuButton
 							size='lg'

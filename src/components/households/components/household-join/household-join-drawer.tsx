@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useRef, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 
 import { Button } from '@atoms/button'
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from '@atoms/drawer'
@@ -56,6 +57,7 @@ export const HouseholdJoinDrawer: FC<HouseholdJoinDrawerProps> = ({ trigger }) =
 				form.reset()
 				queryClient.invalidateQueries({ queryKey: HOUSEHOLDS_QUERY_KEYS.households })
 
+				toast.success(t('success'))
 				router.push(ROUTES.HOUSEHOLD.ROOT.replace(':id', result.data.id))
 			},
 			onError: (error) => {
@@ -65,6 +67,7 @@ export const HouseholdJoinDrawer: FC<HouseholdJoinDrawerProps> = ({ trigger }) =
 						message: error instanceof Error ? error.message : t('error.generic'),
 					})
 				}
+				toast.error(error instanceof Error ? error.message : t('error.generic'))
 			},
 		}),
 	)

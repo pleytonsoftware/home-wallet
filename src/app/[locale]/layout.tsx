@@ -6,10 +6,12 @@ import { Montserrat, Quicksand } from 'next/font/google'
 
 import { NextIntlClientProvider } from 'next-intl'
 
+import { Toaster } from '@atoms/sonner'
 import { cn } from '@cn'
+import { NProgressProvider } from '@contexts/nprogress'
 import { FloatingControls } from '@molecules/floating-controls'
 
-import '../globals.css'
+import '@/app/globals.css'
 
 export type ResolveLocaleLayoutProps<T = unknown> = T & {
 	params: LayoutProps['params']
@@ -37,12 +39,15 @@ export const metadata: Metadata = {
 }
 
 export default async function RootLayout({ children, params }: Readonly<LocaleLayoutProps>) {
+	const lang = (await params).locale
 	return (
 		<NextIntlClientProvider>
-			<html lang={(await params).locale} className={cn('h-full', 'antialiased', montserrat.variable, quicksand.variable, 'font-sans')}>
+			<html lang={lang} className={cn('h-full', 'antialiased', montserrat.variable, quicksand.variable, 'font-sans')}>
 				<body className='min-h-full flex flex-col'>
+					<NProgressProvider />
 					{children}
 					<FloatingControls theme={''} />
+					<Toaster />
 				</body>
 			</html>
 		</NextIntlClientProvider>

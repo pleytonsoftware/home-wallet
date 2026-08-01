@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+@import './nprogress.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -194,5 +195,15 @@
 	to {
 		height: 0;
 		opacity: 0;
+	}
+}
+@keyframes flip-in {
+	from {
+		transform: rotateX(90deg);
+		opacity: 0;
+	}
+	to {
+		transform: rotateX(0deg);
+		opacity: 1;
 	}
 }

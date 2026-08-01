@@ -6,6 +6,7 @@ import { useCallback, type FC } from 'react'
 import { ChevronsUpDownIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Controller } from 'react-hook-form'
+import { toast } from 'sonner'
 
 import { createHousehold } from '@actions/household/create'
 import { Button } from '@atoms/button'
@@ -50,6 +51,7 @@ export const OnboardingCreate: FC = () => {
 					throw new Error(Array.isArray(res.error) ? res.error.map((issue) => issue.message).join(', ') : res.error || t('error.generic'))
 				}
 
+				toast.success(t('success'))
 				router.push(ROUTES.HOUSEHOLDS)
 			} catch (err) {
 				if (!form.formState.errors.root)
@@ -57,6 +59,7 @@ export const OnboardingCreate: FC = () => {
 						type: 'manual',
 						message: err instanceof Error ? err.message : t('error.generic'),
 					})
+				toast.error(err instanceof Error ? err.message : t('error.generic'))
 			}
 		},
 		[router, t, form],

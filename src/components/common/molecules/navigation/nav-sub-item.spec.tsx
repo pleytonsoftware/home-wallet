@@ -4,6 +4,10 @@ import { render, screen } from '@testing-library/react'
 
 import { NavSubItemRenderer } from './nav-sub-item'
 
+vi.mock('@navigation', () => ({
+	Link: (props: React.ComponentProps<'a'>) => <a {...props} />,
+}))
+
 function MockIcon(props: React.ComponentProps<'svg'>) {
 	return <svg data-testid='icon' {...props} />
 }

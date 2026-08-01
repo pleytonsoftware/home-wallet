@@ -6,6 +6,7 @@ import { ServerCrash } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { Button } from '@atoms/button'
+import { ErrorCodeBlock } from '@atoms/error-code-block'
 import { ROUTES } from '@lib/constants/routes.const'
 import { logger } from '@lib/logger'
 import { StatusScreen } from '@molecules/status-screen'
@@ -24,7 +25,14 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
 	}, [error])
 
 	return (
-		<StatusScreen code='500' icon={ServerCrash} tone='destructive' title={t('error.title')} description={t('error.description')}>
+		<StatusScreen
+			code='500'
+			icon={ServerCrash}
+			tone='destructive'
+			title={t('error.title')}
+			description={t('error.description')}
+			contentUnderTitleNode={process.env.NODE_ENV === 'development' && <ErrorCodeBlock>{error.stack}</ErrorCodeBlock>}
+		>
 			<Button onClick={reset}>{t('cta.retry')}</Button>
 			<Button asChild variant='outline'>
 				<Link href={ROUTES.LANDING}>{t('cta.home')}</Link>

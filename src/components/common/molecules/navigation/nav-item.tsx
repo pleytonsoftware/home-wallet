@@ -2,25 +2,19 @@
 
 import type { NavItem } from './types'
 
-import Link from 'next/link'
-
 import { ChevronRight } from 'lucide-react'
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@atoms/collapsible'
 import { SidebarMenuAction, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub } from '@atoms/sidebar'
+import { cn } from '@cn'
+import { useHouseholdContext } from '@households/context/household.context'
+import { Link } from '@navigation'
 
 import { NavSubItemRenderer } from './nav-sub-item'
+import { hasAccessToNavItem, isAbsoluteUrl, navItemColourMap } from './utils'
 
 type NavItemRendererProps = {
 	item: NavItem
-}
-
-/**
- * Checks whether a given URL is absolute (i.e. includes a scheme such as
- * `http:`/`https:` or is protocol-relative, e.g. `//example.com`).
- */
-function isAbsoluteUrl(url: string) {
-	return /^([a-z][a-z0-9+.-]*:)?\/\//i.test(url)
 }
 
 /**
@@ -34,13 +28,14 @@ function isAbsoluteUrl(url: string) {
  * Returns `null` when the user lacks any required permission.
  */
 export function NavItemRenderer({ item }: NavItemRendererProps) {
+	const household = useHouseholdContext()
 	const hasSubItems = Array.isArray(item.items) && item.items.length > 0
 
 	// ── Collapsible item with sub-menu ──────────────────────────────────────────
 	if (hasSubItems) {
 		return (
 			<Collapsible asChild defaultOpen={item.defaultOpen ?? item.isActive} className='group/collapsible'>
-				<SidebarMenuItem>
+				<SidebarMenuItem className={cn(item.colour && navItemColourMap[item.colour])}>
 					<CollapsibleTrigger asChild>
 						<SidebarMenuButton {...item} className='cursor-pointer'>
 							{item.icon && <item.icon />}
@@ -50,7 +45,7 @@ export function NavItemRenderer({ item }: NavItemRendererProps) {
 					</CollapsibleTrigger>
 					<CollapsibleContent>
 						<SidebarMenuSub>
-							{item.items!.map((subItem) => (
+							{item.items!.filter(hasAccessToNavItem(household.household.role)).map((subItem) => (
 								<NavSubItemRenderer key={subItem.title} item={subItem} />
 							))}
 						</SidebarMenuSub>
@@ -62,7 +57,7 @@ export function NavItemRenderer({ item }: NavItemRendererProps) {
 
 	// ── Leaf item ───────────────────────────────────────────────────────────────
 	return (
-		<SidebarMenuItem>
+		<SidebarMenuItem className={cn(item.colour && navItemColourMap[item.colour])}>
 			<SidebarMenuButton asChild={!!item.url} tooltip={item.tooltip} isActive={item.isActive} variant={item.variant} size={item.size}>
 				{item.url ? (
 					!isAbsoluteUrl(item.url) ? (

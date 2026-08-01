@@ -2,6 +2,7 @@ import type { NavItem } from './types'
 
 import { SidebarProvider } from '@atoms/sidebar'
 import { useIsMobile } from '@hooks/use-mobile'
+import { MemberRole } from '@lib/constants/role.enum'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -9,6 +10,16 @@ import { NavItemRenderer } from './nav-item'
 
 vi.mock('@hooks/use-mobile', () => ({
 	useIsMobile: vi.fn(() => false),
+}))
+
+const { currentRole } = vi.hoisted(() => ({ currentRole: { value: 'ADMIN' as MemberRole } }))
+
+vi.mock('@households/context/household.context', () => ({
+	useHouseholdContext: () => ({ household: { role: currentRole.value } }),
+}))
+
+vi.mock('@navigation', () => ({
+	Link: (props: React.ComponentProps<'a'>) => <a {...props} />,
 }))
 
 function MockIcon(props: React.ComponentProps<'svg'>) {
@@ -38,6 +49,7 @@ function renderItem(item: NavItem) {
 describe('NavItemRenderer', () => {
 	beforeEach(() => {
 		vi.mocked(useIsMobile).mockReturnValue(false)
+		currentRole.value = MemberRole.ADMIN
 	})
 
 	describe('leaf item', () => {
@@ -180,6 +192,32 @@ describe('NavItemRenderer', () => {
 			expect(container.querySelector('[data-slot="collapsible"]')).toHaveAttribute('data-state', 'closed')
 			await user.click(screen.getByText('Dashboard'))
 			expect(container.querySelector('[data-slot="collapsible"]')).toHaveAttribute('data-state', 'open')
+		})
+
+		describe('role-based sub-item visibility', () => {
+			function makeGatedParent(): NavItem {
+				return makeItem({
+					defaultOpen: true,
+					items: [
+						{ title: 'Everyone', url: '/everyone' },
+						{ title: 'Admins only', url: '/admins', allowedRoles: [MemberRole.ADMIN] },
+					],
+				})
+			}
+
+			it('renders admin-gated sub-items for an admin', () => {
+				currentRole.value = MemberRole.ADMIN
+				renderItem(makeGatedParent())
+				expect(screen.getByText('Everyone')).toBeInTheDocument()
+				expect(screen.getByText('Admins only')).toBeInTheDocument()
+			})
+
+			it('hides admin-gated sub-items from a member', () => {
+				currentRole.value = MemberRole.MEMBER
+				renderItem(makeGatedParent())
+				expect(screen.getByText('Everyone')).toBeInTheDocument()
+				expect(screen.queryByText('Admins only')).not.toBeInTheDocument()
+			})
 		})
 	})
 })

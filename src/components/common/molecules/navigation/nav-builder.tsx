@@ -2,7 +2,10 @@
 
 import type { NavConfig } from './types'
 
+import { usePathname } from '@navigation'
+
 import { NavGroupRenderer } from './nav-group'
+import { resolveNavConfigActiveState } from './utils'
 
 type NavBuilderProps = {
 	/**
@@ -15,8 +18,9 @@ type NavBuilderProps = {
 /**
  * Generates a full sidebar navigation tree from a declarative `NavConfig`.
  *
- * Reads the authenticated user's permissions via `useAuthReq` and propagates
- * them to every group, item, and sub-item for fine-grained visibility control.
+ * Derives each entry's `isActive`/`defaultOpen` from the current pathname so the
+ * active route is highlighted and its parent group stays expanded. Role-based
+ * visibility is applied downstream by the group/item renderers.
  *
  * Render inside `SidebarContent` (or any `SidebarGroup` container):
  *
@@ -27,9 +31,12 @@ type NavBuilderProps = {
  * ```
  */
 export function NavBuilder({ config }: NavBuilderProps) {
+	const pathname = usePathname()
+	const resolvedConfig = resolveNavConfigActiveState(config, pathname)
+
 	return (
 		<>
-			{config.map((group, index) => (
+			{resolvedConfig.map((group, index) => (
 				<NavGroupRenderer key={group.label ?? index} group={group} />
 			))}
 		</>

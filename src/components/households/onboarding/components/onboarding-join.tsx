@@ -5,6 +5,7 @@ import { useCallback, type FC } from 'react'
 
 import { StatusCodes } from 'http-status-codes'
 import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 
 import { joinHousehold } from '@actions/household/join'
 import { JoinCodeField } from '@households/components/household-join/join-code-field'
@@ -40,6 +41,7 @@ export const OnboardingJoin: FC = () => {
 					throw new Error(Array.isArray(res.error) ? res.error.map((issue) => issue.message).join(', ') : res.error || t('error.generic'))
 				}
 
+				toast.success(t('success'))
 				router.push(ROUTES.HOUSEHOLDS)
 			} catch (err) {
 				if (!form.formState.errors.root)
@@ -47,6 +49,7 @@ export const OnboardingJoin: FC = () => {
 						type: 'manual',
 						message: err instanceof Error ? err.message : t('error.generic'),
 					})
+				toast.error(err instanceof Error ? err.message : t('error.generic'))
 			}
 		},
 		[router, t, form],

@@ -31,7 +31,27 @@
 				"placeholder": "Selecciona una moneda",
 				"search-placeholder": "Buscar moneda...",
 				"empty": "No se encontró ninguna moneda."
+			},
+			"roles": {
+				"members": {
+					"member": "Miembro",
+					"admin": "Administrador"
+				}
 			}
+		},
+		"confirm": {
+			"save": {
+				"title": "¿Estás seguro de que deseas guardar estos cambios?",
+				"cancel": "Cancelar",
+				"confirm": "Confirmar",
+				"save": "Guardar cambios",
+				"saved": "Configuración guardada"
+			}
+		},
+		"sidebar": {
+			"transactions": "Transacciones",
+			"settings": "Configuración",
+			"households": "Mis hogares"
 		},
 		"error": {
 			"conflict": "Ocurrió un conflicto desconocido. Por favor, inténtalo de nuevo más tarde.",
@@ -93,6 +113,7 @@
 						}
 					},
 					"submit-button": "Crear hogar",
+					"success": "Hogar creado.",
 					"error": {
 						"invalid-invite-code": "El código de invitación generado no es válido. Por favor, inténtalo de nuevo.",
 						"generic": "No se pudo crear el hogar. Por favor, inténtalo de nuevo más tarde."
@@ -139,6 +160,7 @@
 					"not-found": "El código de invitación no es válido. Por favor, verifica con el administrador de tu hogar.",
 					"generic": "No se pudo unir al hogar. Por favor, inténtalo de nuevo más tarde."
 				},
+				"success": "Te has unido al hogar.",
 				"submit-button": "Unirse al hogar"
 			},
 			"create-new": "¿Quieres crear tu propio hogar? Crea un hogar"
@@ -151,6 +173,7 @@
 		"active": "Activo",
 		"open": "Abrir",
 		"members-count": "{count, plural, one {# miembro} other {# miembros}}",
+		"copied-clipboard": "Copiado al portapapeles",
 		"stats": {
 			"balance": "Balance",
 			"income": "Ingresos",
@@ -180,6 +203,7 @@
 			"error": {
 				"generic": "No se pudo unir al hogar. Por favor, inténtalo de nuevo más tarde."
 			},
+			"success": "Te has unido al hogar.",
 			"submit-button": "Unirse al hogar"
 		}
 	},
@@ -218,6 +242,87 @@
 		"not-authorized": {
 			"title": "Necesitas iniciar sesión",
 			"description": "Debes iniciar sesión para acceder a esta página. Inicia sesión para continuar donde lo dejaste."
+		}
+	},
+	"settings": {
+		"title": "Configuración",
+		"subtitle": "Administra la configuración, los miembros y más de este hogar.",
+		"sections": {
+			"general": "General",
+			"members": "Miembros",
+			"danger": "Zona de peligro"
+		},
+		"general": {
+			"subtitle": "Información general y valores por defecto de este hogar.",
+			"name": {
+				"label": "Nombre del hogar",
+				"description": "El nombre visible para todos los miembros de este hogar."
+			},
+			"currency": {
+				"label": "Moneda",
+				"description": "La moneda usada en presupuestos, transacciones e informes."
+			},
+			"split-strategy": {
+				"label": "Estrategia de división predeterminada",
+				"description": "Cómo se reparten los gastos compartidos entre los miembros por defecto."
+			},
+			"auto-categorize": {
+				"label": "Categorizar automáticamente",
+				"description": "Asigna automáticamente una categoría a las nuevas transacciones."
+			},
+			"ai-assist": {
+				"label": "Asistencia con IA",
+				"description": "Activa resúmenes, sugerencias y borradores de presupuesto con IA."
+			},
+			"full-address": {
+				"label": "Dirección",
+				"description": "Dirección física opcional de este hogar."
+			},
+			"saved": "Configuración del hogar guardada.",
+			"error": "Ocurrió un error al guardar. Inténtalo de nuevo."
+		},
+		"members": {
+			"title": "Miembros del hogar",
+			"subtitle": "Los administradores gestionan la configuración, los miembros y los roles. Los miembros tienen acceso limitado.",
+			"member-column": "Miembros",
+			"admin-column": "Administradores",
+			"you": "Tú",
+			"help": {
+				"title": "Cómo cambiar roles",
+				"body": "Selecciona a una o varias personas y usa los botones de flecha para moverlas entre columnas, o arrastra a una persona a la otra columna. Guarda para aplicar los cambios."
+			},
+			"last-admin-error": "Un hogar debe tener al menos un administrador.",
+			"unknown-member-error": "Una o más personas seleccionadas no son miembros de este hogar.",
+			"save": "Guardar roles",
+			"saved": "Roles actualizados",
+			"error": "Ocurrió un error al actualizar los roles. Inténtalo de nuevo."
+		},
+		"danger": {
+			"title": "Zona de peligro",
+			"subtitle": "Acciones irreversibles y destructivas.",
+			"error": "Ocurrió un error. Inténtalo de nuevo.",
+			"regenerate-code": {
+				"label": "Regenerar código de invitación",
+				"description": "Crea un nuevo código de invitación. El anterior dejará de funcionar de inmediato.",
+				"confirm": "¿Seguro? Quienes usen el código actual ya no podrán unirse.",
+				"cooldown-error": "Solo puedes regenerar el código de invitación cada 30 días.",
+				"success": "Código de invitación regenerado."
+			},
+			"leave": {
+				"label": "Salir del hogar",
+				"description": "Te eliminas de este hogar. Necesitarás una nueva invitación para volver.",
+				"confirm": "¿Seguro que quieres salir de este hogar?",
+				"last-admin-error": "Eres el último administrador. Asciende a otro miembro antes de salir.",
+				"success": "Has salido del hogar."
+			},
+			"delete": {
+				"label": "Eliminar hogar",
+				"description": "Elimina permanentemente este hogar y todos sus datos. No se puede deshacer.",
+				"confirm": "Esto elimina permanentemente el hogar y todos sus presupuestos, transacciones y miembros.",
+				"confirm-name-prompt": "Escribe “{name}” para confirmar.",
+				"name-mismatch-error": "El nombre que escribiste no coincide con el del hogar.",
+				"success": "Hogar eliminado."
+			}
 		}
 	}
 }

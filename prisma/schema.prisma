@@ -73,13 +73,14 @@ model User {
 }
 
 model Household {
-  id          String   @id @default(cuid())
-  name        String
-  fullAddress String?  @map("full_address")
-  code        String   @unique
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  createdById String   @map("created_by_id")
+  id                String    @id @default(cuid())
+  name              String
+  fullAddress       String?   @map("full_address")
+  code              String    @unique
+  codeRegeneratedAt DateTime? @map("code_regenerated_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  createdById       String    @map("created_by_id")
 
   config       HouseholdConfig?
   members      HouseholdMember[]

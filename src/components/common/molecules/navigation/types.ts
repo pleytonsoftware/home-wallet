@@ -1,13 +1,9 @@
+import type { MemberRole } from '@/lib/constants/role.enum'
 import type { SidebarMenuButton } from '@atoms/sidebar'
 import type { LucideIcon } from 'lucide-react'
 import type React from 'react'
 
 type UrlRoute = string | '#'
-
-// ─── Permission ───────────────────────────────────────────────────────────────
-
-/** A single permission name string (must match a value in `AccountPermissionsDto.name`). */
-export type NavPermission = string
 
 // ─── Tooltip ──────────────────────────────────────────────────────────────────
 
@@ -48,9 +44,7 @@ export type NavSubItem = {
 	isActive?: boolean
 	/** Button size — defaults to `'md'`. */
 	size?: 'sm' | 'md'
-	/** Required permissions; every entry must be satisfied for the item to render. */
-	permissions?: NavPermission[]
-}
+} & Pick<NavItem, 'colour' | 'allowedRoles' | 'prefetch'>
 
 // ─── Primary item ─────────────────────────────────────────────────────────────
 
@@ -91,8 +85,14 @@ export type NavItem = {
 	 * Defaults to the value of `isActive`.
 	 */
 	defaultOpen?: boolean
-	/** Required permissions; every entry must be satisfied for the item to render. */
-	permissions?: NavPermission[]
+	/** Required roles; every entry must be satisfied for the item to render. */
+	allowedRoles?: MemberRole[]
+
+	/** Color variant for the group. */
+	colour?: 'default' | 'primary' | 'secondary' | 'accent' | 'destructive' | 'warning' | 'info' | 'success'
+
+	/** Pre-fetches the route when clicked. */
+	prefetch?: boolean
 }
 
 // ─── Group action ─────────────────────────────────────────────────────────────
@@ -130,8 +130,11 @@ export type NavGroup = {
 	defaultOpen?: boolean
 	/** Ordered list of primary nav items — rendered in array order. */
 	items: NavItem[]
-	/** Required permissions; every entry must be satisfied for the group to render. */
-	permissions?: NavPermission[]
+	/** Required roles; every entry must be satisfied for the group to render. */
+	allowedRoles?: MemberRole[]
+
+	/** Color variant for the group. */
+	colour?: 'default' | 'primary' | 'secondary' | 'accent' | 'destructive' | 'warning' | 'info' | 'success'
 }
 
 // ─── Config ───────────────────────────────────────────────────────────────────

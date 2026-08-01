@@ -74,7 +74,14 @@ export const CurrencyCombobox: FC<CurrencyComboboxProps> = ({ id, name, onChange
 			modal={!!container}
 			value={value ? (getCurrencyDetails(value) ?? null) : null}
 		>
-			<ComboboxInput id={id} name={name} placeholder={placeholder || t('placeholder')} onChange={(e) => setQuery(e.target.value)} />
+			<ComboboxInput
+				id={id}
+				name={name}
+				data-testid='currencybox-input'
+				placeholder={placeholder || t('placeholder')}
+				onChange={(e) => setQuery(e.target.value)}
+				disabled={disabled}
+			/>
 			<ComboboxContent container={container}>
 				<ComboboxEmpty>{emptyLabel || t('empty')}</ComboboxEmpty>
 				<ComboboxList className='overflow-x-hidden'>

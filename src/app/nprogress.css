@@ -1,0 +1,18 @@
+@import 'nprogress/nprogress.css';
+
+#nprogress {
+	.spinner {
+		@apply hidden;
+	}
+
+	.bar {
+		@apply h-1 shadow-2xl;
+		background: var(--primary);
+
+		.peg {
+			box-shadow:
+				0 0 10px var(--accent),
+				0 0 5px var(--accent);
+		}
+	}
+}

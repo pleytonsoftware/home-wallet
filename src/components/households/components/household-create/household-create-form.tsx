@@ -6,6 +6,7 @@ import { useCallback } from 'react'
 
 import { useTranslations } from 'next-intl'
 import { Controller } from 'react-hook-form'
+import { toast } from 'sonner'
 
 import { createHousehold } from '@actions/household/create'
 import { Button } from '@atoms/button'
@@ -65,6 +66,7 @@ export const HouseholdCreateForm: FC<HouseholdCreateFormProps> = ({ setOpen, con
 					exact: true,
 				})
 				form.reset()
+				toast.success(t('success'))
 				router.refresh()
 			} catch (err) {
 				if (!form.formState.errors.root)
@@ -72,6 +74,7 @@ export const HouseholdCreateForm: FC<HouseholdCreateFormProps> = ({ setOpen, con
 						type: 'manual',
 						message: err instanceof Error ? err.message : t('error.generic'),
 					})
+				toast.error(err instanceof Error ? err.message : t('error.generic'))
 			}
 		},
 		[router, t, form],

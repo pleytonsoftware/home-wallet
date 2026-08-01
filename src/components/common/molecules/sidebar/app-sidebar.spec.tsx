@@ -8,7 +8,7 @@ import { SidebarProvider } from '@atoms/sidebar'
 import { TooltipProvider } from '@atoms/tooltip'
 import { useSignOut } from '@auth/hooks/use-signout.hook'
 import { useIsMobile } from '@hooks/use-mobile'
-import { UserRole } from '@lib/constants/role.enum'
+import { MemberRole, UserRole } from '@lib/constants/role.enum'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -30,6 +30,20 @@ vi.mock('@auth/hooks/use-signout.hook', () => ({
 	useSignOut: vi.fn(),
 }))
 
+const { currentRole, currentPathname } = vi.hoisted(() => ({
+	currentRole: { value: MemberRole.ADMIN },
+	currentPathname: { value: '/' },
+}))
+
+vi.mock('@households/context/household.context', () => ({
+	useHouseholdContext: () => ({ household: { role: currentRole.value } }),
+}))
+
+vi.mock('@navigation', () => ({
+	usePathname: () => currentPathname.value,
+	Link: (props: React.ComponentProps<'a'>) => <a {...props} />,
+}))
+
 const sessionUser = {
 	name: 'Jane Doe',
 	email: 'jane@example.com',
@@ -46,7 +60,7 @@ function renderAppSidebar(householdName = 'My Household') {
 	return render(
 		<TooltipProvider>
 			<SidebarProvider>
-				<AppSidebar householdName={householdName} />
+				<AppSidebar />
 			</SidebarProvider>
 		</TooltipProvider>,
 	)
@@ -56,6 +70,8 @@ describe('AppSidebar', () => {
 	beforeEach(() => {
 		vi.mocked(useIsMobile).mockReturnValue(false)
 		vi.mocked(useSignOut).mockReturnValue(vi.fn())
+		currentRole.value = MemberRole.ADMIN
+		currentPathname.value = '/'
 	})
 
 	it('throws when there is no active session', () => {
@@ -98,15 +114,40 @@ describe('AppSidebar', () => {
 			expect(screen.getByText('Member')).toBeInTheDocument()
 		})
 
-		it('renders the Settings nav item with its nested routes once expanded', async () => {
+		it('renders the Settings nav item with its nested routes once expanded for an admin', async () => {
 			const user = userEvent.setup()
+			currentRole.value = MemberRole.ADMIN
 			renderAppSidebar()
 
 			expect(screen.getByText('Settings')).toBeInTheDocument()
 			await user.click(screen.getByText('Settings'))
 
 			expect(screen.getByText('General')).toBeInTheDocument()
-			expect(screen.getByText('Roles')).toBeInTheDocument()
+			expect(screen.getByText('Members')).toBeInTheDocument()
+			expect(screen.getByText('Danger zone')).toBeInTheDocument()
+		})
+
+		it('hides the admin-only Members settings route from a non-admin member', async () => {
+			const user = userEvent.setup()
+			currentRole.value = MemberRole.MEMBER
+			renderAppSidebar()
+
+			await user.click(screen.getByText('Settings'))
+
+			expect(screen.getByText('General')).toBeInTheDocument()
+			expect(screen.getByText('Danger zone')).toBeInTheDocument()
+			expect(screen.queryByText('Members')).not.toBeInTheDocument()
+		})
+
+		it('keeps Settings expanded and marks the active sub-route based on the current url', () => {
+			currentPathname.value = '/household/household-id/settings/general'
+			const { container } = renderAppSidebar()
+
+			// Settings auto-expands because a child route is active — no click required.
+			expect(container.querySelector('[data-slot="collapsible"]')).toHaveAttribute('data-state', 'open')
+
+			const general = screen.getByRole('link', { name: 'General' }).closest('[data-slot="sidebar-menu-sub-button"]')
+			expect(general).toHaveAttribute('data-active', 'true')
 		})
 
 		it('renders the signed-in user in the footer', () => {

@@ -27,7 +27,8 @@ export const SignPage: FC = () => {
 			additionalContent={
 				<div className='group absolute w-16 top-8 right-4'>
 					<Logo
-						className='[&>img]:w-7 relative'
+						className='relative'
+						imgClassName='w-7'
 						textClassName='absolute text-muted-foreground text-[10px] line-clamp-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out'
 					/>
 				</div>

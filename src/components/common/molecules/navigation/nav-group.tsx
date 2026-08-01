@@ -6,8 +6,10 @@ import { ChevronDown } from 'lucide-react'
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@atoms/collapsible'
 import { SidebarGroup, SidebarGroupAction, SidebarGroupLabel, SidebarMenu } from '@atoms/sidebar'
+import { useHouseholdContext } from '@households/context/household.context'
 
 import { NavItemRenderer } from './nav-item'
+import { hasAccessToNavItem } from './utils'
 
 type NavGroupRendererProps = {
 	group: NavGroup
@@ -23,9 +25,11 @@ type NavGroupRendererProps = {
  * Returns `null` when the user lacks any required permission.
  */
 export function NavGroupRenderer({ group }: NavGroupRendererProps) {
+	const household = useHouseholdContext()
+
 	const menu = (
 		<SidebarMenu>
-			{group.items.map((item) => (
+			{group.items.filter(hasAccessToNavItem(household.household.role)).map((item) => (
 				<NavItemRenderer key={item.title} item={item} />
 			))}
 		</SidebarMenu>
@@ -59,7 +63,11 @@ export function NavGroupRenderer({ group }: NavGroupRendererProps) {
 	// ── Static group ────────────────────────────────────────────────────────────
 	return (
 		<SidebarGroup>
-			{group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
+			{group.label && (
+				<SidebarGroupLabel className='truncate line-clamp-1 h-fit mb-1' title={group.label}>
+					{group.label}
+				</SidebarGroupLabel>
+			)}
 			{group.groupAction && (
 				<SidebarGroupAction onClick={group.groupAction.onClick}>
 					<group.groupAction.icon />
