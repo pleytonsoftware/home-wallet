@@ -1,0 +1,20 @@
+node_modules
+.next
+.git
+.github
+.husky
+.vscode
+.claude
+data
+coverage
+
+# Env files hold secrets and must never end up in a build context or image layer.
+# Runtime config is injected via `docker run -e` / `--env-file` / your orchestrator instead.
+.env
+.env.*
+!.env.example
+
+*.log
+.DS_Store
+README.md
+docker-compose.yml

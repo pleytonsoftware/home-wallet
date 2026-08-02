@@ -1,3 +1,4 @@
+import type { LucideIcon } from 'lucide-react'
 import type { NavSubItem } from './types'
 
 import { render, screen } from '@testing-library/react'
@@ -8,9 +9,7 @@ vi.mock('@navigation', () => ({
 	Link: (props: React.ComponentProps<'a'>) => <a {...props} />,
 }))
 
-function MockIcon(props: React.ComponentProps<'svg'>) {
-	return <svg data-testid='icon' {...props} />
-}
+const MockIcon = ((props: React.ComponentProps<'svg'>) => <svg data-testid='icon' {...props} />) as unknown as LucideIcon
 
 function makeItem(overrides: Partial<NavSubItem> = {}): NavSubItem {
 	return {

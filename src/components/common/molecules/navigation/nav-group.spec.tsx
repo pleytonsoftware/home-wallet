@@ -1,3 +1,4 @@
+import type { LucideIcon } from 'lucide-react'
 import type { NavGroup } from './types'
 
 import { SidebarProvider } from '@atoms/sidebar'
@@ -22,9 +23,7 @@ vi.mock('@navigation', () => ({
 	Link: (props: React.ComponentProps<'a'>) => <a {...props} />,
 }))
 
-function GroupActionIcon(props: React.ComponentProps<'svg'>) {
-	return <svg data-testid='group-action-icon' {...props} />
-}
+const GroupActionIcon = ((props: React.ComponentProps<'svg'>) => <svg data-testid='group-action-icon' {...props} />) as unknown as LucideIcon
 
 function makeGroup(overrides: Partial<NavGroup> = {}): NavGroup {
 	return {

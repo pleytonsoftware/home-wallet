@@ -1,3 +1,4 @@
+import type { LucideIcon } from 'lucide-react'
 import type { NavItem } from './types'
 
 import { SidebarProvider } from '@atoms/sidebar'
@@ -22,13 +23,9 @@ vi.mock('@navigation', () => ({
 	Link: (props: React.ComponentProps<'a'>) => <a {...props} />,
 }))
 
-function MockIcon(props: React.ComponentProps<'svg'>) {
-	return <svg data-testid='icon' {...props} />
-}
+const MockIcon = ((props: React.ComponentProps<'svg'>) => <svg data-testid='icon' {...props} />) as unknown as LucideIcon
 
-function ActionIcon(props: React.ComponentProps<'svg'>) {
-	return <svg data-testid='action-icon' {...props} />
-}
+const ActionIcon = ((props: React.ComponentProps<'svg'>) => <svg data-testid='action-icon' {...props} />) as unknown as LucideIcon
 
 function makeItem(overrides: Partial<NavItem> = {}): NavItem {
 	return {
