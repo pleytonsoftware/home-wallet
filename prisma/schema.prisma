@@ -180,6 +180,7 @@ model MonthlyBudget {
   aiSummary    AISummary?
 
   @@index([householdId, householdMemberId, month])
+  @@map("monthly_budgets")
 }
 
 model Category {
@@ -194,6 +195,7 @@ model Category {
   payments     Payment[]
 
   @@unique([name, householdId])
+  @@map("categories")
 }
 
 model Transaction {
