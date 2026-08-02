@@ -40,7 +40,7 @@ export function SidebarUser({ user, onSignout }: NavUserProps) {
 						<Link href={ROUTES.HOUSEHOLDS} className='px-3'>
 							<span className='relative p-2 pl-0'>
 								<Icon className='' IconComponent={Building2Icon} />
-								<Icon className='absolute right-1 top-5' size='xs' IconComponent={CornerDownLeftIcon} />
+								<Icon className='absolute right-1 top-5' size='xs' forceSize IconComponent={CornerDownLeftIcon} />
 							</span>
 							{t('sidebar.households')}
 						</Link>

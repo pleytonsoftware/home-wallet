@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-type-imports */
 import type { PropsWithChildren } from 'react'
 
 import axios from 'axios'

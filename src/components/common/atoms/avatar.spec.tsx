@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 
-import { Avatar, AvatarBadge, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage } from './avatar'
+import { Avatar, AvatarBadge, AvatarFallback, AvatarGroup, AvatarGroupCount } from './avatar'
 
 describe('Avatar', () => {
 	it('renders with data-slot attribute', () => {

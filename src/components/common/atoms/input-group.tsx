@@ -1,10 +1,12 @@
 'use client'
 
+import type { ButtonProps } from '@atoms/button'
+
 import * as React from 'react'
 
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import { Button, ButtonProps } from '@atoms/button'
+import { Button } from '@atoms/button'
 import { Input } from '@atoms/input'
 import { Textarea } from '@atoms/textarea'
 import { cn } from '@cn'

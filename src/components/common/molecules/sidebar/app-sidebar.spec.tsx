@@ -30,13 +30,13 @@ vi.mock('@auth/hooks/use-signout.hook', () => ({
 	useSignOut: vi.fn(),
 }))
 
-const { currentRole, currentPathname } = vi.hoisted(() => ({
-	currentRole: { value: MemberRole.ADMIN },
+const { currentHousehold, currentPathname } = vi.hoisted(() => ({
+	currentHousehold: { value: { id: 'household-id', name: 'My Household', role: 'ADMIN' as MemberRole } },
 	currentPathname: { value: '/' },
 }))
 
 vi.mock('@households/context/household.context', () => ({
-	useHouseholdContext: () => ({ household: { role: currentRole.value } }),
+	useHouseholdContext: () => ({ household: currentHousehold.value }),
 }))
 
 vi.mock('@navigation', () => ({
@@ -56,7 +56,7 @@ const sessionUser = {
 	householdIds: ['household-id'],
 } satisfies Session['user']
 
-function renderAppSidebar(householdName = 'My Household') {
+function renderAppSidebar() {
 	return render(
 		<TooltipProvider>
 			<SidebarProvider>
@@ -70,7 +70,7 @@ describe('AppSidebar', () => {
 	beforeEach(() => {
 		vi.mocked(useIsMobile).mockReturnValue(false)
 		vi.mocked(useSignOut).mockReturnValue(vi.fn())
-		currentRole.value = MemberRole.ADMIN
+		currentHousehold.value = { id: 'household-id', name: 'My Household', role: MemberRole.ADMIN }
 		currentPathname.value = '/'
 	})
 
@@ -105,48 +105,60 @@ describe('AppSidebar', () => {
 		})
 
 		it('renders the household name as the nav group label', () => {
-			renderAppSidebar('The Does')
+			currentHousehold.value = { ...currentHousehold.value, name: 'The Does' }
+			renderAppSidebar()
 			expect(screen.getByText('The Does')).toBeInTheDocument()
 		})
 
-		it('renders the Member nav item', () => {
+		it('renders the Transactions nav item', () => {
 			renderAppSidebar()
-			expect(screen.getByText('Member')).toBeInTheDocument()
+			expect(screen.getByText('transactions')).toBeInTheDocument()
+		})
+
+		it('renders the Transactions nav item with its nested routes once expanded', async () => {
+			const user = userEvent.setup()
+			renderAppSidebar()
+
+			await user.click(screen.getByText('transactions'))
+
+			expect(screen.getByText('Shared')).toBeInTheDocument()
+			expect(screen.getByText('Personal')).toBeInTheDocument()
 		})
 
 		it('renders the Settings nav item with its nested routes once expanded for an admin', async () => {
 			const user = userEvent.setup()
-			currentRole.value = MemberRole.ADMIN
+			currentHousehold.value = { ...currentHousehold.value, role: MemberRole.ADMIN }
 			renderAppSidebar()
 
-			expect(screen.getByText('Settings')).toBeInTheDocument()
-			await user.click(screen.getByText('Settings'))
+			expect(screen.getByText('settings')).toBeInTheDocument()
+			await user.click(screen.getByText('settings'))
 
-			expect(screen.getByText('General')).toBeInTheDocument()
-			expect(screen.getByText('Members')).toBeInTheDocument()
-			expect(screen.getByText('Danger zone')).toBeInTheDocument()
+			expect(screen.getByText('sections.general')).toBeInTheDocument()
+			expect(screen.getByText('sections.members')).toBeInTheDocument()
+			expect(screen.getByText('sections.danger')).toBeInTheDocument()
 		})
 
 		it('hides the admin-only Members settings route from a non-admin member', async () => {
 			const user = userEvent.setup()
-			currentRole.value = MemberRole.MEMBER
+			currentHousehold.value = { ...currentHousehold.value, role: MemberRole.MEMBER }
 			renderAppSidebar()
 
-			await user.click(screen.getByText('Settings'))
+			await user.click(screen.getByText('settings'))
 
-			expect(screen.getByText('General')).toBeInTheDocument()
-			expect(screen.getByText('Danger zone')).toBeInTheDocument()
-			expect(screen.queryByText('Members')).not.toBeInTheDocument()
+			expect(screen.getByText('sections.general')).toBeInTheDocument()
+			expect(screen.getByText('sections.danger')).toBeInTheDocument()
+			expect(screen.queryByText('sections.members')).not.toBeInTheDocument()
 		})
 
 		it('keeps Settings expanded and marks the active sub-route based on the current url', () => {
-			currentPathname.value = '/household/household-id/settings/general'
-			const { container } = renderAppSidebar()
+			currentPathname.value = `/household/${currentHousehold.value.id}/settings/general`
+			renderAppSidebar()
 
 			// Settings auto-expands because a child route is active — no click required.
-			expect(container.querySelector('[data-slot="collapsible"]')).toHaveAttribute('data-state', 'open')
+			const settingsCollapsible = screen.getByText('settings').closest('[data-slot="collapsible"]')
+			expect(settingsCollapsible).toHaveAttribute('data-state', 'open')
 
-			const general = screen.getByRole('link', { name: 'General' }).closest('[data-slot="sidebar-menu-sub-button"]')
+			const general = screen.getByRole('link', { name: 'sections.general' }).closest('[data-slot="sidebar-menu-sub-button"]')
 			expect(general).toHaveAttribute('data-active', 'true')
 		})
 

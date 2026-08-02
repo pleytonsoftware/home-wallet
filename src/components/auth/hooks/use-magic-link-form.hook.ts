@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 
-import { magicLinkResolver } from '../magic-link.schema'
+import { magicLinkResolver } from '@auth/magic-link.schema'
 
 export const useMagicLinkForm = () =>
 	useForm({

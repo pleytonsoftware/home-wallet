@@ -1,7 +1,9 @@
 'use client'
 
+import type { Languages } from '@/i18n/languages'
+
 import { AVAILABLE_LANGUAGE_FLAGS_DICTIONARY } from '@/assets/flags'
-import { LOCALE_DICTIONARY, Languages } from '@/i18n/languages'
+import { LOCALE_DICTIONARY } from '@/i18n/languages'
 
 import { Globe } from 'lucide-react'
 

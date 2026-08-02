@@ -1,16 +1,6 @@
 import { render, screen } from '@testing-library/react'
 
-import {
-	Command,
-	CommandDialog,
-	CommandInput,
-	CommandList,
-	CommandEmpty,
-	CommandGroup,
-	CommandItem,
-	CommandShortcut,
-	CommandSeparator,
-} from './command'
+import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandShortcut, CommandSeparator } from './command'
 
 beforeAll(() => {
 	globalThis.ResizeObserver = class ResizeObserver {

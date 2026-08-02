@@ -1,3 +1,4 @@
+import type { TransformField } from '@/lib/types/raw/types'
 import type { MemberRole } from '@lib/constants/role.enum'
 import type { SplitStrategy } from '@lib/constants/split-strategy.enum'
 
@@ -17,9 +18,9 @@ export interface HouseholdMemberWithRole extends HouseholdMemberSummary {
 }
 
 /** Editable household configuration mirrored from the `HouseholdConfig` model. */
-export interface HouseholdConfigSummary {
+export interface HouseholdConfigSummary<R extends boolean = false> {
 	currency: string
-	defaultSplitStrategy: SplitStrategy
+	defaultSplitStrategy: TransformField<SplitStrategy, string, R>
 	autoCategorize: boolean
 	aiAssistEnabled: boolean
 }
@@ -55,7 +56,7 @@ export interface HouseholdDetail<R extends boolean = false> extends Omit<Househo
 	fullAddress?: string | null
 	/** Whether the current user created (owns) this household. Only the owner may delete it. */
 	isOwner: boolean
-	config: HouseholdConfigSummary
+	config: HouseholdConfigSummary<R>
 	members: Array<HouseholdMemberWithRole>
 	isInviteCodeOnCooldown: boolean
 }

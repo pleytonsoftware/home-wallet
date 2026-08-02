@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 
-import { Item, ItemGroup, ItemSeparator, ItemTitle, ItemDescription } from './item'
+import { Item, ItemGroup, ItemTitle, ItemDescription } from './item'
 
 beforeAll(() => {
 	Object.defineProperty(window, 'matchMedia', {

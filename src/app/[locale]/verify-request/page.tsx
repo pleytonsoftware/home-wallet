@@ -1,1 +1,1 @@
-export { VerifyRequestCard as default } from '@/components/auth/verify-request-card'
+export { VerifyRequestCard as default } from '@auth/verify-request-card'

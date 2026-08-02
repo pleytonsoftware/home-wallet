@@ -81,9 +81,12 @@ const eslintConfig = defineConfig([
 			'src/app/**/layout.tsx',
 			'src/app/**/loading.tsx',
 			'src/app/**/error.tsx',
+			'src/app/**/forbidden.tsx',
 			'src/app/**/not-found.tsx',
 			'*.config.ts',
 			'src/proxy.ts',
+			'src/i18n/request.ts',
+			'src/emails/*.tsx',
 		],
 		rules: {
 			'import/no-default-export': 'off',

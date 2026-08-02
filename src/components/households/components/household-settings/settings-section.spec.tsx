@@ -91,9 +91,7 @@ describe('SettingsSection', () => {
 
 		it('renders the help trigger inside the title heading', () => {
 			render(<SettingsSection title='General' help='Help content' />)
-			expect(screen.getByRole('heading', { level: 3 })).toContainElement(
-				screen.getByRole('button', { name: 'transfer-list-help' }),
-			)
+			expect(screen.getByRole('heading', { level: 3 })).toContainElement(screen.getByRole('button', { name: 'transfer-list-help' }))
 		})
 	})
 })

@@ -1,6 +1,7 @@
-import { createContext, Dispatch, SetStateAction, useContext } from 'react'
+import type { OnboardingOption } from '@households/onboarding/types'
+import type { Dispatch, SetStateAction } from 'react'
 
-import { OnboardingOption } from '../types'
+import { createContext, useContext } from 'react'
 
 interface OnboardingContextType {
 	view: OnboardingOption

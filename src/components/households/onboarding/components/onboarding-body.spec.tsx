@@ -1,4 +1,4 @@
-import type { OnboardingOption } from '../types'
+import type { OnboardingOption } from '@households/onboarding/types'
 
 import { useState } from 'react'
 

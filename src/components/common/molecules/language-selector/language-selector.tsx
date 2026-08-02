@@ -1,5 +1,7 @@
 'use client'
 
+import type { AVAILABLE_LANGUAGE_FLAGS_DICTIONARY } from '@assets/flags'
+
 import { AVAILABLE_LANGUAGES, LOCALE_DICTIONARY } from '@/i18n/languages'
 
 import { useSearchParams } from 'next/navigation'
@@ -7,7 +9,6 @@ import { useMemo } from 'react'
 
 import { LanguagesIcon } from 'lucide-react'
 
-import { AVAILABLE_LANGUAGE_FLAGS_DICTIONARY } from '@assets/flags'
 import { Button } from '@atoms/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuTrigger } from '@atoms/dropdown-menu'
 import { useLanguage } from '@hooks/use-language'

@@ -55,4 +55,23 @@ describe('Icon component', () => {
 		expect(svg).toBeInTheDocument()
 		expect(svg).toHaveAttribute('data-testid', 'icon')
 	})
+
+	it('does not force the size class by default', () => {
+		render(<Icon IconComponent={Heart} data-testid='icon' />)
+		const svg = screen.getByTestId('icon')
+		expect(svg).toHaveClass('size-5')
+		expect(svg).not.toHaveClass('size-5!')
+	})
+
+	it('forces the size class when forceSize is true', () => {
+		render(<Icon IconComponent={Heart} forceSize data-testid='icon' />)
+		const svg = screen.getByTestId('icon')
+		expect(svg).toHaveClass('size-5!')
+		expect(svg).not.toHaveClass('size-5')
+	})
+
+	it('forces the size class for a non-default size when forceSize is true', () => {
+		render(<Icon IconComponent={Heart} size='lg' forceSize data-testid='icon' />)
+		expect(screen.getByTestId('icon')).toHaveClass('size-6!')
+	})
 })

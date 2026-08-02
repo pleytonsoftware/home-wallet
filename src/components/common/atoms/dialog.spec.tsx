@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from './dialog'
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter } from './dialog'
 
 describe('Dialog', () => {
 	it('renders dialog root with data-slot attribute', () => {
