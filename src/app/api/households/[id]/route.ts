@@ -2,10 +2,10 @@ import type { HouseholdDetail } from '@households/types'
 
 import { NextResponse } from 'next/server'
 
-import { StatusCodes } from 'http-status-codes'
 import { z } from 'zod'
 
-import { authorizedSession } from '@lib/auth/utils'
+import { withAuth, withErrorBoundary, withParamsValidation } from '@lib/api/middlewares'
+import { createRoute } from '@lib/api/route-builder'
 import { MemberRole, parseMemberRole } from '@lib/constants/role.enum'
 import { SplitStrategy } from '@lib/constants/split-strategy.enum'
 import { householdLogger } from '@lib/logger'
@@ -14,20 +14,11 @@ import { isInviteCodeRegenerateOnCooldown } from '@lib/utils/invite-code.utils'
 
 const paramsSchema = z.object({ id: z.string().min(1) })
 
-export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
-	const parsed = paramsSchema.safeParse(await context.params)
-	if (!parsed.success) {
-		return NextResponse.json({ error: 'Invalid path params', issues: z.treeifyError(parsed.error).errors }, { status: StatusCodes.BAD_REQUEST })
-	}
-
-	const { id } = parsed.data
-
-	const { session, error: authError } = await authorizedSession()
-	if (authError) {
-		return NextResponse.json({ error: authError }, { status: authError.status })
-	}
-
-	try {
+export const GET = createRoute<{ params: Promise<{ id: string }> }>()
+	.use(withErrorBoundary(householdLogger, '[GET /households/:id]: {error}'))
+	.use(withAuth)
+	.use(withParamsValidation(paramsSchema))
+	.handler(async (_request, { params: { id }, session }) => {
 		const household = await prisma.household.findFirstOrThrow({
 			where: { id, members: { some: { userId: session.user.id } } },
 			include: {
@@ -71,10 +62,6 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
 		}
 
 		return NextResponse.json(detail)
-	} catch (error) {
-		householdLogger.error('[GET /households/:id]: {error}', { error })
-		return NextResponse.json({ error: 'Household not found' }, { status: StatusCodes.NOT_FOUND })
-	}
-}
+	})
 
 export const dynamic = 'force-dynamic'

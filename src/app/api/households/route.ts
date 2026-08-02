@@ -2,26 +2,21 @@ import type { HouseholdSummary } from '@households/types'
 
 import { NextResponse } from 'next/server'
 
-import { StatusCodes } from 'http-status-codes'
-
-import { authorizedSession } from '@lib/auth/utils'
+import { withAuth, withErrorBoundary } from '@lib/api/middlewares'
+import { createRoute } from '@lib/api/route-builder'
 import { MemberRole } from '@lib/constants/role.enum'
 import { householdLogger } from '@lib/logger'
 import { prisma } from '@lib/prisma'
 
-export async function GET() {
-	try {
-		const { session, error: authError } = await authorizedSession()
-
-		if (authError) {
-			return NextResponse.json({ error: authError }, { status: authError.status })
-		}
-
+export const GET = createRoute()
+	.use(withErrorBoundary(householdLogger, 'Failed to fetch households: {error}'))
+	.use(withAuth)
+	.handler(async (_request, { session }) => {
 		const households = await prisma.household.findMany({
 			where: {
 				members: {
 					some: {
-						userId: session!.user.id,
+						userId: session.user.id,
 					},
 				},
 			},
@@ -62,10 +57,6 @@ export async function GET() {
 		})
 
 		return NextResponse.json(householdData)
-	} catch (error) {
-		householdLogger.error('Failed to fetch households: {error}', { error })
-		return NextResponse.json({ error: 'Internal server error' }, { status: StatusCodes.INTERNAL_SERVER_ERROR })
-	}
-}
+	})
 
 export const dynamic = 'force-dynamic'

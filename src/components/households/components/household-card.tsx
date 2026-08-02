@@ -88,11 +88,6 @@ export const HouseholdCard: FC<PropsWithChildren<HouseholdCardProps>> = ({
 										/>
 									</Button>
 								}
-								{/* // ) : (
-									// <Button size='icon-xs' variant='ghost' className='-ml-1' onClick={copyToClipboardEvent}>
-									// 	<Icon className='size-3.5' IconComponent={} />
-									// </Button>
-								// )} */}
 							</span>
 						)}
 					</p>
