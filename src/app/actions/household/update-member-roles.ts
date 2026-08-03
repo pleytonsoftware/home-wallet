@@ -34,7 +34,7 @@ export async function updateMemberRoles(householdId: string, roles: Record<strin
 		const rolesTrans = await getTranslations('settings.members')
 
 		const members = await prisma.householdMember.findMany({
-			where: { householdId },
+			where: { householdId, removedAt: null },
 			select: { id: true, role: true },
 		})
 

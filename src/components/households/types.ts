@@ -1,6 +1,6 @@
-import type { TransformField } from '@/lib/types/raw/types'
 import type { MemberRole } from '@lib/constants/role.enum'
 import type { SplitStrategy } from '@lib/constants/split-strategy.enum'
+import type { TransformField } from '@lib/types/raw/types'
 
 export interface HouseholdMemberSummary {
 	/** `User.id` - the user `id` of the household member. */
@@ -15,6 +15,11 @@ export interface HouseholdMemberWithRole extends HouseholdMemberSummary {
 	memberId: string
 	email: string
 	role: MemberRole
+}
+
+/** A removed (soft-deleted) household member — admin-only, browsable on the members settings page. */
+export interface RemovedHouseholdMember extends HouseholdMemberWithRole {
+	removedAt: string
 }
 
 /** Editable household configuration mirrored from the `HouseholdConfig` model. */

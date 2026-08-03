@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -14,7 +16,12 @@ const ITEMS: Row[] = [
 	{ id: 'c', name: 'Carol' },
 ]
 
-function renderList(assignments: Record<string, string>, onChange = vi.fn(), isItemDisabled?: (item: Row) => boolean) {
+function renderList(
+	assignments: Record<string, string>,
+	onChange = vi.fn(),
+	isItemDisabled?: (item: Row) => boolean,
+	renderItemAction?: (item: Row) => ReactNode,
+) {
 	render(
 		<TransferList<Row>
 			items={ITEMS}
@@ -25,6 +32,7 @@ function renderList(assignments: Record<string, string>, onChange = vi.fn(), isI
 			rightColumn={{ key: 'right', label: 'Admins' }}
 			isItemDisabled={isItemDisabled}
 			renderItem={(item) => <span>{item.name}</span>}
+			renderItemAction={renderItemAction}
 		/>,
 	)
 	return onChange
@@ -90,6 +98,36 @@ describe('TransferList', () => {
 
 			const lastArgs = onChange.mock.calls.at(-1)?.[0]
 			expect(lastArgs).toMatchObject({ a: 'left', b: 'right' })
+		})
+	})
+
+	describe('renderItemAction', () => {
+		it('renders the action next to the row without nesting it inside the toggle button', async () => {
+			const onRemove = vi.fn()
+			renderList({ a: 'left', b: 'left', c: 'right' }, vi.fn(), undefined, (item) => (
+				<button type='button' onClick={() => onRemove(item.id)}>
+					Remove {item.name}
+				</button>
+			))
+
+			const removeButton = screen.getByRole('button', { name: 'Remove Alice' })
+			expect(screen.getByText('Alice').closest('button')).not.toContainElement(removeButton)
+
+			const user = userEvent.setup()
+			await user.click(removeButton)
+
+			expect(onRemove).toHaveBeenCalledWith('a')
+		})
+
+		it('does not toggle row selection when the action is clicked', async () => {
+			const onChange = vi.fn()
+			const user = userEvent.setup()
+			renderList({ a: 'left', b: 'left', c: 'right' }, onChange, undefined, (item) => <button type='button'>Remove {item.name}</button>)
+
+			await user.click(screen.getByRole('button', { name: 'Remove Alice' }))
+			await user.click(screen.getByLabelText('move-selected-right'))
+
+			expect(onChange).not.toHaveBeenCalled()
 		})
 	})
 })

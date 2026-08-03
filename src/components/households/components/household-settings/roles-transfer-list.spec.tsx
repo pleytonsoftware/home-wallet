@@ -33,6 +33,10 @@ vi.mock('@households/hooks/forms/use-save-member-roles.hook', () => ({
 	useSaveMemberRoles: () => ({ mutateAsync, isPending: false }),
 }))
 
+vi.mock('@households/components/household-settings/remove-member-button', () => ({
+	RemoveMemberButton: () => null,
+}))
+
 const MEMBERS: HouseholdMemberWithRole[] = [
 	{ id: 'u1', memberId: 'm1', name: 'Alice', email: 'alice@example.com', image: null, role: MemberRole.ADMIN },
 	{ id: 'u2', memberId: 'm2', name: 'Bob', email: 'bob@example.com', image: null, role: MemberRole.MEMBER },

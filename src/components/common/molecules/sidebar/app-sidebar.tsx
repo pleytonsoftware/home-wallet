@@ -2,7 +2,7 @@
 
 import type { NavConfig } from '@molecules/navigation/types'
 
-import { SettingsIcon, BanknoteCheckIcon } from 'lucide-react'
+import { SettingsIcon, BanknoteCheckIcon, WalletIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 
@@ -26,6 +26,12 @@ const NAV_CONFIG: (params: NavConfigParams) => NavConfig = ({ t, tSidebar, house
 		{
 			label: household.name,
 			items: [
+				{
+					title: tSidebar('bankAccounts'),
+					icon: WalletIcon,
+					url: ROUTES.HOUSEHOLD.BANK_ACCOUNTS.replace(':id', household.id),
+					prefetch: true,
+				},
 				{
 					// TODO: Add all the household-related routes here, like dashboard, transactions, budgets, etc.
 					title: tSidebar('transactions'),

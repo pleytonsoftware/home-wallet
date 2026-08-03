@@ -25,6 +25,10 @@ vi.mock('@households/hooks/forms/use-danger-zone-actions.hook', () => ({
 	useDangerZoneActions: () => ({ regenerate: regenerateMock, leave: leaveMock, deleteHousehold: deleteMock }),
 }))
 
+vi.mock('@actions/household/danger', () => ({
+	getLeaveHouseholdImpact: vi.fn().mockResolvedValue({ status: 200, success: true, data: [] }),
+}))
+
 function makeHousehold(overrides?: Partial<HouseholdDetail>): HouseholdDetail {
 	return {
 		id: 'h1',

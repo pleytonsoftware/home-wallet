@@ -1,5 +1,5 @@
-import type { MemberRole } from '@/lib/constants/role.enum'
 import type { SidebarMenuButton } from '@atoms/sidebar'
+import type { MemberRole } from '@lib/constants/role.enum'
 import type { LucideIcon } from 'lucide-react'
 import type React from 'react'
 

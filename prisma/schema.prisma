@@ -121,11 +121,13 @@ model HouseholdMember {
   role        String    @default("member") // TS enum: MEMBER_ROLE
   // monthlyIncome Float?    @map("monthly_income") // Used for proportional_to_income split // ! MAKE IT VIRTUALLY CALCULATED FROM HouseholdMemberPayroll for each MonthlyBudget
   createdAt   DateTime  @default(now()) @map("created_at")
+  removedAt   DateTime? @map("removed_at")
 
-  payments       Payment[]
-  bankAccounts   BankAccount[]
-  payrolls       HouseholdMemberPayroll[]
-  monthlyBudgets MonthlyBudget[]
+  payments           Payment[]
+  bankAccounts       BankAccount[]
+  sharedBankAccounts BankAccountMember[]
+  payrolls           HouseholdMemberPayroll[]
+  monthlyBudgets     MonthlyBudget[]
 
   @@index([householdId])
   @@map("household_members")
@@ -134,7 +136,7 @@ model HouseholdMember {
 model HouseholdMemberPayroll {
   id                String          @id @default(cuid())
   householdMemberId String          @map("household_member_id")
-  householdMember   HouseholdMember @relation(fields: [householdMemberId], references: [id])
+  householdMember   HouseholdMember @relation(fields: [householdMemberId], references: [id], onDelete: Cascade)
   name              String
   amount            Float
   startDate         DateTime        @map("start_date")
@@ -149,18 +151,32 @@ model BankAccount {
   id                String          @id @default(cuid())
   householdId       String          @map("household_id")
   household         Household       @relation(fields: [householdId], references: [id])
-  householdMemberId String          @map("household_member_id")
-  householdMember   HouseholdMember @relation(fields: [householdMemberId], references: [id])
+  householdMemberId String          @map("household_member_id") // creator/owner — only they can edit or delete
+  householdMember   HouseholdMember @relation(fields: [householdMemberId], references: [id], onDelete: Cascade)
   name              String
   lastFourDigits    String?         @map("last_four_digits")
   type              String          @default("bank") // TS enum: ACCOUNT_TYPE
   createdAt         DateTime        @default(now()) @map("created_at")
 
-  sourcePayments Payment[] @relation("SourcePayments")
-  destPayments   Payment[] @relation("DestPayments")
+  sharedWith     BankAccountMember[]
+  sourcePayments Payment[]           @relation("SourcePayments")
+  destPayments   Payment[]           @relation("DestPayments")
 
   @@index([householdId])
   @@map("bank_accounts")
+}
+
+model BankAccountMember {
+  id                String          @id @default(cuid())
+  bankAccountId     String          @map("bank_account_id")
+  bankAccount       BankAccount     @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+  householdMemberId String          @map("household_member_id")
+  householdMember   HouseholdMember @relation(fields: [householdMemberId], references: [id], onDelete: Cascade)
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  @@unique([bankAccountId, householdMemberId])
+  @@index([householdMemberId])
+  @@map("bank_account_members")
 }
 
 model MonthlyBudget {
@@ -168,7 +184,7 @@ model MonthlyBudget {
   householdId       String           @map("household_id")
   household         Household        @relation(fields: [householdId], references: [id])
   householdMemberId String?          @map("household_member_id")
-  householdMember   HouseholdMember? @relation(fields: [householdMemberId], references: [id])
+  householdMember   HouseholdMember? @relation(fields: [householdMemberId], references: [id], onDelete: SetNull)
   month             DateTime // Format: YYYY-MM-01
   type              String           @default("personal") // TS enum: BUDGET_TYPE
   status            String           @default("draft") // TS enum: BUDGET_STATUS
@@ -233,16 +249,16 @@ model Payment {
   transactionId     String?          @map("transaction_id")
   transaction       Transaction?     @relation(fields: [transactionId], references: [id])
   householdMemberId String?          @map("household_member_id")
-  householdMember   HouseholdMember? @relation(fields: [householdMemberId], references: [id])
+  householdMember   HouseholdMember? @relation(fields: [householdMemberId], references: [id], onDelete: SetNull)
 
   amount          Float
   type            String       @default("expense") // TS enum: PAYMENT_TYPE
   categoryId      String?      @map("category_id")
   category        Category?    @relation(fields: [categoryId], references: [id])
   sourceAccountId String?      @map("source_account_id")
-  sourceAccount   BankAccount? @relation("SourcePayments", fields: [sourceAccountId], references: [id])
+  sourceAccount   BankAccount? @relation("SourcePayments", fields: [sourceAccountId], references: [id], onDelete: SetNull)
   destAccountId   String?      @map("dest_account_id")
-  destAccount     BankAccount? @relation("DestPayments", fields: [destAccountId], references: [id])
+  destAccount     BankAccount? @relation("DestPayments", fields: [destAccountId], references: [id], onDelete: SetNull)
 
   note        String?
   date        DateTime

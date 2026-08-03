@@ -37,6 +37,15 @@
 					"member": "Miembro",
 					"admin": "Administrador"
 				}
+			},
+			"account-type": {
+				"options": {
+					"bank": "Cuenta bancaria",
+					"credit_card": "Tarjeta de crédito",
+					"debit_card": "Tarjeta de débito",
+					"cash": "Efectivo",
+					"other": "Otro"
+				}
 			}
 		},
 		"confirm": {
@@ -51,7 +60,8 @@
 		"sidebar": {
 			"transactions": "Transacciones",
 			"settings": "Configuración",
-			"households": "Mis hogares"
+			"households": "Mis hogares",
+			"bankAccounts": "Cuentas bancarias"
 		},
 		"error": {
 			"conflict": "Ocurrió un conflicto desconocido. Por favor, inténtalo de nuevo más tarde.",
@@ -63,7 +73,8 @@
 			"household": {
 				"join": {
 					"not-found": "El código de invitación no es válido. Por favor, verifica con el administrador de tu hogar.",
-					"already-member": "Ya eres miembro de este hogar."
+					"already-member": "Ya eres miembro de este hogar.",
+					"previously-removed": "Fuiste eliminado anteriormente de este hogar. Pídele a un administrador que te vuelva a agregar."
 				}
 			}
 		},
@@ -117,6 +128,31 @@
 					"error": {
 						"invalid-invite-code": "El código de invitación generado no es válido. Por favor, inténtalo de nuevo.",
 						"generic": "No se pudo crear el hogar. Por favor, inténtalo de nuevo más tarde."
+					}
+				}
+			},
+			"bank-accounts": {
+				"create": {
+					"name": {
+						"error": {
+							"required": "El nombre de la cuenta es obligatorio",
+							"max-length": "El nombre debe tener menos de {max} caracteres"
+						}
+					},
+					"type": {
+						"error": {
+							"required": "Selecciona un tipo de cuenta"
+						}
+					},
+					"last-four-digits": {
+						"error": {
+							"invalid": "Ingresa exactamente 4 dígitos"
+						}
+					},
+					"shared-members": {
+						"error": {
+							"invalid": "Una o más personas seleccionadas no son miembros de este hogar"
+						}
 					}
 				}
 			}
@@ -295,7 +331,28 @@
 			"unknown-member-error": "Una o más personas seleccionadas no son miembros de este hogar.",
 			"save": "Guardar roles",
 			"saved": "Roles actualizados",
-			"error": "Ocurrió un error al actualizar los roles. Inténtalo de nuevo."
+			"error": "Ocurrió un error al actualizar los roles. Inténtalo de nuevo.",
+			"remove": {
+				"trigger": "Eliminar miembro",
+				"confirm-title": "Eliminar miembro",
+				"confirm-description": "¿Eliminar a {name} de este hogar? Perderá el acceso de inmediato.",
+				"confirm-button": "Eliminar",
+				"success": "Miembro eliminado.",
+				"error": "Ocurrió un error al eliminar a este miembro. Inténtalo de nuevo.",
+				"last-admin-error": "Un hogar debe tener al menos un administrador.",
+				"self-error": "Usa “Salir del hogar” para eliminarte a ti mismo."
+			},
+			"previous": {
+				"title": "Miembros anteriores",
+				"subtitle": "Personas que formaron parte de este hogar.",
+				"removed-on": "Eliminado el {date}",
+				"delete-trigger": "Eliminar permanentemente",
+				"delete-confirm-title": "Eliminar permanentemente",
+				"delete-confirm-description": "Elimina permanentemente a {name} del historial de este hogar. Esto no se puede deshacer.",
+				"delete-confirm-button": "Eliminar permanentemente",
+				"delete-success": "Miembro eliminado permanentemente.",
+				"delete-error": "Ocurrió un error al eliminar a este miembro. Inténtalo de nuevo."
+			}
 		},
 		"danger": {
 			"title": "Zona de peligro",
@@ -313,7 +370,11 @@
 				"description": "Te eliminas de este hogar. Necesitarás una nueva invitación para volver.",
 				"confirm": "¿Seguro que quieres salir de este hogar?",
 				"last-admin-error": "Eres el último administrador. Asciende a otro miembro antes de salir.",
-				"success": "Has salido del hogar."
+				"success": "Has salido del hogar.",
+				"impact": {
+					"transfer": "“{account}” se transferirá a {member}.",
+					"delete": "“{account}” se eliminará, ya que no la compartes con nadie más."
+				}
 			},
 			"delete": {
 				"label": "Eliminar hogar",
@@ -323,6 +384,60 @@
 				"name-mismatch-error": "El nombre que escribiste no coincide con el del hogar.",
 				"success": "Hogar eliminado."
 			}
+		}
+	},
+	"bank-accounts-page": {
+		"eyebrow": "Tus cuentas",
+		"title": "Cuentas bancarias",
+		"description": "Agrega y administra las cuentas bancarias, tarjetas y efectivo de tu hogar.",
+		"add-account": {
+			"title": "Agregar cuenta",
+			"description": "Registra una nueva cuenta bancaria, tarjeta o efectivo."
+		},
+		"card": {
+			"actions": "Acciones de la cuenta",
+			"edit": "Editar",
+			"not-shared": "No compartida",
+			"owned-by": "Propiedad de {name}"
+		},
+		"form": {
+			"create-title": "Agregar cuenta bancaria",
+			"create-description": "Registra una nueva cuenta bancaria, de crédito, débito o efectivo.",
+			"edit-title": "Editar cuenta bancaria",
+			"edit-description": "Actualiza los datos de esta cuenta o con quién la compartes.",
+			"name": {
+				"label": "Nombre de la cuenta",
+				"placeholder": "p. ej., Cuenta conjunta, Tarjeta Visa"
+			},
+			"type": {
+				"label": "Tipo de cuenta"
+			},
+			"last-four-digits": {
+				"label": "Últimos 4 dígitos",
+				"placeholder": "1234",
+				"description": "Opcional — te ayuda a diferenciar tus cuentas."
+			},
+			"shared-members": {
+				"label": "Compartida con",
+				"description": "Los miembros con los que compartes esta cuenta pueden verla, pero solo tú puedes editarla o eliminarla.",
+				"not-shared": "No compartida",
+				"shared": "Compartida"
+			},
+			"submit-button": {
+				"create": "Agregar cuenta",
+				"edit": "Guardar cambios"
+			},
+			"created": "Cuenta bancaria agregada.",
+			"saved": "Cuenta bancaria actualizada.",
+			"error": "Ocurrió un error. Inténtalo de nuevo."
+		},
+		"delete": {
+			"trigger": "Eliminar",
+			"confirm-title": "Eliminar cuenta bancaria",
+			"confirm-description": "Esto elimina permanentemente “{name}”. Las transacciones pasadas que la referencian conservarán su registro, pero perderán el vínculo con la cuenta.",
+			"confirm-button": "Eliminar",
+			"success": "Cuenta bancaria eliminada.",
+			"error": "Ocurrió un error al eliminar la cuenta. Inténtalo de nuevo."
 		}
 	}
 }

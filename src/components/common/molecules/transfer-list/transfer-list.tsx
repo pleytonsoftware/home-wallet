@@ -26,6 +26,8 @@ export interface TransferListProps<T, S extends string = string> {
 	leftColumn: TransferListColumn<S>
 	rightColumn: TransferListColumn<S>
 	renderItem: (item: T) => ReactNode
+	/** Optional trailing content rendered next to (not inside) the row's toggle button — for row-level actions like a destructive remove button. */
+	renderItemAction?: (item: T) => ReactNode
 	disabled?: boolean
 	/** Per-item lock: when it returns `true`, the item can't be selected, moved or dragged. */
 	isItemDisabled?: (item: T) => boolean
@@ -45,6 +47,7 @@ export function TransferList<T, S extends string = string>({
 	leftColumn,
 	rightColumn,
 	renderItem,
+	renderItemAction,
 	disabled,
 	isItemDisabled,
 	className,
@@ -129,13 +132,14 @@ export function TransferList<T, S extends string = string>({
 					items={columns[leftColumn.key]}
 					getItemId={getItemId}
 					renderItem={renderItem}
+					renderItemAction={renderItemAction}
 					selected={selected}
 					onToggle={toggleSelected}
 					disabled={disabled}
 					disabledIds={disabledIds}
 				/>
 
-				<div className='flex flex-row items-center justify-center gap-2 sm:flex-col'>
+				<div className='flex flex-row items-center justify-center gap-2 sm:flex-col [&_button>svg]:rotate-90 [&_button>svg]:sm:rotate-0'>
 					<Button
 						type='button'
 						variant='outline'
@@ -163,6 +167,7 @@ export function TransferList<T, S extends string = string>({
 					items={columns[rightColumn.key]}
 					getItemId={getItemId}
 					renderItem={renderItem}
+					renderItemAction={renderItemAction}
 					selected={selected}
 					onToggle={toggleSelected}
 					disabled={disabled}
@@ -178,13 +183,24 @@ interface TransferColumnProps<T> {
 	items: T[]
 	getItemId: (item: T) => string
 	renderItem: (item: T) => ReactNode
+	renderItemAction?: (item: T) => ReactNode
 	selected: Set<string>
 	onToggle: (id: string) => void
 	disabled?: boolean
 	disabledIds: Set<string>
 }
 
-function TransferColumn<T>({ column, items, getItemId, renderItem, selected, onToggle, disabled, disabledIds }: TransferColumnProps<T>) {
+function TransferColumn<T>({
+	column,
+	items,
+	getItemId,
+	renderItem,
+	renderItemAction,
+	selected,
+	onToggle,
+	disabled,
+	disabledIds,
+}: TransferColumnProps<T>) {
 	const { ref, isDropTarget } = useDroppable({ id: column.key, disabled })
 
 	return (
@@ -206,7 +222,14 @@ function TransferColumn<T>({ column, items, getItemId, renderItem, selected, onT
 				{items.map((item) => {
 					const id = getItemId(item)
 					return (
-						<TransferItem key={id} id={id} isSelected={selected.has(id)} onToggle={onToggle} disabled={disabled || disabledIds.has(id)}>
+						<TransferItem
+							key={id}
+							id={id}
+							isSelected={selected.has(id)}
+							onToggle={onToggle}
+							disabled={disabled || disabledIds.has(id)}
+							action={renderItemAction?.(item)}
+						>
 							{renderItem(item)}
 						</TransferItem>
 					)
@@ -222,13 +245,15 @@ interface TransferItemProps {
 	onToggle: (id: string) => void
 	disabled?: boolean
 	children: ReactNode
+	/** Rendered as a sibling of the toggle button, not inside it — keeps interactive actions out of the button's own click/drag handling. */
+	action?: ReactNode
 }
 
-function TransferItem({ id, isSelected, onToggle, disabled, children }: TransferItemProps) {
+function TransferItem({ id, isSelected, onToggle, disabled, children, action }: TransferItemProps) {
 	const { ref, isDragging } = useDraggable({ id, disabled })
 
 	return (
-		<li>
+		<li className='flex items-center gap-1'>
 			<button
 				ref={ref}
 				type='button'
@@ -236,7 +261,7 @@ function TransferItem({ id, isSelected, onToggle, disabled, children }: Transfer
 				disabled={disabled}
 				onClick={() => onToggle(id)}
 				className={cn(
-					'flex w-full items-center gap-2 rounded-lg border px-2.5 py-2 text-left text-sm transition-colors',
+					'flex flex-1 items-center gap-2 rounded-lg border px-2.5 py-2 text-left text-sm transition-colors',
 					'hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
 					isSelected ? 'border-primary bg-primary/5' : 'border-transparent bg-muted/40',
 					isDragging && 'opacity-50',
@@ -245,6 +270,7 @@ function TransferItem({ id, isSelected, onToggle, disabled, children }: Transfer
 			>
 				{children}
 			</button>
+			{action}
 		</li>
 	)
 }

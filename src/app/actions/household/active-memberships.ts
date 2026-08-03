@@ -6,56 +6,47 @@ export const hasActiveMemberships = async (userId: string): Promise<boolean> => 
 
 export const getActiveMembershipCount = async (userId: string): Promise<number> =>
 	prisma.householdMember.count({
-		where: { userId },
+		where: { userId, removedAt: null },
 	})
 
 export const getActiveMembershipsIds = async (userId: string) => {
 	const membershipsIds = await prisma.householdMember.findMany({
-		where: { userId },
+		where: { userId, removedAt: null },
 		select: { householdId: true },
 	})
 	return membershipsIds.flatMap((membership) => membership.householdId)
 }
 
-interface IsActiveMemberOfParams {
-	userId?: string
-	householdId: string
-}
-export const isActiveMemberOf = async ({ userId, householdId }: IsActiveMemberOfParams): Promise<boolean> => {
-	if (!userId) {
-		const session = await auth<true>()
-		userId = session.user.id
-	}
-
-	return prisma.householdMember
-		.count({
-			where: { userId, householdId },
-		})
-		.then((membership) => typeof membership === 'number' && membership > 0)
-}
-
-interface MemberRoleParams {
+interface ActiveMembershipParams {
 	userId?: string
 	householdId: string
 }
 
 /**
- * Resolves the current (or given) user's {@link MemberRole} within a household.
- * Returns `null` when the user is not a member.
+ * Resolves the current (or given) user's active membership (id + role) within a household.
+ * Returns `null` when the user is not a member, or was removed (`removedAt` is set).
  */
-export const getMemberRole = async ({ userId, householdId }: MemberRoleParams): Promise<MemberRole | null> => {
+export const getActiveMembership = async ({ userId, householdId }: ActiveMembershipParams): Promise<{ id: string; role: MemberRole } | null> => {
 	if (!userId) {
 		const session = await auth<true>()
 		userId = session.user.id
 	}
 
 	const membership = await prisma.householdMember.findFirst({
-		where: { userId, householdId },
-		select: { role: true },
+		where: { userId, householdId, removedAt: null },
+		select: { id: true, role: true },
 	})
 
-	return membership ? parseMemberRole(membership.role) : null
+	return membership ? { id: membership.id, role: parseMemberRole(membership.role) } : null
 }
 
+export const isActiveMemberOf = async (params: ActiveMembershipParams): Promise<boolean> => (await getActiveMembership(params)) !== null
+
+/**
+ * Resolves the current (or given) user's {@link MemberRole} within a household.
+ * Returns `null` when the user is not an active member.
+ */
+export const getMemberRole = async (params: ActiveMembershipParams): Promise<MemberRole | null> => (await getActiveMembership(params))?.role ?? null
+
 /** Whether the current (or given) user is an admin of the household. */
-export const isAdminOf = async (params: MemberRoleParams): Promise<boolean> => (await getMemberRole(params)) === MemberRole.ADMIN
+export const isAdminOf = async (params: ActiveMembershipParams): Promise<boolean> => (await getMemberRole(params)) === MemberRole.ADMIN

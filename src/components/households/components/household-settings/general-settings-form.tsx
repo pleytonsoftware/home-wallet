@@ -5,11 +5,9 @@ import type { FC } from 'react'
 
 import { useCallback } from 'react'
 
-import { RotateCcwIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Controller } from 'react-hook-form'
 
-import { Button } from '@atoms/button'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@atoms/field'
 import { Input } from '@atoms/input'
 import { SettingsSection } from '@households/components/household-settings/settings-section'
@@ -19,6 +17,7 @@ import { useUpdateHouseholdSettingsForm } from '@households/hooks/forms/use-upda
 import { MAX_HOUSEHOLD_FULL_ADDRESS_LENGTH, MAX_HOUSEHOLD_NAME_LENGTH, MIN_HOUSEHOLD_NAME_LENGTH } from '@lib/schemas/household/create-household'
 import { ConfirmSaveButton } from '@molecules/confirm-save-button'
 import { CurrencyCombobox } from '@molecules/currency-combobox'
+import { ResetFormButton } from '@molecules/reset-form-button'
 import { SplitStrategyDropdown, SplitStrategyLabel } from '@molecules/split-strategy-dropdown'
 import { SwitchField } from '@molecules/switch-field'
 
@@ -51,14 +50,9 @@ export const GeneralSettingsForm: FC = () => {
 				description={t('subtitle')}
 				footer={
 					!readOnly && (
-						<div className='flex gap-2'>
-							{form.formState.isDirty && (
-								<Button variant='ghost' size='icon' type='reset' onClick={() => form.reset()}>
-									<RotateCcwIcon />
-								</Button>
-							)}
+						<ResetFormButton formState={form.formState} reset={form.reset}>
 							<ConfirmSaveButton formId={formId} disabled={!form.formState.isDirty} loading={form.formState.isSubmitting} />
-						</div>
+						</ResetFormButton>
 					)
 				}
 			>

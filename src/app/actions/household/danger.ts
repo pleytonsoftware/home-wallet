@@ -4,7 +4,8 @@ import type { FullErrorResult, ResponseResult } from '@lib/errors/types'
 
 import { getTranslations } from 'next-intl/server'
 
-import { getMemberRole, isAdminOf } from '@actions/household/active-memberships'
+import { getBankAccountTransferPlan, planToPrismaOps, type BankAccountTransferPlanEntry } from '@actions/bank-account/shared/transfer-plan'
+import { getActiveMembership, isAdminOf } from '@actions/household/active-memberships'
 import { authorizedSession } from '@lib/auth/utils'
 import { MemberRole, UserRole } from '@lib/constants/role.enum'
 import { BAD_REQUEST, FORBIDDEN, INTERNAL_ERROR, OK } from '@lib/errors'
@@ -50,7 +51,32 @@ export async function regenerateInviteCode(householdId: string): Promise<Respons
 	}
 }
 
-/** Removes the current user's membership. Blocks the last remaining admin from leaving. */
+/**
+ * Previews what leaving the household would do to the current user's owned bank accounts
+ * (transferred to another shared member, or deleted if not shared with anyone else).
+ */
+export async function getLeaveHouseholdImpact(
+	householdId: string,
+): Promise<ResponseResult<BankAccountTransferPlanEntry[], string> | FullErrorResult> {
+	try {
+		const { session, error } = await authorizedSession()
+		if (error) return error
+
+		const membership = await getActiveMembership({ userId: session.user.id, householdId })
+		if (!membership) return FORBIDDEN()
+
+		return OK(await getBankAccountTransferPlan(membership.id))
+	} catch (error) {
+		householdLogger.error('[getLeaveHouseholdImpact]: {error}', { error })
+		return INTERNAL_ERROR(error)
+	}
+}
+
+/**
+ * Deactivates the current user's membership (soft delete). Blocks the last remaining admin
+ * from leaving. Bank accounts they own are transferred to another shared member or deleted,
+ * per {@link getBankAccountTransferPlan}.
+ */
 export async function leaveHousehold(householdId: string): Promise<ResponseResult<{ left: true }, string> | FullErrorResult> {
 	try {
 		const { session, error } = await authorizedSession()
@@ -58,20 +84,26 @@ export async function leaveHousehold(householdId: string): Promise<ResponseResul
 
 		const dangerTrans = await getTranslations('settings.danger')
 
-		const role = await getMemberRole({ userId: session.user.id, householdId })
-		if (!role) {
+		const membership = await getActiveMembership({ userId: session.user.id, householdId })
+		if (!membership) {
 			return FORBIDDEN()
 		}
 
-		if (role === MemberRole.ADMIN) {
-			const adminCount = await prisma.householdMember.count({ where: { householdId, role: MemberRole.ADMIN } })
+		if (membership.role === MemberRole.ADMIN) {
+			const adminCount = await prisma.householdMember.count({ where: { householdId, role: MemberRole.ADMIN, removedAt: null } })
 			if (adminCount <= 1) {
 				return BAD_REQUEST(dangerTrans('leave.last-admin-error'))
 			}
 		}
 
-		const [deleteError] = await to(prisma.householdMember.deleteMany({ where: { householdId, userId: session.user.id } }))
-		if (deleteError) return INTERNAL_ERROR(deleteError)
+		const plan = await getBankAccountTransferPlan(membership.id)
+		const [updateError] = await to(
+			prisma.$transaction([
+				...planToPrismaOps(plan),
+				prisma.householdMember.update({ where: { id: membership.id }, data: { removedAt: new Date() } }),
+			]),
+		)
+		if (updateError) return INTERNAL_ERROR(updateError)
 
 		return OK({ left: true })
 	} catch (error) {

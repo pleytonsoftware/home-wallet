@@ -9,10 +9,16 @@ export enum ACCOUNT_TYPE {
 	BANK = 'bank',
 
 	/**
-	 * Card account type represents a credit or debit card account.
-	 * It is used for managing and tracking transactions made using a card.
+	 * Credit card account type represents a credit card account.
+	 * It is used for managing and tracking transactions made using a credit card.
 	 */
-	CARD = 'card',
+	CREDIT_CARD = 'credit_card',
+
+	/**
+	 * Debit card account type represents a debit card account.
+	 * It is used for managing and tracking transactions made using a debit card.
+	 */
+	DEBIT_CARD = 'debit_card',
 
 	/**
 	 * Cash account type represents physical cash that is held by the user.

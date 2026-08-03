@@ -1,11 +1,8 @@
 'use server'
 
-import type { PrismaClientKnownRequestError } from '@/lib/generated/prisma/internal/prismaNamespace'
 import type { ResponseResult } from '@lib/errors/types'
+import type { PrismaClientKnownRequestError } from '@lib/generated/prisma/internal/prismaNamespace'
 import type { $ZodIssue } from 'zod/v4/core'
-
-import { INTERNAL_ERROR } from '@/lib/errors/internal-error'
-import { householdLogger } from '@/lib/logger'
 
 import { getTranslations } from 'next-intl/server'
 
@@ -13,6 +10,8 @@ import { authorizedSession } from '@lib/auth/utils'
 import { PRISMA_ERRORS } from '@lib/constants/prisma-errors.const'
 import { MemberRole } from '@lib/constants/role.enum'
 import { BAD_REQUEST, NOT_FOUND, OK } from '@lib/errors'
+import { INTERNAL_ERROR } from '@lib/errors/internal-error'
+import { householdLogger } from '@lib/logger'
 import { prisma, type Prisma } from '@lib/prisma'
 import { joinHouseholdSchema } from '@lib/schemas/household/join-household'
 import { to } from '@lib/utils/to.utils'
@@ -56,7 +55,7 @@ export async function joinHousehold(code: string): Promise<JoinHouseholdResult> 
 		}
 
 		// TODO: move to a new file for reusability
-		// if user already a member, return error
+		// if user already a member (or was previously removed), return an error
 		const [membershipError, existingMembership] = await to(
 			prisma.householdMember.findFirst({
 				where: {
@@ -65,6 +64,7 @@ export async function joinHousehold(code: string): Promise<JoinHouseholdResult> 
 				},
 				select: {
 					id: true,
+					removedAt: true,
 				},
 			}),
 		)
@@ -74,7 +74,7 @@ export async function joinHousehold(code: string): Promise<JoinHouseholdResult> 
 		}
 
 		if (existingMembership) {
-			return BAD_REQUEST(t('household.join.already-member'))
+			return BAD_REQUEST(existingMembership.removedAt ? t('household.join.previously-removed') : t('household.join.already-member'))
 		}
 
 		// TODO maybe send a request to household admin to approve the join request instead of automatically adding the user to the household

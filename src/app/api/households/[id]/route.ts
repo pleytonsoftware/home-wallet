@@ -20,10 +20,11 @@ export const GET = createRoute<{ params: Promise<{ id: string }> }>()
 	.use(withParamsValidation(paramsSchema))
 	.handler(async (_request, { params: { id }, session }) => {
 		const household = await prisma.household.findFirstOrThrow({
-			where: { id, members: { some: { userId: session.user.id } } },
+			where: { id, members: { some: { userId: session.user.id, removedAt: null } } },
 			include: {
 				config: true,
 				members: {
+					where: { removedAt: null },
 					include: {
 						user: { select: { id: true, name: true, email: true, image: true } },
 					},

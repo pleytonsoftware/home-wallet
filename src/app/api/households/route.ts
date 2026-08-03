@@ -17,12 +17,14 @@ export const GET = createRoute()
 				members: {
 					some: {
 						userId: session.user.id,
+						removedAt: null,
 					},
 				},
 			},
 			include: {
 				config: true,
 				members: {
+					where: { removedAt: null },
 					include: {
 						user: {
 							select: {

@@ -10,12 +10,11 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { useCopyToClipboard, useDebounceCallback } from 'usehooks-ts'
 
-import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage } from '@atoms/avatar'
 import { Button } from '@atoms/button'
 import { Icon } from '@atoms/icon'
 import { cn } from '@cn'
-import { getInitials } from '@lib/utils/avatar'
 import { pd } from '@lib/utils/events'
+import { MemberAvatarGroup } from '@molecules/member-avatar-group'
 
 import { HouseholdCardStats } from './household-card-stat'
 
@@ -101,15 +100,7 @@ export const HouseholdCard: FC<PropsWithChildren<HouseholdCardProps>> = ({
 			</div>
 
 			<div className='flex items-center justify-between'>
-				<AvatarGroup>
-					{members.slice(0, MEMBER_MAX_DISPLAY).map((member) => (
-						<Avatar key={member.id} size='sm'>
-							<AvatarImage src={member.image ?? undefined} alt={member.name} />
-							<AvatarFallback>{getInitials(member.name)}</AvatarFallback>
-						</Avatar>
-					))}
-					{members.length > MEMBER_MAX_DISPLAY && <AvatarGroupCount>+{members.length - MEMBER_MAX_DISPLAY}</AvatarGroupCount>}
-				</AvatarGroup>
+				<MemberAvatarGroup members={members} max={MEMBER_MAX_DISPLAY} />
 				<span className={cn('flex items-center gap-0.5 text-sm font-medium', isActive ? 'text-primary' : 'text-muted-foreground')}>
 					{t('open')}
 					<Icon IconComponent={ChevronRight} size='sm' />

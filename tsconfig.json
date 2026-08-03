@@ -36,6 +36,7 @@
 			"@emails/*": ["./src/emails/*"],
 			"@actions/*": ["./src/app/actions/*"],
 			"@households/*": ["./src/components/households/*"],
+			"@bank-accounts/*": ["./src/components/bank-accounts/*"],
 			"@common/*": ["./src/components/common/*"]
 		}
 	},

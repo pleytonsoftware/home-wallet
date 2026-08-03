@@ -14,6 +14,7 @@ import {
 	AlertDialogTrigger,
 } from '@atoms/alert-dialog'
 import { Button, type ButtonProps } from '@atoms/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@atoms/tooltip'
 
 export type ConfirmSaveButton = ButtonProps & {
 	openDialog?: boolean
@@ -28,6 +29,7 @@ export type ConfirmSaveButton = ButtonProps & {
 	onOpenChange?: ComponentProps<typeof AlertDialog>['onOpenChange']
 	onCancelClick?: ComponentProps<typeof AlertDialogCancel>['onClick']
 	onConfirmClick?: ComponentProps<typeof AlertDialogAction>['onClick']
+	btnTooltip?: ReactNode
 }
 
 export const ConfirmSaveButton: FC<ConfirmSaveButton> = ({
@@ -44,17 +46,31 @@ export const ConfirmSaveButton: FC<ConfirmSaveButton> = ({
 	children,
 	onCancelClick,
 	onConfirmClick,
+	btnTooltip,
 	...buttonProps
 }) => {
 	const t = useTranslations('common.confirm.save')
 
+	let btn = (
+		<AlertDialogTrigger asChild>
+			<Button type='button' {...buttonProps} disabled={buttonProps.disabled}>
+				{children || t('save')}
+			</Button>
+		</AlertDialogTrigger>
+	)
+
+	if (btnTooltip) {
+		btn = (
+			<Tooltip>
+				<TooltipTrigger asChild>{btn}</TooltipTrigger>
+				<TooltipContent>{btnTooltip}</TooltipContent>
+			</Tooltip>
+		)
+	}
+
 	return (
 		<AlertDialog open={openDialog} onOpenChange={onOpenChange}>
-			<AlertDialogTrigger asChild>
-				<Button type='button' {...buttonProps} disabled={buttonProps.disabled}>
-					{children || t('save')}
-				</Button>
-			</AlertDialogTrigger>
+			{btn}
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle>{dialogTitle || t('title')}</AlertDialogTitle>

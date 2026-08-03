@@ -12,10 +12,12 @@ import { Button } from '@atoms/button'
 import { FieldError } from '@atoms/field'
 import { useCurrentUser } from '@hooks/use-current-user'
 import { MemberItem } from '@households/components/household-settings/member-item'
+import { RemoveMemberButton } from '@households/components/household-settings/remove-member-button'
 import { SettingsSection } from '@households/components/household-settings/settings-section'
 import { useHouseholdContext } from '@households/context/household.context'
 import { useSaveMemberRoles } from '@households/hooks/forms/use-save-member-roles.hook'
 import { MemberRole } from '@lib/constants/role.enum'
+import { ResetFormButton } from '@molecules/reset-form-button'
 import { TransferList } from '@molecules/transfer-list'
 
 interface RolesFormValues {
@@ -32,9 +34,10 @@ export const RolesTransferList: FC = () => {
 	const { user } = useCurrentUser()
 
 	const currentUserId = user?.id
+	const initialAssignments = useMemo(() => buildAssignments(household.members), [household.members])
 
 	const form = useForm<RolesFormValues>({
-		defaultValues: { assignments: buildAssignments(household.members) },
+		defaultValues: { assignments: initialAssignments },
 		disabled: !isAdmin,
 	})
 
@@ -63,9 +66,11 @@ export const RolesTransferList: FC = () => {
 				}
 				footer={
 					isAdmin && (
-						<Button type='submit' disabled={!form.formState.isDirty || !hasAdmins} loading={form.formState.isSubmitting}>
-							{t('save')}
-						</Button>
+						<ResetFormButton formState={form.formState} reset={form.reset}>
+							<Button type='submit' disabled={!form.formState.isDirty || !hasAdmins} loading={form.formState.isSubmitting}>
+								{t('save')}
+							</Button>
+						</ResetFormButton>
 					)
 				}
 			>
@@ -83,6 +88,12 @@ export const RolesTransferList: FC = () => {
 							disabled={field.disabled}
 							isItemDisabled={(member) => member.id === currentUserId}
 							renderItem={(member) => <MemberItem member={member} isCurrentUser={member.id === currentUserId} />}
+							renderItemAction={(member) =>
+								isAdmin &&
+								member.id !== currentUserId && (
+									<RemoveMemberButton householdId={household.id} memberId={member.memberId} memberName={member.name} />
+								)
+							}
 						/>
 					)}
 				/>

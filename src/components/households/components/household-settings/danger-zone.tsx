@@ -1,10 +1,13 @@
 'use client'
 
-import { type MouseEventHandler, useCallback, type FC } from 'react'
+import type { BankAccountTransferPlanEntry } from '@actions/bank-account/shared/transfer-plan'
+
+import { type MouseEventHandler, useCallback, useState, type FC } from 'react'
 
 import { useTranslations } from 'next-intl'
 import { Controller } from 'react-hook-form'
 
+import { getLeaveHouseholdImpact } from '@actions/household/danger'
 import { Field, FieldError, FieldLabel } from '@atoms/field'
 import { Input } from '@atoms/input'
 import { DangerZoneRow } from '@households/components/household-settings/danger-zone-row'
@@ -22,11 +25,16 @@ export const DangerZone: FC = () => {
 	const { household, isAdmin } = useHouseholdContext()
 	const { regenerate, leave, deleteHousehold } = useDangerZoneActions(household)
 	const deleteForm = useDeleteConfirmationForm(household.name, t)
+	const [leaveImpact, setLeaveImpact] = useState<BankAccountTransferPlanEntry[]>([])
 
 	const code = regenerate.data?.success ? regenerate.data.data.code : household.code
 
 	const executeRegenerate = useCallback<MouseEventHandler<HTMLButtonElement>>(() => regenerate.mutateAsync(), [regenerate])
 	const executeLeave = useCallback<MouseEventHandler<HTMLButtonElement>>(() => leave.mutateAsync(), [regenerate])
+	const fetchLeaveImpact = useCallback(async () => {
+		const res = await getLeaveHouseholdImpact(household.id)
+		setLeaveImpact(res.success ? res.data : [])
+	}, [household.id])
 
 	return (
 		<SettingsSection title={tSections('danger')} description={t('subtitle')} className='border-destructive/40'>
@@ -66,7 +74,21 @@ export const DangerZone: FC = () => {
 							confirmVariant='destructive'
 							dialogTitle={t('leave.label')}
 							dialogDescription={t('leave.confirm')}
+							dialogChildren={
+								leaveImpact.length > 0 && (
+									<ul className='flex flex-col gap-1 text-sm text-muted-foreground'>
+										{leaveImpact.map((entry) => (
+											<li key={entry.accountId}>
+												{entry.action === 'transfer'
+													? t('leave.impact.transfer', { account: entry.accountName, member: entry.transferTo?.name ?? '' })
+													: t('leave.impact.delete', { account: entry.accountName })}
+											</li>
+										))}
+									</ul>
+								)
+							}
 							confirm={t('leave.label')}
+							onOpenChange={(nextOpen) => nextOpen && fetchLeaveImpact()}
 							onConfirmClick={executeLeave}
 						>
 							{t('leave.label')}

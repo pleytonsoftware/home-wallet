@@ -37,6 +37,15 @@
 					"member": "Member",
 					"admin": "Admin"
 				}
+			},
+			"account-type": {
+				"options": {
+					"bank": "Bank account",
+					"credit_card": "Credit card",
+					"debit_card": "Debit card",
+					"cash": "Cash",
+					"other": "Other"
+				}
 			}
 		},
 		"confirm": {
@@ -51,7 +60,8 @@
 		"sidebar": {
 			"transactions": "Transactions",
 			"settings": "Settings",
-			"households": "My households"
+			"households": "My households",
+			"bankAccounts": "Bank Accounts"
 		},
 		"error": {
 			"conflict": "Unknown conflict occurred. Please try again later.",
@@ -63,7 +73,8 @@
 			"household": {
 				"join": {
 					"not-found": "Invitation code not valid. Please check with your household admin.",
-					"already-member": "You are already a member of this household."
+					"already-member": "You are already a member of this household.",
+					"previously-removed": "You were previously removed from this household. Ask an admin to add you back."
 				}
 			}
 		},
@@ -110,6 +121,31 @@
 					"error": {
 						"invalid-invite-code": "The generated invite code is invalid. Please try again.",
 						"generic": "Failed to create household. Please try again later."
+					}
+				}
+			},
+			"bank-accounts": {
+				"create": {
+					"name": {
+						"error": {
+							"required": "Account name is required",
+							"max-length": "Name must be less than {max} characters"
+						}
+					},
+					"type": {
+						"error": {
+							"required": "Please select an account type"
+						}
+					},
+					"last-four-digits": {
+						"error": {
+							"invalid": "Enter exactly 4 digits"
+						}
+					},
+					"shared-members": {
+						"error": {
+							"invalid": "One or more selected people are not members of this household"
+						}
 					}
 				}
 			}
@@ -289,7 +325,28 @@
 			"unknown-member-error": "One or more selected people are not members of this household.",
 			"save": "Save roles",
 			"saved": "Roles updated",
-			"error": "Something went wrong while updating roles. Please try again."
+			"error": "Something went wrong while updating roles. Please try again.",
+			"remove": {
+				"trigger": "Remove member",
+				"confirm-title": "Remove member",
+				"confirm-description": "Remove {name} from this household? They'll lose access immediately.",
+				"confirm-button": "Remove",
+				"success": "Member removed.",
+				"error": "Something went wrong while removing this member. Please try again.",
+				"last-admin-error": "A household must keep at least one admin.",
+				"self-error": "Use “Leave household” to remove yourself."
+			},
+			"previous": {
+				"title": "Previous members",
+				"subtitle": "People who used to be part of this household.",
+				"removed-on": "Removed on {date}",
+				"delete-trigger": "Delete permanently",
+				"delete-confirm-title": "Delete permanently",
+				"delete-confirm-description": "Permanently erase {name} from this household's history. This cannot be undone.",
+				"delete-confirm-button": "Delete permanently",
+				"delete-success": "Member permanently deleted.",
+				"delete-error": "Something went wrong while deleting this member. Please try again."
+			}
 		},
 		"danger": {
 			"subtitle": "Irreversible and destructive actions.",
@@ -306,7 +363,11 @@
 				"description": "Remove yourself from this household. You'll need a new invite to rejoin.",
 				"confirm": "Are you sure you want to leave this household?",
 				"last-admin-error": "You are the last admin. Promote another member to admin before leaving.",
-				"success": "You've left the household."
+				"success": "You've left the household.",
+				"impact": {
+					"transfer": "“{account}” will be transferred to {member}.",
+					"delete": "“{account}” will be deleted, since it isn't shared with anyone else."
+				}
 			},
 			"delete": {
 				"label": "Delete household",
@@ -316,6 +377,60 @@
 				"name-mismatch-error": "The name you typed does not match the household name.",
 				"success": "Household deleted."
 			}
+		}
+	},
+	"bank-accounts-page": {
+		"eyebrow": "Your accounts",
+		"title": "Bank Accounts",
+		"description": "Add and manage the bank, card and cash accounts used across your household.",
+		"add-account": {
+			"title": "Add account",
+			"description": "Register a new bank, card or cash account."
+		},
+		"card": {
+			"actions": "Account actions",
+			"edit": "Edit",
+			"not-shared": "Not shared",
+			"owned-by": "Owned by {name}"
+		},
+		"form": {
+			"create-title": "Add bank account",
+			"create-description": "Register a new bank, credit, debit or cash account.",
+			"edit-title": "Edit bank account",
+			"edit-description": "Update this account's details or who it's shared with.",
+			"name": {
+				"label": "Account name",
+				"placeholder": "e.g., Joint Checking, Visa Card"
+			},
+			"type": {
+				"label": "Account type"
+			},
+			"last-four-digits": {
+				"label": "Last 4 digits",
+				"placeholder": "1234",
+				"description": "Optional — helps you tell accounts apart."
+			},
+			"shared-members": {
+				"label": "Shared with",
+				"description": "Members you share this account with can see it, but only you can edit or delete it.",
+				"not-shared": "Not shared",
+				"shared": "Shared"
+			},
+			"submit-button": {
+				"create": "Add account",
+				"edit": "Save changes"
+			},
+			"created": "Bank account added.",
+			"saved": "Bank account updated.",
+			"error": "Something went wrong. Please try again."
+		},
+		"delete": {
+			"trigger": "Delete",
+			"confirm-title": "Delete bank account",
+			"confirm-description": "This permanently deletes “{name}”. Past transactions that reference it will keep their record, but lose the account link.",
+			"confirm-button": "Delete",
+			"success": "Bank account deleted.",
+			"error": "Something went wrong while deleting the account. Please try again."
 		}
 	}
 }
