@@ -1,0 +1,81 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+      - development
+
+concurrency:
+  group: pr-checks-${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Lint, typecheck, and test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # actions/setup-node must come first: its own Node install prepends a
+      # bin dir to PATH that ships a stale, unrelated global pnpm. Running
+      # pnpm/action-setup afterwards re-prepends PATH with the pinned
+      # version, so it wins for every step that follows. Reversing this
+      # order lets the stale pnpm shadow ours for the rest of the job.
+      #
+      # `cache: 'pnpm'` is deliberately NOT set here: that feature detects
+      # the pnpm store path during this same step, before pnpm/action-setup
+      # has run — so it resolves the stale pnpm's store, not ours, and the
+      # cache save at the end of the job fails because that path was never
+      # populated. Caching is done manually below instead, after our pinned
+      # pnpm is actually on PATH.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate Prisma schema
+        run: pnpm prisma:validate
+
+      - name: Generate Prisma client
+        run: pnpm prisma:generate
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      # Disabled for now because coverage is not complete
+      # - name: Test with coverage
+      #   run: pnpm coverage
+
+      # - name: Upload coverage report
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: coverage-report
+      #     path: coverage/
+      #     retention-days: 14
