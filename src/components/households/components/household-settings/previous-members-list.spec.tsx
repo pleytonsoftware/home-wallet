@@ -61,12 +61,13 @@ describe('PreviousMembersList', () => {
 		queryData.value = undefined
 	})
 
-	it('renders nothing when the current user is not an admin', () => {
+	it('lists removed members for a non-admin, without a delete action', () => {
 		isAdminMock.value = false
-		queryData.value = [makeMember()]
-		const { container } = render(<PreviousMembersList />)
+		queryData.value = [makeMember({ name: 'Bob' })]
+		render(<PreviousMembersList />)
 
-		expect(container).toBeEmptyDOMElement()
+		expect(screen.getByText('Bob')).toBeInTheDocument()
+		expect(screen.queryByRole('button', { name: 'previous.delete-trigger' })).not.toBeInTheDocument()
 	})
 
 	it('renders nothing when there are no removed members', () => {
@@ -112,5 +113,11 @@ describe('PreviousMembersList', () => {
 		await user.click(confirmButton)
 
 		expect(mutate).toHaveBeenCalledWith('m1')
+	})
+
+	it('caps the list height and scrolls instead of growing unbounded', () => {
+		queryData.value = [makeMember()]
+		const { container } = render(<PreviousMembersList />)
+		expect(container.querySelector('ul')).toHaveClass('max-h-72', 'overflow-y-auto')
 	})
 })

@@ -49,11 +49,11 @@ describe('SettingsShell', () => {
 		expect(screen.getByRole('tab', { name: 'sections.danger' })).toHaveAttribute('href', hrefFor(ROUTES.HOUSEHOLD.SETTINGS.DANGER))
 	})
 
-	it('hides admin-only sections for non-admins', () => {
+	it('renders every section tab for non-admins too — sections self-gate their own admin-only content', () => {
 		isAdminMock.value = false
 		render(<SettingsShell>content</SettingsShell>)
 		expect(screen.getByRole('tab', { name: 'sections.general' })).toBeInTheDocument()
-		expect(screen.queryByRole('tab', { name: 'sections.members' })).not.toBeInTheDocument()
+		expect(screen.getByRole('tab', { name: 'sections.members' })).toBeInTheDocument()
 		expect(screen.getByRole('tab', { name: 'sections.danger' })).toBeInTheDocument()
 	})
 

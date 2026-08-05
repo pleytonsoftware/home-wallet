@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 
 import { z } from 'zod'
 
-import { isAdminOf } from '@actions/household/active-memberships'
+import { isActiveMemberOf } from '@actions/household/active-memberships'
 import { withAuth, withErrorBoundary, withParamsValidation } from '@lib/api/middlewares'
 import { createRoute } from '@lib/api/route-builder'
 import { parseMemberRole } from '@lib/constants/role.enum'
@@ -19,7 +19,7 @@ export const GET = createRoute<{ params: Promise<{ id: string }> }>()
 	.use(withAuth)
 	.use(withParamsValidation(paramsSchema))
 	.handler(async (_request, { params: { id: householdId }, session }) => {
-		if (!(await isAdminOf({ userId: session.user.id, householdId }))) {
+		if (!(await isActiveMemberOf({ userId: session.user.id, householdId }))) {
 			const { status, error } = FORBIDDEN()
 			return NextResponse.json({ error }, { status })
 		}

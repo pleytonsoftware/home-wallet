@@ -24,7 +24,7 @@ export const PreviousMembersList: FC = () => {
 	const locale = useLanguage()
 	const { household, isAdmin } = useHouseholdContext()
 	const queryClient = useQueryClient()
-	const { data: removedMembers } = useQuery({ ...getRemovedMembersOptions(household.id), enabled: isAdmin })
+	const { data: removedMembers } = useQuery(getRemovedMembersOptions(household.id))
 
 	const deleteMutation = useMutation(
 		hardDeletePreviousMemberMutationOptions(household.id, {
@@ -43,11 +43,11 @@ export const PreviousMembersList: FC = () => {
 		}),
 	)
 
-	if (!isAdmin || !removedMembers?.length) return null
+	if (!removedMembers?.length) return null
 
 	return (
 		<SettingsSection title={t('previous.title')} description={t('previous.subtitle')}>
-			<ul className='flex flex-col gap-2'>
+			<ul className='flex max-h-72 flex-col gap-2 overflow-y-auto pr-1'>
 				{removedMembers.map((member) => (
 					<li key={member.memberId} className='flex items-center gap-3 rounded-lg border border-transparent bg-muted/40 px-2.5 py-2'>
 						<Avatar className='size-8 rounded-full'>
@@ -60,20 +60,22 @@ export const PreviousMembersList: FC = () => {
 								{t('previous.removed-on', { date: new Date(member.removedAt).toLocaleDateString(locale) })}
 							</span>
 						</span>
-						<ConfirmSaveButton
-							type='button'
-							variant='ghost'
-							size='sm'
-							className='text-destructive hover:text-destructive'
-							loading={deleteMutation.isPending}
-							confirmVariant='destructive'
-							dialogTitle={t('previous.delete-confirm-title')}
-							dialogDescription={t('previous.delete-confirm-description', { name: member.name })}
-							confirm={t('previous.delete-confirm-button')}
-							onConfirmClick={() => deleteMutation.mutate(member.memberId)}
-						>
-							{t('previous.delete-trigger')}
-						</ConfirmSaveButton>
+						{isAdmin && (
+							<ConfirmSaveButton
+								type='button'
+								variant='ghost'
+								size='sm'
+								className='text-destructive hover:text-destructive'
+								loading={deleteMutation.isPending}
+								confirmVariant='destructive'
+								dialogTitle={t('previous.delete-confirm-title')}
+								dialogDescription={t('previous.delete-confirm-description', { name: member.name })}
+								confirm={t('previous.delete-confirm-button')}
+								onConfirmClick={() => deleteMutation.mutate(member.memberId)}
+							>
+								{t('previous.delete-trigger')}
+							</ConfirmSaveButton>
+						)}
 					</li>
 				))}
 			</ul>

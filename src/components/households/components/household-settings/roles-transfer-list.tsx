@@ -38,7 +38,6 @@ export const RolesTransferList: FC = () => {
 
 	const form = useForm<RolesFormValues>({
 		defaultValues: { assignments: initialAssignments },
-		disabled: !isAdmin,
 	})
 
 	const assignments = useWatch({ control: form.control, name: 'assignments' })
@@ -53,6 +52,8 @@ export const RolesTransferList: FC = () => {
 
 	const rootError = !hasAdmins ? t('last-admin-error') : form.formState.errors.root?.message
 
+	if (!isAdmin) return null
+
 	return (
 		<form onSubmit={form.handleSubmit(handleSubmit)}>
 			<SettingsSection
@@ -65,13 +66,11 @@ export const RolesTransferList: FC = () => {
 					</div>
 				}
 				footer={
-					isAdmin && (
-						<ResetFormButton formState={form.formState} reset={form.reset}>
-							<Button type='submit' disabled={!form.formState.isDirty || !hasAdmins} loading={form.formState.isSubmitting}>
-								{t('save')}
-							</Button>
-						</ResetFormButton>
-					)
+					<ResetFormButton formState={form.formState} reset={form.reset}>
+						<Button type='submit' disabled={!form.formState.isDirty || !hasAdmins} loading={form.formState.isSubmitting}>
+							{t('save')}
+						</Button>
+					</ResetFormButton>
 				}
 			>
 				<Controller
@@ -85,11 +84,9 @@ export const RolesTransferList: FC = () => {
 							onChange={field.onChange}
 							leftColumn={{ key: MemberRole.MEMBER, label: tMembers('member') }}
 							rightColumn={{ key: MemberRole.ADMIN, label: tMembers('admin') }}
-							disabled={field.disabled}
 							isItemDisabled={(member) => member.id === currentUserId}
 							renderItem={(member) => <MemberItem member={member} isCurrentUser={member.id === currentUserId} />}
 							renderItemAction={(member) =>
-								isAdmin &&
 								member.id !== currentUserId && (
 									<RemoveMemberButton householdId={household.id} memberId={member.memberId} memberName={member.name} />
 								)

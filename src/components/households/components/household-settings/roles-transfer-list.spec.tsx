@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event'
 
 import { RolesTransferList } from './roles-transfer-list'
 
-const { householdMock, currentUserMock, mutateAsync } = vi.hoisted(() => ({
+const { householdMock, currentUserMock, isAdminMock, mutateAsync } = vi.hoisted(() => ({
 	householdMock: {
 		value: {
 			id: 'h1',
@@ -14,6 +14,7 @@ const { householdMock, currentUserMock, mutateAsync } = vi.hoisted(() => ({
 		},
 	},
 	currentUserMock: { value: { id: 'u1' } },
+	isAdminMock: { value: true },
 	mutateAsync: vi.fn(),
 }))
 
@@ -22,7 +23,7 @@ vi.mock('next-intl', () => ({
 }))
 
 vi.mock('@households/context/household.context', () => ({
-	useHouseholdContext: () => ({ household: householdMock.value, isAdmin: true }),
+	useHouseholdContext: () => ({ household: householdMock.value, isAdmin: isAdminMock.value }),
 }))
 
 vi.mock('@hooks/use-current-user', () => ({
@@ -47,6 +48,14 @@ describe('RolesTransferList', () => {
 		vi.clearAllMocks()
 		householdMock.value = { id: 'h1', members: MEMBERS }
 		currentUserMock.value = { id: 'u1' }
+		isAdminMock.value = true
+	})
+
+	it('renders nothing when the current user is not an admin', () => {
+		isAdminMock.value = false
+		const { container } = render(<RolesTransferList />)
+
+		expect(container).toBeEmptyDOMElement()
 	})
 
 	it('shows each member name and email', () => {

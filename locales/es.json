@@ -318,8 +318,12 @@
 			"error": "Ocurrió un error al guardar. Inténtalo de nuevo."
 		},
 		"members": {
-			"title": "Miembros del hogar",
-			"subtitle": "Los administradores gestionan la configuración, los miembros y los roles. Los miembros tienen acceso limitado.",
+			"title": "Gestionar roles",
+			"subtitle": "Mueve a los miembros entre columnas para otorgar o revocar el acceso de administrador. Este hogar debe tener siempre al menos un administrador.",
+			"list": {
+				"title": "Miembros",
+				"subtitle": "Todas las personas con acceso a este hogar, y su rol."
+			},
 			"member-column": "Miembros",
 			"admin-column": "Administradores",
 			"you": "Tú",

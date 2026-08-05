@@ -312,8 +312,12 @@
 			"error": "Something went wrong while saving. Please try again."
 		},
 		"members": {
-			"title": "House Members",
-			"subtitle": "Admins can manage settings, members and roles. Members have limited access.",
+			"title": "Manage Roles",
+			"subtitle": "Move members between columns to grant or revoke admin access. This household must always have at least one admin.",
+			"list": {
+				"title": "Members",
+				"subtitle": "Everyone with access to this household, and their role."
+			},
 			"member-column": "Members",
 			"admin-column": "Admins",
 			"you": "You",

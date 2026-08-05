@@ -1,8 +1,7 @@
 'use client'
 
+import type { FC, PropsWithChildren } from 'react'
 import type { Split, LastArrayElement } from 'type-fest'
-
-import { useMemo, type FC, type PropsWithChildren } from 'react'
 
 import { useTranslations } from 'next-intl'
 
@@ -16,8 +15,6 @@ type Route = typeof ROUTES.HOUSEHOLD.SETTINGS.GENERAL | typeof ROUTES.HOUSEHOLD.
 interface SettingsSectionLink {
 	slug: LastArrayElement<Split<Route, '/'>>
 	route: string
-	/** Section only reachable by admins. */
-	adminOnly?: boolean
 	variant?: 'default' | 'destructive'
 }
 
@@ -25,21 +22,21 @@ const getLastSlugOf = (path: Route) => path.split('/').at(-1) as SettingsSection
 
 const SECTIONS: SettingsSectionLink[] = [
 	{ slug: getLastSlugOf(ROUTES.HOUSEHOLD.SETTINGS.GENERAL), route: ROUTES.HOUSEHOLD.SETTINGS.GENERAL },
-	{ slug: getLastSlugOf(ROUTES.HOUSEHOLD.SETTINGS.MEMBERS), route: ROUTES.HOUSEHOLD.SETTINGS.MEMBERS, adminOnly: true },
+	{ slug: getLastSlugOf(ROUTES.HOUSEHOLD.SETTINGS.MEMBERS), route: ROUTES.HOUSEHOLD.SETTINGS.MEMBERS },
 	{ slug: getLastSlugOf(ROUTES.HOUSEHOLD.SETTINGS.DANGER), route: ROUTES.HOUSEHOLD.SETTINGS.DANGER, variant: 'destructive' },
 ]
 
 /**
- * Shared settings chrome: page header + section nav rail. Each settings page renders
- * its own form as `children`. Admin-only sections are hidden from non-admins.
+ * Shared settings chrome: page header + section nav rail. Each settings page renders its own
+ * content as `children` and self-gates any admin-only parts of it — every section is reachable
+ * by every member.
  */
 export const SettingsShell: FC<PropsWithChildren> = ({ children }) => {
 	const t = useTranslations('settings')
-	const { household, isAdmin } = useHouseholdContext()
+	const { household } = useHouseholdContext()
 	const pathname = usePathname()
-	const sections = useMemo(() => SECTIONS.filter((section) => !section.adminOnly || isAdmin), [isAdmin])
 
-	const activeSlug = sections.find(({ route }) => {
+	const activeSlug = SECTIONS.find(({ route }) => {
 		const href = route.replace(':id', household.id)
 		return pathname === href || pathname.startsWith(`${href}/`)
 	})?.slug
@@ -50,7 +47,7 @@ export const SettingsShell: FC<PropsWithChildren> = ({ children }) => {
 
 			<Tabs value={activeSlug}>
 				<TabsList variant='line'>
-					{sections.map(({ slug, route, variant }) => {
+					{SECTIONS.map(({ slug, route, variant }) => {
 						const href = route.replace(':id', household.id)
 
 						return (

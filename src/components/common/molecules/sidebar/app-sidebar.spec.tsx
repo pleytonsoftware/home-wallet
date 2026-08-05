@@ -138,7 +138,7 @@ describe('AppSidebar', () => {
 			expect(screen.getByText('sections.danger')).toBeInTheDocument()
 		})
 
-		it('hides the admin-only Members settings route from a non-admin member', async () => {
+		it('also shows the Members settings route to a non-admin member — it self-gates its admin-only content', async () => {
 			const user = userEvent.setup()
 			currentHousehold.value = { ...currentHousehold.value, role: MemberRole.MEMBER }
 			renderAppSidebar()
@@ -147,7 +147,7 @@ describe('AppSidebar', () => {
 
 			expect(screen.getByText('sections.general')).toBeInTheDocument()
 			expect(screen.getByText('sections.danger')).toBeInTheDocument()
-			expect(screen.queryByText('sections.members')).not.toBeInTheDocument()
+			expect(screen.getByText('sections.members')).toBeInTheDocument()
 		})
 
 		it('keeps Settings expanded and marks the active sub-route based on the current url', () => {

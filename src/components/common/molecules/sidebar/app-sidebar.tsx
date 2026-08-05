@@ -9,7 +9,6 @@ import { useTranslations } from 'next-intl'
 import { Sidebar, SidebarContent, SidebarFooter } from '@atoms/sidebar'
 import { useSignOut } from '@auth/hooks/use-signout.hook'
 import { type HouseholdContextType, useHouseholdContext } from '@households/context/household.context'
-import { MemberRole } from '@lib/constants/role.enum'
 import { ROUTES } from '@lib/constants/routes.const'
 import { NavBuilder } from '@molecules/navigation/nav-builder'
 
@@ -50,7 +49,6 @@ const NAV_CONFIG: (params: NavConfigParams) => NavConfig = ({ t, tSidebar, house
 						{
 							title: t('sections.members'),
 							url: ROUTES.HOUSEHOLD.SETTINGS.MEMBERS.replace(':id', household.id),
-							allowedRoles: [MemberRole.ADMIN],
 							prefetch: true,
 						},
 						{
