@@ -23,7 +23,7 @@ export const MembersList: FC = () => {
 			<ul className='flex max-h-72 flex-col gap-2 overflow-y-auto pr-1'>
 				{household.members.map((member) => (
 					<li key={member.memberId} className='flex items-center gap-3 rounded-lg border border-transparent bg-muted/40 px-2.5 py-2'>
-						<MemberItem member={member} isCurrentUser={member.id === user?.id} />
+						<MemberItem member={member} />
 						<Badge variant={member.role === MemberRole.ADMIN ? 'default' : 'secondary'} className='ml-auto'>
 							{member.role === MemberRole.ADMIN ? tRoles('admin') : tRoles('member')}
 						</Badge>

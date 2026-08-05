@@ -7,13 +7,14 @@ import { MembersList } from './members-list'
 
 const householdMock = { value: { id: 'h1', members: [] as HouseholdMemberWithRole[] } }
 const currentUserMock = { value: { id: 'u1' } }
+const isAdminMock = { value: false }
 
 vi.mock('next-intl', () => ({
 	useTranslations: () => (key: string) => key,
 }))
 
 vi.mock('@households/context/household.context', () => ({
-	useHouseholdContext: () => ({ household: householdMock.value, isAdmin: false }),
+	useHouseholdContext: () => ({ household: householdMock.value, isAdmin: isAdminMock.value }),
 }))
 
 vi.mock('@hooks/use-current-user', () => ({
@@ -29,14 +30,28 @@ describe('MembersList', () => {
 	beforeEach(() => {
 		householdMock.value = { id: 'h1', members: MEMBERS }
 		currentUserMock.value = { id: 'u1' }
+		isAdminMock.value = false
 	})
 
-	it('lists every member with their name and email', () => {
+	it('lists every member with their name', () => {
 		render(<MembersList />)
 
 		expect(screen.getByText('Alice')).toBeInTheDocument()
-		expect(screen.getByText('alice@example.com')).toBeInTheDocument()
 		expect(screen.getByText('Bob')).toBeInTheDocument()
+	})
+
+	it('hides emails from a non-admin viewer', () => {
+		render(<MembersList />)
+
+		expect(screen.queryByText('alice@example.com')).not.toBeInTheDocument()
+		expect(screen.queryByText('bob@example.com')).not.toBeInTheDocument()
+	})
+
+	it('shows emails to an admin viewer', () => {
+		isAdminMock.value = true
+		render(<MembersList />)
+
+		expect(screen.getByText('alice@example.com')).toBeInTheDocument()
 		expect(screen.getByText('bob@example.com')).toBeInTheDocument()
 	})
 

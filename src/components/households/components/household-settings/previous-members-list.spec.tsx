@@ -24,6 +24,10 @@ vi.mock('@households/context/household.context', () => ({
 	useHouseholdContext: () => ({ household: householdMock.value, isAdmin: isAdminMock.value }),
 }))
 
+vi.mock('@/hooks/use-current-user', () => ({
+	useCurrentUser: () => ({ user: { id: 'someone-else' } }),
+}))
+
 vi.mock('@households/hooks/mutations/hard-delete-member.hook', () => ({
 	hardDeletePreviousMemberMutationOptions: () => ({ mutationFn: vi.fn() }),
 }))

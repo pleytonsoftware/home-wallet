@@ -85,7 +85,7 @@ export const RolesTransferList: FC = () => {
 							leftColumn={{ key: MemberRole.MEMBER, label: tMembers('member') }}
 							rightColumn={{ key: MemberRole.ADMIN, label: tMembers('admin') }}
 							isItemDisabled={(member) => member.id === currentUserId}
-							renderItem={(member) => <MemberItem member={member} isCurrentUser={member.id === currentUserId} />}
+							renderItem={(member) => <MemberItem member={member} />}
 							renderItemAction={(member) =>
 								member.id !== currentUserId && (
 									<RemoveMemberButton householdId={household.id} memberId={member.memberId} memberName={member.name} />

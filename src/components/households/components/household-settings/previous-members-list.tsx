@@ -7,16 +7,15 @@ import { useLanguage } from '@/hooks/use-language'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@atoms/avatar'
 import { HOUSEHOLDS_QUERY_KEYS } from '@households/constants/query-keys'
 import { useHouseholdContext } from '@households/context/household.context'
 import { hardDeletePreviousMemberMutationOptions } from '@households/hooks/mutations/hard-delete-member.hook'
 import { getRemovedMembersOptions } from '@households/hooks/queries/get-removed-members-option'
 import { logger } from '@lib/logger'
-import { getInitials } from '@lib/utils/avatar'
 import { ConfirmSaveButton } from '@molecules/confirm-save-button'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
+import { MemberItem } from './member-item'
 import { SettingsSection } from './settings-section'
 
 export const PreviousMembersList: FC = () => {
@@ -50,16 +49,11 @@ export const PreviousMembersList: FC = () => {
 			<ul className='flex max-h-72 flex-col gap-2 overflow-y-auto pr-1'>
 				{removedMembers.map((member) => (
 					<li key={member.memberId} className='flex items-center gap-3 rounded-lg border border-transparent bg-muted/40 px-2.5 py-2'>
-						<Avatar className='size-8 rounded-full'>
-							<AvatarImage src={member.image ?? undefined} alt={member.name} />
-							<AvatarFallback className='rounded-full text-xs uppercase'>{getInitials(member.name)}</AvatarFallback>
-						</Avatar>
-						<span className='flex min-w-0 flex-1 flex-col'>
-							<span className='truncate text-sm'>{member.name}</span>
-							<span className='truncate text-xs text-muted-foreground'>
-								{t('previous.removed-on', { date: new Date(member.removedAt).toLocaleDateString(locale) })}
-							</span>
-						</span>
+						<MemberItem
+							member={member}
+							textClassName='flex-1'
+							extraNode={t('previous.removed-on', { date: new Date(member.removedAt).toLocaleDateString(locale) })}
+						/>
 						{isAdmin && (
 							<ConfirmSaveButton
 								type='button'
