@@ -14,11 +14,11 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@atoms/coll
 import { Field, FieldDescription, FieldError, FieldLabel } from '@atoms/field'
 import { Icon } from '@atoms/icon'
 import { Input } from '@atoms/input'
+import { SplitStrategyDropdown, SplitStrategyLabel } from '@households/components/split-strategy-dropdown'
 import { useCreateHouseholdForm } from '@households/hooks/forms/use-create-household-form.hook'
 import { OnboardingBody } from '@households/onboarding/components/onboarding-body'
 import { ROUTES } from '@lib/constants/routes.const'
 import { CurrencyCombobox } from '@molecules/currency-combobox'
-import { SplitStrategyDropdown, SplitStrategyLabel } from '@molecules/split-strategy-dropdown'
 
 export const OnboardingCreate: FC = () => {
 	const t = useTranslations('common.forms.households.create')

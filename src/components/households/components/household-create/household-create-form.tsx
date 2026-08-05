@@ -13,10 +13,10 @@ import { Button } from '@atoms/button'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@atoms/field'
 import { Input } from '@atoms/input'
 import { Switch } from '@atoms/switch'
+import { SplitStrategyDropdown, SplitStrategyLabel } from '@households/components/split-strategy-dropdown'
 import { HOUSEHOLDS_QUERY_KEYS } from '@households/constants/query-keys'
 import { useCreateHouseholdForm } from '@households/hooks/forms/use-create-household-form.hook'
 import { CurrencyCombobox } from '@molecules/currency-combobox'
-import { SplitStrategyDropdown, SplitStrategyLabel } from '@molecules/split-strategy-dropdown'
 import { useQueryClient } from '@tanstack/react-query'
 
 interface HouseholdCreateFormProps {

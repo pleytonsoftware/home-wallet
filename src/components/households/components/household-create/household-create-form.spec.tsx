@@ -37,7 +37,7 @@ vi.mock('@molecules/currency-combobox', () => ({
 	),
 }))
 
-vi.mock('@molecules/split-strategy-dropdown', () => ({
+vi.mock('@households/components/split-strategy-dropdown', () => ({
 	SplitStrategyLabel: ({ label }: { label: string }) => <label>{label}</label>,
 	SplitStrategyDropdown: ({ value, onChange, disabled }: { value: string; onChange: (v: string) => void; disabled?: boolean }) => (
 		<select data-testid='split-strategy' value={value} disabled={disabled} onChange={(e) => onChange(e.target.value)}>

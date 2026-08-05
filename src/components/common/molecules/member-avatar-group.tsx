@@ -1,12 +1,15 @@
 import type { MemberAvatarSummary } from '@molecules/member-avatar'
-import type { FC, ReactNode } from 'react'
+import type { FC, MouseEvent, ReactNode } from 'react'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { AvatarGroup, AvatarGroupCount } from '@atoms/avatar'
-import { HoverCard, HoverCardContent, HoverCardDescription, HoverCardHeader, HoverCardTitle, HoverCardTrigger } from '@atoms/hover-card'
-import { psp } from '@lib/utils/events'
+import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from '@atoms/popover'
 import { MemberAvatar } from '@molecules/member-avatar'
+
+const OPEN_DELAY_MS = 150
+/** Gives the pointer room to cross the gap between the trigger and the popover content without the card flickering shut. */
+const CLOSE_DELAY_MS = 200
 
 interface MemberAvatarGroupProps {
 	members: Array<MemberAvatarSummary>
@@ -14,26 +17,43 @@ interface MemberAvatarGroupProps {
 	size?: 'default' | 'sm' | 'lg'
 }
 
-interface AvatarHoverCardProps {
+interface AvatarPopoverProps {
 	trigger: ReactNode
 	children: ReactNode
 }
 
-/** Cards/links wrap this group; a trigger click must open the card without also activating whatever wraps it. */
-const AvatarHoverCard: FC<AvatarHoverCardProps> = ({ trigger, children }) => {
+/** Cards/links wrap this group; a trigger click must open the popover without also activating whatever wraps it. */
+const AvatarPopover: FC<AvatarPopoverProps> = ({ trigger, children }) => {
 	const [open, setOpen] = useState(false)
+	const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-	const openOnClick = psp(() => {
+	const scheduleOpen = useCallback(() => {
+		clearTimeout(timeoutRef.current)
+		timeoutRef.current = setTimeout(() => setOpen(true), OPEN_DELAY_MS)
+	}, [])
+	const scheduleClose = useCallback(() => {
+		clearTimeout(timeoutRef.current)
+		timeoutRef.current = setTimeout(() => setOpen(false), CLOSE_DELAY_MS)
+	}, [])
+	const cancelScheduled = useCallback(() => clearTimeout(timeoutRef.current), [])
+	const openOnClick = useCallback((event: MouseEvent) => {
+		event.preventDefault()
+		event.stopPropagation()
+		cancelScheduled()
 		setOpen(true)
-	})
+	}, [])
+
+	useEffect(() => cancelScheduled, [])
 
 	return (
-		<HoverCard open={open} onOpenChange={setOpen} openDelay={150}>
-			<HoverCardTrigger asChild onClick={openOnClick}>
+		<Popover open={open} onOpenChange={setOpen}>
+			<PopoverTrigger asChild onClick={openOnClick} onMouseEnter={scheduleOpen} onMouseLeave={scheduleClose}>
 				{trigger}
-			</HoverCardTrigger>
-			<HoverCardContent className='w-auto'>{children}</HoverCardContent>
-		</HoverCard>
+			</PopoverTrigger>
+			<PopoverContent className='w-auto p-2' onMouseEnter={cancelScheduled} onMouseLeave={scheduleClose}>
+				{children}
+			</PopoverContent>
+		</Popover>
 	)
 }
 
@@ -44,15 +64,15 @@ export const MemberAvatarGroup: FC<MemberAvatarGroupProps> = ({ members, max = 3
 	return (
 		<AvatarGroup>
 			{visibleMembers.map((member) => (
-				<AvatarHoverCard key={member.id} trigger={<MemberAvatar member={member} size={size} />}>
-					<HoverCardHeader>
-						<HoverCardTitle>{member.name}</HoverCardTitle>
-						{member.email && <HoverCardDescription>{member.email}</HoverCardDescription>}
-					</HoverCardHeader>
-				</AvatarHoverCard>
+				<AvatarPopover key={member.id} trigger={<MemberAvatar member={member} size={size} />}>
+					<PopoverHeader>
+						<PopoverTitle>{member.name}</PopoverTitle>
+						{member.email && <PopoverDescription>{member.email}</PopoverDescription>}
+					</PopoverHeader>
+				</AvatarPopover>
 			))}
 			{overflowMembers.length > 0 && (
-				<AvatarHoverCard trigger={<AvatarGroupCount>+{overflowMembers.length}</AvatarGroupCount>}>
+				<AvatarPopover trigger={<AvatarGroupCount>+{overflowMembers.length}</AvatarGroupCount>}>
 					<ul className='flex flex-col gap-2'>
 						{overflowMembers.map((member) => (
 							<li key={member.id} className='flex flex-col'>
@@ -61,7 +81,7 @@ export const MemberAvatarGroup: FC<MemberAvatarGroupProps> = ({ members, max = 3
 							</li>
 						))}
 					</ul>
-				</AvatarHoverCard>
+				</AvatarPopover>
 			)}
 		</AvatarGroup>
 	)
