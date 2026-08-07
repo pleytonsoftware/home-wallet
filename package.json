@@ -21,6 +21,7 @@
 		"prisma:migrate": "prisma migrate dev",
 		"prisma:db-push": "prisma db push",
 		"prisma:db-deploy:dev": "dotenv -e .env.development.local -- prisma migrate deploy",
+		"prisma:seed": "dotenv -e .env -- tsx prisma/seed.ts",
 		"email:dev": "email dev --dir=./src/emails --port 6003"
 	},
 	"dependencies": {

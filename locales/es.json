@@ -46,6 +46,14 @@
 					"cash": "Efectivo",
 					"other": "Otro"
 				}
+			},
+			"category": {
+				"placeholder": "Selecciona una categoría",
+				"empty": "No se encontró ninguna categoría.",
+				"create": {
+					"trigger": "Crear \"{name}\"",
+					"error": "Ocurrió un error al crear la categoría. Inténtalo de nuevo."
+				}
 			}
 		},
 		"confirm": {
@@ -170,6 +178,22 @@
 						"error": {
 							"invalid": "Ingresa un monto válido",
 							"positive": "El monto objetivo debe ser mayor a cero"
+						}
+					}
+				}
+			},
+			"categories": {
+				"create": {
+					"name": {
+						"error": {
+							"required": "El nombre de la categoría es obligatorio",
+							"max-length": "El nombre debe tener menos de {max} caracteres",
+							"already-exists": "Ya existe una categoría con este nombre"
+						}
+					},
+					"color": {
+						"error": {
+							"required": "Selecciona un color"
 						}
 					}
 				}

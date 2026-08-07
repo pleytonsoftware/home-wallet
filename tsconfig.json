@@ -38,6 +38,7 @@
 			"@households/*": ["./src/components/households/*"],
 			"@bank-accounts/*": ["./src/components/bank-accounts/*"],
 			"@monthly-budgets/*": ["./src/components/monthly-budgets/*"],
+			"@categories/*": ["./src/components/categories/*"],
 			"@common/*": ["./src/components/common/*"]
 		}
 	},

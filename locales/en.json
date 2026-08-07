@@ -46,6 +46,14 @@
 					"cash": "Cash",
 					"other": "Other"
 				}
+			},
+			"category": {
+				"placeholder": "Select category",
+				"empty": "No category found.",
+				"create": {
+					"trigger": "Create \"{name}\"",
+					"error": "Something went wrong while creating the category. Please try again."
+				}
 			}
 		},
 		"confirm": {
@@ -163,6 +171,22 @@
 						"error": {
 							"invalid": "Enter a valid amount",
 							"positive": "Target amount must be greater than zero"
+						}
+					}
+				}
+			},
+			"categories": {
+				"create": {
+					"name": {
+						"error": {
+							"required": "Category name is required",
+							"max-length": "Name must be less than {max} characters",
+							"already-exists": "A category with this name already exists"
+						}
+					},
+					"color": {
+						"error": {
+							"required": "Please select a color"
 						}
 					}
 				}
