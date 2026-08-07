@@ -37,6 +37,7 @@
 			"@actions/*": ["./src/app/actions/*"],
 			"@households/*": ["./src/components/households/*"],
 			"@bank-accounts/*": ["./src/components/bank-accounts/*"],
+			"@monthly-budgets/*": ["./src/components/monthly-budgets/*"],
 			"@common/*": ["./src/components/common/*"]
 		}
 	},

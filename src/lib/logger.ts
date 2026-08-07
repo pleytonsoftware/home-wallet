@@ -23,6 +23,10 @@ configureSync({
 			parentSinks: 'inherit',
 		},
 		{
+			category: ['app', 'monthly-budget'],
+			parentSinks: 'inherit',
+		},
+		{
 			category: ['app', 'auth'],
 			parentSinks: 'inherit',
 		},
@@ -34,4 +38,5 @@ export const logger = getLogger(['app'])
 export const prismaLogger = logger.getChild(['prisma'])
 export const householdLogger = logger.getChild(['household'])
 export const bankAccountLogger = logger.getChild(['bank-account'])
+export const monthlyBudgetLogger = logger.getChild(['monthly-budget'])
 export const authLogger = logger.getChild(['auth'])

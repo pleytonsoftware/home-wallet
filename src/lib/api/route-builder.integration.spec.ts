@@ -12,6 +12,7 @@ import { createRoute } from './route-builder'
 vi.mock('@lib/auth/utils', () => ({
 	authorizedSession: vi.fn(),
 }))
+vi.mock('@actions/household/active-memberships', () => ({ getActiveMembership: vi.fn() }))
 
 const request = new NextRequest('http://localhost/api/households/h1')
 const paramsSchema = z.object({ id: z.string().min(1) })

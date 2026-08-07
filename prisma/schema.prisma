@@ -63,11 +63,10 @@ model User {
   gender        String?
   createdAt     DateTime  @default(now()) @map("created_at")
 
-  accounts     Account[]
-  sessions     Session[]
-  memberships  HouseholdMember[]
-  transactions Transaction[]
-  households   Household[]
+  accounts    Account[]
+  sessions    Session[]
+  memberships HouseholdMember[]
+  households  Household[]
 
   @@map("users")
 }
@@ -128,6 +127,7 @@ model HouseholdMember {
   sharedBankAccounts BankAccountMember[]
   payrolls           HouseholdMemberPayroll[]
   monthlyBudgets     MonthlyBudget[]
+  transactions       Transaction[]
 
   @@index([householdId])
   @@map("household_members")
@@ -161,6 +161,7 @@ model BankAccount {
   sharedWith     BankAccountMember[]
   sourcePayments Payment[]           @relation("SourcePayments")
   destPayments   Payment[]           @relation("DestPayments")
+  transactions   Transaction[]
 
   @@index([householdId])
   @@map("bank_accounts")
@@ -188,6 +189,7 @@ model MonthlyBudget {
   month             DateTime // Format: YYYY-MM-01
   type              String           @default("personal") // TS enum: BUDGET_TYPE
   status            String           @default("draft") // TS enum: BUDGET_STATUS
+  targetAmount      Float?           @map("target_amount")
   createdAt         DateTime         @default(now()) @map("created_at")
   updatedAt         DateTime         @updatedAt @map("updated_at")
 
@@ -195,6 +197,7 @@ model MonthlyBudget {
   transactions Transaction[]
   aiSummary    AISummary?
 
+  @@unique([householdMemberId, month, type])
   @@index([householdId, householdMemberId, month])
   @@map("monthly_budgets")
 }
@@ -205,6 +208,7 @@ model Category {
   household   Household? @relation(fields: [householdId], references: [id])
   name        String
   isBase      Boolean    @default(false)
+  color       String     @default("gray") // TS enum: CATEGORY_COLOR
   createdAt   DateTime   @default(now())
 
   transactions Transaction[]
@@ -215,29 +219,31 @@ model Category {
 }
 
 model Transaction {
-  id              String         @id @default(cuid())
-  householdId     String         @map("household_id")
-  household       Household      @relation(fields: [householdId], references: [id])
-  monthlyBudgetId String?        @map("monthly_budget_id")
-  monthlyBudget   MonthlyBudget? @relation(fields: [monthlyBudgetId], references: [id])
-  name            String
-  amount          Float
-  type            String         @default("expense") // TS enum: PAYMENT_TYPE
-  categoryId      String?        @map("category_id")
-  category        Category?      @relation(fields: [categoryId], references: [id])
-  sourceAccountId String?        @map("source_account_id")
-  destAccountId   String?        @map("dest_account_id")
-  note            String?
-  date            DateTime
-  isRecurring     Boolean        @default(false) @map("is_recurring")
-  recurrenceRule  Json?          @map("recurrence_rule") // Stores schedule/installment config
-  createdAt       DateTime       @default(now()) @map("created_at")
+  id                String          @id @default(cuid())
+  householdId       String          @map("household_id")
+  household         Household       @relation(fields: [householdId], references: [id])
+  householdMemberId String          @map("household_member_id") // creator/owner — only they can edit or delete
+  householdMember   HouseholdMember @relation(fields: [householdMemberId], references: [id], onDelete: Cascade)
+  monthlyBudgetId   String          @map("monthly_budget_id")
+  monthlyBudget     MonthlyBudget   @relation(fields: [monthlyBudgetId], references: [id])
+  name              String
+  amount            Float
+  type              String          @default("expense") // TS enum: PAYMENT_TYPE
+  categoryId        String?         @map("category_id")
+  category          Category?       @relation(fields: [categoryId], references: [id])
+  sourceAccountId   String?         @map("source_account_id")
+  sourceAccount     BankAccount?    @relation(fields: [sourceAccountId], references: [id], onDelete: SetNull)
+  note              String?
+  date              DateTime
+  isRecurring       Boolean         @default(false) @map("is_recurring")
+  recurrenceRule    Json?           @map("recurrence_rule") // { frequency: RECURRENCE_FREQUENCY; interval?: number; endDate?: string; occurrences?: number }
+  createdAt         DateTime        @default(now()) @map("created_at")
 
-  payments Payment[] // Links to monthly budget instances
-  userId   String?
-  user     User?     @relation(fields: [userId], references: [id])
+  payments Payment[]
 
   @@index([householdId])
+  @@index([householdMemberId])
+  @@index([monthlyBudgetId])
   @@index([isRecurring])
   @@map("transactions")
 }

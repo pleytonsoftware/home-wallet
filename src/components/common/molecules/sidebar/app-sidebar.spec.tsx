@@ -121,8 +121,8 @@ describe('AppSidebar', () => {
 
 			await user.click(screen.getByText('transactions'))
 
-			expect(screen.getByText('Shared')).toBeInTheDocument()
-			expect(screen.getByText('Personal')).toBeInTheDocument()
+			expect(screen.getByText('transactionsShared')).toBeInTheDocument()
+			expect(screen.getByText('transactionsPersonal')).toBeInTheDocument()
 		})
 
 		it('renders the Settings nav item with its nested routes once expanded for an admin', async () => {

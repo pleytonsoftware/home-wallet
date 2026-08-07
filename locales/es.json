@@ -59,6 +59,8 @@
 		},
 		"sidebar": {
 			"transactions": "Transacciones",
+			"transactionsPersonal": "Personal",
+			"transactionsShared": "Compartidas",
 			"settings": "Configuración",
 			"households": "Mis hogares",
 			"bankAccounts": "Cuentas bancarias"
@@ -152,6 +154,22 @@
 					"shared-members": {
 						"error": {
 							"invalid": "Una o más personas seleccionadas no son miembros de este hogar"
+						}
+					}
+				}
+			},
+			"monthly-budgets": {
+				"create": {
+					"month": {
+						"error": {
+							"invalid": "Mes inválido.",
+							"out-of-sequence": "Solo puedes crear el próximo mes disponible ({month})."
+						}
+					},
+					"target-amount": {
+						"error": {
+							"invalid": "Ingresa un monto válido",
+							"positive": "El monto objetivo debe ser mayor a cero"
 						}
 					}
 				}
@@ -442,6 +460,54 @@
 			"confirm-button": "Eliminar",
 			"success": "Cuenta bancaria eliminada.",
 			"error": "Ocurrió un error al eliminar la cuenta. Inténtalo de nuevo."
+		}
+	},
+	"monthly-budget-page": {
+		"eyebrow": "Presupuesto mensual",
+		"title": "Presupuesto Mensual",
+		"description": "Selecciona un mes existente o crea el siguiente para empezar a registrar transacciones.",
+		"view": {
+			"grid": "Cuadrícula",
+			"list": "Lista"
+		},
+		"year": {
+			"previous": "Año anterior",
+			"next": "Año siguiente"
+		},
+		"grid": {
+			"create": "Crear presupuesto",
+			"used": "{percent}% utilizado",
+			"no-target": "Sin monto objetivo",
+			"available": "Disponible",
+			"locked": "Bloqueado",
+			"not-created": "No creado"
+		},
+		"summary": {
+			"previous": "Mes anterior",
+			"next": "Mes siguiente",
+			"income": "Ingresos",
+			"expenses": "Gastos",
+			"savings": "Ahorro",
+			"budget": "Presupuesto",
+			"no-target": "Sin definir"
+		},
+		"locked": {
+			"title": "Este mes aún no está configurado",
+			"description": "Este mes todavía no tiene un presupuesto. Vuelve a la selección de meses para crear el próximo mes disponible.",
+			"available-description": "Este es el próximo mes disponible — crea un presupuesto para empezar a registrar transacciones aquí.",
+			"create-button": "Crear presupuesto mensual",
+			"back-button": "Volver a la selección de meses"
+		},
+		"form": {
+			"title": "Crear presupuesto mensual",
+			"description": "Define opcionalmente un monto objetivo para {month}.",
+			"target-amount": {
+				"label": "Monto objetivo (opcional)",
+				"description": "Déjalo en blanco si prefieres no llevar un monto objetivo este mes."
+			},
+			"submit-button": "Crear presupuesto",
+			"created": "Presupuesto mensual creado.",
+			"error": "Ocurrió un error. Inténtalo de nuevo."
 		}
 	}
 }

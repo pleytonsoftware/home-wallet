@@ -5,10 +5,8 @@ import { NextResponse } from 'next/server'
 
 import { z } from 'zod'
 
-import { getActiveMembership } from '@actions/household/active-memberships'
-import { withAuth, withErrorBoundary, withParamsValidation } from '@lib/api/middlewares'
+import { withActiveMembership, withAuth, withErrorBoundary, withParamsValidation } from '@lib/api/middlewares'
 import { createRoute } from '@lib/api/route-builder'
-import { FORBIDDEN } from '@lib/errors'
 import { bankAccountLogger } from '@lib/logger'
 import { prisma } from '@lib/prisma'
 
@@ -18,13 +16,8 @@ export const GET = createRoute<{ params: Promise<{ id: string }> }>()
 	.use(withErrorBoundary(bankAccountLogger, '[GET /households/:id/bank-accounts]: {error}'))
 	.use(withAuth)
 	.use(withParamsValidation(paramsSchema))
-	.handler(async (_request, { params: { id: householdId }, session }) => {
-		const membership = await getActiveMembership({ userId: session.user.id, householdId })
-		if (!membership) {
-			const { status, error } = FORBIDDEN()
-			return NextResponse.json({ error }, { status })
-		}
-
+	.use(withActiveMembership)
+	.handler(async (_request, { params: { id: householdId }, membership }) => {
 		const bankAccounts = await prisma.bankAccount.findMany({
 			where: {
 				householdId,

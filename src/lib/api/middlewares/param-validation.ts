@@ -1,5 +1,4 @@
 import type { Middleware } from '@lib/api/route-builder'
-import type { EmptyObject } from 'type-fest'
 
 import { NextResponse } from 'next/server'
 
@@ -28,9 +27,9 @@ export const withParamsValidation =
 	}
 
 export const withQueryValidation =
-	<Q>(schema: z.ZodType<Q>): Middleware<EmptyObject, { query: Q }> =>
+	<Q>(schema: z.ZodType<Q>): Middleware<unknown, { query: Q }> =>
 	async (request, _context, next) => {
-		const parsed = schema.safeParse(request.nextUrl.searchParams)
+		const parsed = schema.safeParse(Object.fromEntries(request.nextUrl.searchParams))
 
 		if (!parsed.success) {
 			return NextResponse.json(

@@ -15,6 +15,10 @@ export const ROUTES = {
 	HOUSEHOLD: {
 		ROOT: '/household/:id',
 		BANK_ACCOUNTS: '/household/:id/bank-accounts',
+		TRANSACTIONS: {
+			PERSONAL: '/household/:id/transactions/personal',
+			PERSONAL_MONTH: '/household/:id/transactions/personal/:month',
+		},
 		SETTINGS: {
 			ROOT: '/household/:id/settings',
 			GENERAL: '/household/:id/settings/general',

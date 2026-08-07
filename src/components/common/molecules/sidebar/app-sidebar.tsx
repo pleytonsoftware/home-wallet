@@ -32,13 +32,16 @@ const NAV_CONFIG: (params: NavConfigParams) => NavConfig = ({ t, tSidebar, house
 					prefetch: true,
 				},
 				{
-					// TODO: Add all the household-related routes here, like dashboard, transactions, budgets, etc.
+					// TODO: Add the shared-transactions route once that feature ships.
 					title: tSidebar('transactions'),
 					icon: BanknoteCheckIcon,
-					tooltip: 'View and manage transactions',
 					items: [
-						{ title: 'Shared', url: '/transactions/shared' },
-						{ title: 'Personal', url: '/transactions/personal' },
+						{
+							title: tSidebar('transactionsPersonal'),
+							url: ROUTES.HOUSEHOLD.TRANSACTIONS.PERSONAL.replace(':id', household.id),
+							prefetch: true,
+						},
+						{ title: tSidebar('transactionsShared'), url: '/transactions/shared' },
 					],
 				},
 				{

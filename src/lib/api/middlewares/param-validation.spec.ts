@@ -37,6 +37,16 @@ describe('withParamsValidation', () => {
 })
 
 describe('withQueryValidation', () => {
+	it('calls next with the parsed query when valid', async () => {
+		const next = vi.fn().mockReturnValue(NextResponse.json({ ok: true }))
+		const middleware = withQueryValidation(schema)
+
+		const response = await middleware(makeRequest('http://localhost/api/test?id=abc'), {}, next)
+
+		expect(next).toHaveBeenCalledWith({ query: { id: 'abc' } })
+		expect(await (response as NextResponse).json()).toEqual({ ok: true })
+	})
+
 	it('responds 400 and skips next when query fails validation', async () => {
 		const next = vi.fn()
 		const middleware = withQueryValidation(schema)
