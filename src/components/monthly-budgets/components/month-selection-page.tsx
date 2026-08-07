@@ -14,6 +14,7 @@ import { useQueryState, parseAsInteger } from 'nuqs'
 import { Button } from '@atoms/button'
 import { Icon } from '@atoms/icon'
 import { Skeleton } from '@atoms/skeleton'
+import { useCookieState } from '@hooks/use-cookie-state'
 import { useHouseholdContext } from '@households/context/household.context'
 import { ROUTES } from '@lib/constants/routes.const'
 import { PageHeader } from '@molecules/page-header'
@@ -21,15 +22,22 @@ import { CreateMonthlyBudgetDialog } from '@monthly-budgets/components/create-mo
 import { MonthGrid } from '@monthly-budgets/components/month-grid'
 import { MonthList } from '@monthly-budgets/components/month-list'
 import { type MonthSelectionView, ViewToggle } from '@monthly-budgets/components/view-toggle'
+import { MONTH_SELECTION_VIEW_COOKIE_MAX_AGE, MONTH_SELECTION_VIEW_COOKIE_NAME } from '@monthly-budgets/constants/view'
 import { getMonthlyBudgetsOptions } from '@monthly-budgets/hooks/queries/get-monthly-budgets-option'
 import { useQuery } from '@tanstack/react-query'
 
-export const MonthSelectionPage: FC = () => {
+interface MonthSelectionPageProps {
+	initialView: MonthSelectionView
+}
+
+export const MonthSelectionPage: FC<MonthSelectionPageProps> = ({ initialView }) => {
 	const t = useTranslations('monthly-budget-page')
 	const router = useRouter()
 	const { household } = useHouseholdContext()
 	const [year, setYear] = useQueryState('year', parseAsInteger.withDefault(new Date().getFullYear()))
-	const [view, setView] = useState<MonthSelectionView>('grid') // TODO: pick default view based on cookie
+	const [view, setView] = useCookieState<MonthSelectionView>(MONTH_SELECTION_VIEW_COOKIE_NAME, initialView, {
+		maxAge: MONTH_SELECTION_VIEW_COOKIE_MAX_AGE,
+	})
 	const [createMonth, setCreateMonth] = useState<string | null>(null)
 
 	const { data, isLoading } = useQuery(getMonthlyBudgetsOptions(household.id, year))
