@@ -9,6 +9,7 @@ import { useMemo, useState } from 'react'
 
 import { CalendarRangeIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useQueryState, parseAsInteger } from 'nuqs'
 
 import { Button } from '@atoms/button'
 import { Icon } from '@atoms/icon'
@@ -27,7 +28,7 @@ export const MonthSelectionPage: FC = () => {
 	const t = useTranslations('monthly-budget-page')
 	const router = useRouter()
 	const { household } = useHouseholdContext()
-	const [year, setYear] = useState(() => new Date().getFullYear()) // TODO: use nuqs so we have query parameter state
+	const [year, setYear] = useQueryState('year', parseAsInteger.withDefault(new Date().getFullYear()))
 	const [view, setView] = useState<MonthSelectionView>('grid') // TODO: pick default view based on cookie
 	const [createMonth, setCreateMonth] = useState<string | null>(null)
 

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 
 import { StatusCodes } from 'http-status-codes'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 
 import { TooltipProvider } from '@atoms/tooltip'
 import { AuthProvider } from '@auth/context/session'
@@ -18,7 +19,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 	return (
 		<TooltipProvider>
 			<AuthProvider session={session}>
-				<QueryProvider>{children}</QueryProvider>
+				<QueryProvider>
+					<NuqsAdapter>{children}</NuqsAdapter>
+				</QueryProvider>
 			</AuthProvider>
 		</TooltipProvider>
 	)
