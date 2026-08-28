@@ -1,0 +1,28 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Next.js: debug server (actions/API routes)",
+			"type": "node",
+			"request": "launch",
+			"cwd": "${workspaceFolder}",
+			"runtimeExecutable": "pnpm",
+			"runtimeArgs": ["exec", "dotenv", "-e", ".env", "--", "next", "dev", "-p", "6001"],
+			"skipFiles": ["<node_internals>/**"],
+			"console": "integratedTerminal",
+			"serverReadyAction": {
+				"pattern": "started server on .+, url: (https?://.+)",
+				"uriFormat": "%s",
+				"action": "debugWithChrome",
+				"webRoot": "${workspaceFolder}"
+			}
+		},
+		{
+			"name": "Next.js: debug client",
+			"type": "chrome",
+			"request": "launch",
+			"url": "http://localhost:6001",
+			"webRoot": "${workspaceFolder}"
+		}
+	]
+}

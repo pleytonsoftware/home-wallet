@@ -61,8 +61,7 @@ export const MonthSelectionPage: FC<MonthSelectionPageProps> = ({ initialView })
 		})
 	}, [data, year])
 
-	const handleOpen = (month: string) =>
-		router.push(ROUTES.HOUSEHOLD.TRANSACTIONS.PERSONAL_MONTH.replace(':id', household.id).replace(':month', month))
+	const handleOpen = (month: string) => router.push(ROUTES.HOUSEHOLD.BUDGETS.PERSONAL_MONTH.replace(':id', household.id).replace(':month', month))
 
 	return (
 		<div className='mx-auto flex w-full flex-col gap-6 py-4 px-4 sm:px-0'>

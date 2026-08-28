@@ -16,8 +16,13 @@ export const ROUTES = {
 		ROOT: '/household/:id',
 		BANK_ACCOUNTS: '/household/:id/bank-accounts',
 		TRANSACTIONS: {
-			PERSONAL: '/household/:id/transactions/personal',
-			PERSONAL_MONTH: '/household/:id/transactions/personal/:month',
+			RECURRING: '/household/:id/transactions/recurring',
+		},
+		BUDGETS: {
+			PERSONAL: '/household/:id/budgets/personal',
+			PERSONAL_MONTH: '/household/:id/budgets/personal/:month',
+			SHARED: '/household/:id/budgets/shared',
+			SHARED_MONTH: '/household/:id/budgets/shared/:month',
 		},
 		SETTINGS: {
 			ROOT: '/household/:id/settings',

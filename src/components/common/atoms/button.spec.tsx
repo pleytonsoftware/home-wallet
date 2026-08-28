@@ -170,6 +170,11 @@ describe('buttonVariants', () => {
 		expect(classes).toContain('text-destructive')
 	})
 
+	it('generates correct classes for success variant', () => {
+		const classes = buttonVariants({ variant: 'success' })
+		expect(classes).toContain('text-success')
+	})
+
 	it('generates correct classes for link variant', () => {
 		const classes = buttonVariants({ variant: 'link' })
 		expect(classes).toContain('text-primary')

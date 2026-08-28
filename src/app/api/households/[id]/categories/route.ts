@@ -18,10 +18,10 @@ export const GET = createRoute<{ params: Promise<{ id: string }> }>()
 		const categories = await prisma.category.findMany({
 			where: { OR: [{ householdId }, { isBase: true }] },
 			orderBy: { name: 'asc' },
-			select: { id: true, name: true, color: true, isBase: true },
+			select: { id: true, name: true, color: true, icon: true, isBase: true },
 		})
 
 		return NextResponse.json(categories)
 	})
 
-export const dynamic = 'cache'
+export const dynamic = 'auto'

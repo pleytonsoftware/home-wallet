@@ -110,19 +110,25 @@ describe('AppSidebar', () => {
 			expect(screen.getByText('The Does')).toBeInTheDocument()
 		})
 
-		it('renders the Transactions nav item', () => {
-			renderAppSidebar()
-			expect(screen.getByText('transactions')).toBeInTheDocument()
-		})
-
 		it('renders the Transactions nav item with its nested routes once expanded', async () => {
 			const user = userEvent.setup()
 			renderAppSidebar()
 
-			await user.click(screen.getByText('transactions'))
+			expect(screen.getByText('transactions.$')).toBeInTheDocument()
+			await user.click(screen.getByText('transactions.$'))
 
-			expect(screen.getByText('transactionsShared')).toBeInTheDocument()
-			expect(screen.getByText('transactionsPersonal')).toBeInTheDocument()
+			expect(screen.getByText('transactions.recurring')).toBeInTheDocument()
+		})
+
+		it('renders the Budgets nav item with its nested routes once expanded', async () => {
+			const user = userEvent.setup()
+			renderAppSidebar()
+
+			expect(screen.getByText('budgets.$')).toBeInTheDocument()
+			await user.click(screen.getByText('budgets.$'))
+
+			expect(screen.getByText('budgets.personal')).toBeInTheDocument()
+			expect(screen.getByText('budgets.shared')).toBeInTheDocument()
 		})
 
 		it('renders the Settings nav item with its nested routes once expanded for an admin', async () => {

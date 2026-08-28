@@ -1,6 +1,15 @@
 import { describe, it, expect } from 'vitest'
 
-import { addMonthsUtc, computeNextAvailableMonth, formatMonthParam, isSameMonth, parseMonthParam, toMonthStart } from './monthly-budget.utils'
+import {
+	addMonthsUtc,
+	computeNextAvailableMonth,
+	formatMonthParam,
+	getDefaultTransactionDate,
+	isSameMonth,
+	lastDayOfMonthUtc,
+	parseMonthParam,
+	toMonthStart,
+} from './monthly-budget.utils'
 
 describe('toMonthStart', () => {
 	it('normalizes a date to the first day of its month at UTC midnight', () => {
@@ -57,6 +66,20 @@ describe('isSameMonth', () => {
 	})
 })
 
+describe('lastDayOfMonthUtc', () => {
+	it('returns the last day of a 31-day month', () => {
+		expect(lastDayOfMonthUtc(new Date('2026-08-01T00:00:00.000Z')).toISOString()).toBe('2026-08-31T00:00:00.000Z')
+	})
+
+	it('returns the last day of February in a non-leap year', () => {
+		expect(lastDayOfMonthUtc(new Date('2026-02-01T00:00:00.000Z')).toISOString()).toBe('2026-02-28T00:00:00.000Z')
+	})
+
+	it('returns the last day of February in a leap year', () => {
+		expect(lastDayOfMonthUtc(new Date('2028-02-01T00:00:00.000Z')).toISOString()).toBe('2028-02-29T00:00:00.000Z')
+	})
+})
+
 describe('computeNextAvailableMonth', () => {
 	it('returns the current calendar month when there is no latest budget', () => {
 		const now = new Date('2026-08-17T14:32:00.000Z')
@@ -66,5 +89,19 @@ describe('computeNextAvailableMonth', () => {
 	it('returns the month after the latest created budget', () => {
 		const latest = new Date('2026-06-01T00:00:00.000Z')
 		expect(computeNextAvailableMonth(latest).toISOString()).toBe('2026-07-01T00:00:00.000Z')
+	})
+})
+
+describe('getDefaultTransactionDate', () => {
+	it('returns today when the budget month is the current calendar month', () => {
+		const monthlyBudgetMonth = new Date('2026-08-01T00:00:00.000Z')
+		const now = new Date('2026-08-20T14:32:00.000Z')
+		expect(getDefaultTransactionDate(monthlyBudgetMonth, now)).toBe(now)
+	})
+
+	it('returns the budget month unchanged when it is not the current calendar month', () => {
+		const monthlyBudgetMonth = new Date('2026-06-01T00:00:00.000Z')
+		const now = new Date('2026-08-20T14:32:00.000Z')
+		expect(getDefaultTransactionDate(monthlyBudgetMonth, now)).toBe(monthlyBudgetMonth)
 	})
 })

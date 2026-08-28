@@ -53,7 +53,34 @@
 				"create": {
 					"trigger": "Crear \"{name}\"",
 					"error": "Ocurrió un error al crear la categoría. Inténtalo de nuevo."
+				},
+				"search-placeholder": "Buscar categorías...",
+				"base": {
+					"groceries": "Supermercado",
+					"rent": "Alquiler",
+					"utilities": "Servicios",
+					"transport": "Transporte",
+					"dining": "Restaurantes",
+					"entertainment": "Entretenimiento",
+					"health": "Salud",
+					"shopping": "Compras",
+					"subscriptions": "Suscripciones",
+					"income": "Ingreso",
+					"travel": "Viajes",
+					"education": "Educación",
+					"other": "Otro"
 				}
+			},
+			"payment-type": {
+				"expense": "Gasto",
+				"income": "Ingreso"
+			},
+			"recurrence-frequency": {
+				"daily": "Diario",
+				"weekly": "Semanal",
+				"biweekly": "Cada 2 semanas",
+				"monthly": "Mensual",
+				"yearly": "Anual"
 			}
 		},
 		"confirm": {
@@ -66,12 +93,18 @@
 			}
 		},
 		"sidebar": {
-			"transactions": "Transacciones",
-			"transactionsPersonal": "Personal",
-			"transactionsShared": "Compartidas",
+			"transactions": {
+				"$": "Transacciones",
+				"recurring": "Recurrentes"
+			},
+			"budgets": {
+				"$": "Gastos",
+				"personal": "Personales",
+				"shared": "Compartidos"
+			},
 			"settings": "Configuración",
 			"households": "Mis hogares",
-			"bankAccounts": "Cuentas bancarias"
+			"wallet": "Cartera"
 		},
 		"error": {
 			"conflict": "Ocurrió un conflicto desconocido. Por favor, inténtalo de nuevo más tarde.",
@@ -195,9 +228,80 @@
 						"error": {
 							"required": "Selecciona un color"
 						}
+					},
+					"icon": {
+						"error": {
+							"required": "Selecciona un ícono"
+						}
+					}
+				}
+			},
+			"transactions": {
+				"create": {
+					"name": {
+						"error": {
+							"required": "El nombre de la transacción es obligatorio",
+							"max-length": "El nombre debe tener menos de {max} caracteres"
+						}
+					},
+					"amount": {
+						"error": {
+							"required": "Ingresa un monto válido",
+							"positive": "El monto debe ser mayor a cero"
+						}
+					},
+					"type": {
+						"error": {
+							"required": "Selecciona un tipo"
+						}
+					},
+					"note": {
+						"error": {
+							"max-length": "La nota debe tener menos de {max} caracteres"
+						}
+					},
+					"date": {
+						"error": {
+							"required": "Selecciona una fecha"
+						}
+					},
+					"category": {
+						"error": {
+							"invalid": "La categoría seleccionada no está disponible"
+						}
+					},
+					"account": {
+						"error": {
+							"invalid": "La cuenta seleccionada no está disponible"
+						}
+					},
+					"monthly-budget": {
+						"error": {
+							"not-active": "El presupuesto de este mes no está activo"
+						}
+					},
+					"recurrence": {
+						"frequency": {
+							"error": {
+								"required": "Selecciona con qué frecuencia se repite"
+							}
+						},
+						"error": {
+							"end-conflict": "Elige una fecha de fin o un número de repeticiones, no ambos"
+						}
+					},
+					"batch": {
+						"error": {
+							"empty": "Agrega al menos una transacción",
+							"max-rows": "Puedes guardar hasta {max} transacciones a la vez"
+						}
 					}
 				}
 			}
+		},
+		"others": {
+			"coming-soon": "¡Muy pronto!",
+			"coming-soon-badge": "Pronto!"
 		}
 	},
 	"home-page": {
@@ -434,8 +538,8 @@
 	},
 	"bank-accounts-page": {
 		"eyebrow": "Tus cuentas",
-		"title": "Cuentas bancarias",
-		"description": "Agrega y administra las cuentas bancarias, tarjetas y efectivo de tu hogar.",
+		"title": "Billetera",
+		"description": "Administra tu billetera de tarjetas, cuentas bancarias y efectivo de tu hogar.",
 		"add-account": {
 			"title": "Agregar cuenta",
 			"description": "Registra una nueva cuenta bancaria, tarjeta o efectivo."
@@ -531,6 +635,245 @@
 			},
 			"submit-button": "Crear presupuesto",
 			"created": "Presupuesto mensual creado.",
+			"error": "Ocurrió un error. Inténtalo de nuevo."
+		},
+		"detail-description": "Consulta los ingresos, gastos y ahorros de este mes."
+	},
+	"transactions-personal-page": {
+		"row": {
+			"recurring": "Transacción recurrente"
+		},
+		"timeline": {
+			"today": "Hoy",
+			"yesterday": "Ayer"
+		},
+		"add-transaction": "Agregar transacción",
+		"empty-state": {
+			"title": "Aún no hay transacciones",
+			"description": "Agrega tu primera transacción de este mes."
+		},
+		"detail": {
+			"title": "Transacción",
+			"actions": "Acciones de la transacción",
+			"edit": "Editar",
+			"date": "Fecha",
+			"category": "Categoría",
+			"account": "Cuenta",
+			"recurring": "Recurrente",
+			"yes": "Sí",
+			"no": "No",
+			"note": "Nota",
+			"none": "—"
+		},
+		"delete": {
+			"trigger": "Eliminar",
+			"confirm-title": "Eliminar transacción",
+			"confirm-description": "Esto elimina permanentemente “{name}”.",
+			"confirm-button": "Eliminar",
+			"success": "Transacción eliminada.",
+			"error": "Ocurrió un error al eliminar la transacción. Inténtalo de nuevo.",
+			"scope": {
+				"occurrence": "Solo esta ocurrencia",
+				"series": "Esta y las próximas ocurrencias"
+			}
+		},
+		"form": {
+			"create-title": "Agregar transacción",
+			"create-description": "Registra un nuevo gasto o ingreso para este mes.",
+			"edit-title": "Editar transacción",
+			"edit-description": "Actualiza los datos de esta transacción.",
+			"name": {
+				"label": "Nombre",
+				"placeholder": "p. ej., Supermercado, Sueldo"
+			},
+			"amount": {
+				"label": "Monto"
+			},
+			"type": {
+				"label": "Tipo"
+			},
+			"date": {
+				"label": "Fecha",
+				"placeholder": "Selecciona una fecha",
+				"description": "Debe estar dentro de este mes."
+			},
+			"category": {
+				"label": "Categoría"
+			},
+			"account": {
+				"label": "Cuenta",
+				"none": "Sin cuenta"
+			},
+			"note": {
+				"label": "Nota",
+				"placeholder": "Nota opcional"
+			},
+			"recurring": {
+				"label": "Transacción recurrente"
+			},
+			"recurrence": {
+				"frequency": {
+					"label": "Se repite"
+				},
+				"interval": {
+					"label": "Cada"
+				},
+				"ends": {
+					"label": "Termina",
+					"never": "Nunca",
+					"on-date": "En una fecha",
+					"after-occurrences": "Después de N veces"
+				},
+				"end-date": {
+					"label": "Fecha de fin"
+				},
+				"occurrences": {
+					"label": "Número de repeticiones"
+				}
+			},
+			"submit-button": {
+				"create": "Agregar transacción",
+				"edit": "Guardar cambios"
+			},
+			"created": "Transacción agregada.",
+			"saved": "Transacción actualizada.",
+			"error": "Ocurrió un error. Inténtalo de nuevo.",
+			"more-options": "Más opciones",
+			"cancel-button": "Cancelar",
+			"mode": {
+				"single": "Individual",
+				"multiple": "Múltiple",
+				"ai": "IA"
+			},
+			"multiple": {
+				"quick-add": {
+					"label": "Modo de agregado rápido"
+				},
+				"columns": {
+					"type": "Tipo",
+					"name": "Nombre",
+					"amount": "Importe",
+					"category": "Categoría",
+					"account": "Cuenta",
+					"date": "Fecha"
+				},
+				"add-row": "Agregar fila",
+				"save-all": "Guardar todo",
+				"transactions-count": "{count, plural, one {# transacción} other {# transacciones}}",
+				"total": "Total",
+				"autosave": {
+					"saving": "Guardando…",
+					"saved": "Guardado",
+					"toggle-label": "Guardado automático"
+				},
+				"clear-row-confirm": "Presiona Esc de nuevo para descartar esta fila",
+				"row-cleared": "Fila descartada",
+				"quick-add-list": {
+					"edit": "Editar",
+					"remove": "Eliminar",
+					"accept": "Aceptar",
+					"reject": "Cancelar",
+					"empty": "Aún no hay transacciones — agrega la primera abajo."
+				},
+				"shortcuts": {
+					"trigger-label": "Ayuda de atajos de teclado",
+					"title": "Atajos de teclado",
+					"tab": "Siguiente campo",
+					"shift-tab": "Campo anterior",
+					"enter": "Agregar / guardar fila",
+					"cmd-enter": "Guardar todo",
+					"arrows": "Navegar opciones",
+					"esc": "Vaciar fila"
+				},
+				"save-success": "{count, plural, one {# transacción guardada} other {# transacciones guardadas}}",
+				"clear-draft": "Vaciar borrador",
+				"clear-row": "Vaciar fila",
+				"intro": {
+					"title": "Agrega varias transacciones a la vez",
+					"description": "El modo Múltiple funciona de dos formas — elige la que mejor se adapte a cómo quieres registrar tus transacciones.",
+					"draft-mode": {
+						"label": "Modo borrador (por defecto)",
+						"description": "Completa tantas filas como quieras — no se guarda nada hasta que presiones \"Guardar todo\". Tu progreso se conserva localmente aunque cierres esta ventana."
+					},
+					"quick-add-mode": {
+						"label": "Modo de agregado rápido",
+						"description": "Activa el interruptor en la esquina superior derecha para guardar cada transacción en el momento en que la confirmes — sin paso de \"Guardar todo\", una por una."
+					},
+					"tip": "Usa Tab para moverte entre los campos — al llegar al final de la última fila se agrega una nueva automáticamente, y ⌘/Ctrl+Enter guarda todo en el modo borrador.",
+					"got-it": "Entendido"
+				}
+			}
+		}
+	},
+	"transactions-recurring-page": {
+		"eyebrow": "Recurrentes",
+		"title": "Transacciones recurrentes",
+		"description": "Cada serie recurrente, activa o finalizada — edita su plantilla o deténla para que no continúe.",
+		"empty-state": {
+			"title": "Sin transacciones recurrentes",
+			"description": "Las series que marques como recurrentes aparecerán aquí."
+		},
+		"sections": {
+			"active": "Activas",
+			"past": "Pasadas"
+		},
+		"row": {
+			"next-due": "{frequency} · Próxima {date}",
+			"ended-on": "Finalizó {date}"
+		},
+		"detail": {
+			"actions": "Acciones de la serie",
+			"edit": "Editar",
+			"edit-title": "Editar serie recurrente",
+			"status": "Estado",
+			"status-active": "Activa",
+			"status-ended": "Finalizada",
+			"frequency": "Se repite",
+			"end-date": "Termina el",
+			"occurrences": "Ocurrencias",
+			"next-due": "Próxima vez",
+			"last-occurrence": "Última ocurrencia",
+			"account": "Cuenta",
+			"category": "Categoría",
+			"note": "Nota",
+			"none": "—",
+			"end": {
+				"trigger": "Terminar recurrencia",
+				"confirm-title": "Terminar serie recurrente",
+				"confirm-description": "“{name}” dejará de generarse en los próximos meses. Las ocurrencias existentes se conservan.",
+				"confirm-button": "Terminar recurrencia",
+				"success": "Serie recurrente finalizada.",
+				"error": "Ocurrió un error al finalizar la serie. Inténtalo de nuevo."
+			}
+		},
+		"form": {
+			"type": {
+				"label": "Tipo"
+			},
+			"name": {
+				"label": "Nombre",
+				"placeholder": "p. ej., Supermercado, Salario"
+			},
+			"amount": {
+				"label": "Monto"
+			},
+			"category": {
+				"label": "Categoría"
+			},
+			"account": {
+				"label": "Cuenta",
+				"none": "Sin cuenta"
+			},
+			"note": {
+				"label": "Nota",
+				"placeholder": "Nota opcional"
+			},
+			"recurrence": {
+				"label": "Recurrencia"
+			},
+			"cancel-button": "Cancelar",
+			"submit-button": "Guardar cambios",
+			"saved": "Serie recurrente actualizada.",
 			"error": "Ocurrió un error. Inténtalo de nuevo."
 		}
 	}

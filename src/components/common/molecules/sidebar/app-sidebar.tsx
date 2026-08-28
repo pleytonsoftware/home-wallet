@@ -2,7 +2,7 @@
 
 import type { NavConfig } from '@molecules/navigation/types'
 
-import { SettingsIcon, BanknoteCheckIcon, WalletIcon } from 'lucide-react'
+import { SettingsIcon, BanknoteCheckIcon, WalletIcon, HandCoinsIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 
@@ -17,35 +17,51 @@ import { SidebarUser } from './sidebar-user'
 
 interface NavConfigParams {
 	t: ReturnType<typeof useTranslations<'settings'>>
-	tSidebar: ReturnType<typeof useTranslations<'common.sidebar'>>
+	tCommon: ReturnType<typeof useTranslations<'common'>>
 	household: HouseholdContextType['household']
 }
-const NAV_CONFIG: (params: NavConfigParams) => NavConfig = ({ t, tSidebar, household }) => {
+const NAV_CONFIG: (params: NavConfigParams) => NavConfig = ({ t, tCommon, household }) => {
 	return [
 		{
 			label: household.name,
 			items: [
 				{
-					title: tSidebar('bankAccounts'),
+					title: tCommon('sidebar.wallet'),
 					icon: WalletIcon,
 					url: ROUTES.HOUSEHOLD.BANK_ACCOUNTS.replace(':id', household.id),
 					prefetch: true,
 				},
 				{
-					// TODO: Add the shared-transactions route once that feature ships.
-					title: tSidebar('transactions'),
+					title: tCommon('sidebar.transactions.$'),
 					icon: BanknoteCheckIcon,
 					items: [
 						{
-							title: tSidebar('transactionsPersonal'),
-							url: ROUTES.HOUSEHOLD.TRANSACTIONS.PERSONAL.replace(':id', household.id),
+							title: tCommon('sidebar.transactions.recurring'),
+							url: ROUTES.HOUSEHOLD.TRANSACTIONS.RECURRING.replace(':id', household.id),
 							prefetch: true,
 						},
-						{ title: tSidebar('transactionsShared'), url: '/transactions/shared' },
 					],
 				},
 				{
-					title: tSidebar('settings'),
+					title: tCommon('sidebar.budgets.$'),
+					icon: HandCoinsIcon,
+					items: [
+						{
+							title: tCommon('sidebar.budgets.personal'),
+							url: ROUTES.HOUSEHOLD.BUDGETS.PERSONAL.replace(':id', household.id),
+							prefetch: true,
+						},
+						{
+							title: tCommon('sidebar.budgets.shared'),
+							url: ROUTES.HOUSEHOLD.BUDGETS.SHARED.replace(':id', household.id),
+							prefetch: true,
+							disabled: true,
+							badge: tCommon('others.coming-soon-badge'),
+						},
+					],
+				},
+				{
+					title: tCommon('sidebar.settings'),
 					icon: SettingsIcon,
 					items: [
 						{ title: t('sections.general'), url: ROUTES.HOUSEHOLD.SETTINGS.GENERAL.replace(':id', household.id), prefetch: true },
@@ -72,7 +88,7 @@ export function AppSidebar() {
 	const { household } = useHouseholdContext()
 	const handleSignOut = useSignOut()
 	const t = useTranslations('settings')
-	const tSidebar = useTranslations('common.sidebar')
+	const tCommon = useTranslations('common')
 
 	if (!session) {
 		throw new Error('Session is required to render the sidebar')
@@ -84,7 +100,7 @@ export function AppSidebar() {
 		<Sidebar collapsible='icon' className='bg-background'>
 			<SidebarBrand />
 			<SidebarContent>
-				<NavBuilder config={NAV_CONFIG({ t, tSidebar, household })} />
+				<NavBuilder config={NAV_CONFIG({ t, tCommon, household })} />
 			</SidebarContent>
 			<SidebarFooter>
 				<SidebarUser user={user} onSignout={handleSignOut} />

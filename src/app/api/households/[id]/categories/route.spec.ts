@@ -58,16 +58,16 @@ describe('GET /households/:id/categories', () => {
 	it('maps category rows to CategorySummary', async () => {
 		vi.mocked(getActiveMembership).mockResolvedValue({ id: 'm1', role: 'member' } as never)
 		vi.mocked(prisma.category.findMany).mockResolvedValue([
-			{ id: 'c1', name: 'Groceries', color: 'green', isBase: true },
-			{ id: 'c2', name: 'Side hustle', color: 'blue', isBase: false },
+			{ id: 'c1', name: 'Groceries', color: 'green', icon: 'shopping-cart', isBase: true },
+			{ id: 'c2', name: 'Side hustle', color: 'blue', icon: 'wallet', isBase: false },
 		] as never)
 
 		const response = await GET(request, { params: Promise.resolve({ id: 'h1' }) })
 		const data = await response.json()
 
 		expect(data).toEqual([
-			{ id: 'c1', name: 'Groceries', color: 'green', isBase: true },
-			{ id: 'c2', name: 'Side hustle', color: 'blue', isBase: false },
+			{ id: 'c1', name: 'Groceries', color: 'green', icon: 'shopping-cart', isBase: true },
+			{ id: 'c2', name: 'Side hustle', color: 'blue', icon: 'wallet', isBase: false },
 		])
 	})
 })

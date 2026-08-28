@@ -58,7 +58,14 @@ export function NavItemRenderer({ item }: NavItemRendererProps) {
 	// ── Leaf item ───────────────────────────────────────────────────────────────
 	return (
 		<SidebarMenuItem className={cn(item.colour && navItemColourMap[item.colour])}>
-			<SidebarMenuButton asChild={!!item.url} tooltip={item.tooltip} isActive={item.isActive} variant={item.variant} size={item.size}>
+			<SidebarMenuButton
+				asChild={!!item.url}
+				disabled={item.disabled}
+				tooltip={item.tooltip}
+				isActive={item.isActive}
+				variant={item.variant}
+				size={item.size}
+			>
 				{item.url ? (
 					!isAbsoluteUrl(item.url) ? (
 						<Link href={item.url}>

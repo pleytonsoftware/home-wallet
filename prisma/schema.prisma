@@ -209,6 +209,7 @@ model Category {
   name        String
   isBase      Boolean    @default(false)
   color       String     @default("gray") // TS enum: CATEGORY_COLOR
+  icon        String     @default("tag") // TS enum: CATEGORY_ICON
   createdAt   DateTime   @default(now())
 
   transactions Transaction[]

@@ -129,6 +129,72 @@ describe('SheetContent', () => {
 		const content = document.querySelector('[data-slot="sheet-content"]')
 		expect(content).toHaveClass('custom-class')
 	})
+
+	it('renders a plain ReactNode actionsNode next to the close button', async () => {
+		const user = userEvent.setup()
+		render(
+			<Sheet>
+				<SheetTrigger>Open</SheetTrigger>
+				<SheetContent actionsNode={<button data-testid='actions-btn'>Actions</button>}>Body</SheetContent>
+			</Sheet>,
+		)
+
+		await user.click(screen.getByText('Open'))
+		expect(screen.getByTestId('actions-btn')).toBeInTheDocument()
+		expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument()
+	})
+
+	it('renders actionsNode even when showCloseButton is false', async () => {
+		const user = userEvent.setup()
+		render(
+			<Sheet>
+				<SheetTrigger>Open</SheetTrigger>
+				<SheetContent showCloseButton={false} actionsNode={<button data-testid='actions-btn'>Actions</button>}>
+					Body
+				</SheetContent>
+			</Sheet>,
+		)
+
+		await user.click(screen.getByText('Open'))
+		expect(screen.getByTestId('actions-btn')).toBeInTheDocument()
+		expect(screen.queryByRole('button', { name: /close/i })).not.toBeInTheDocument()
+	})
+
+	it('invokes a function actionsNode with the sheet content DOM node once mounted', async () => {
+		const user = userEvent.setup()
+		render(
+			<Sheet>
+				<SheetTrigger>Open</SheetTrigger>
+				<SheetContent
+					actionsNode={(container) => (
+						<span data-testid='container-check' data-is-content={container === document.querySelector('[data-slot="sheet-content"]')} />
+					)}
+				>
+					Body
+				</SheetContent>
+			</Sheet>,
+		)
+
+		await user.click(screen.getByText('Open'))
+		expect(screen.getByTestId('container-check')).toHaveAttribute('data-is-content', 'true')
+	})
+
+	it('merges a caller-supplied ref with its own internal ref used for actionsNode', async () => {
+		const user = userEvent.setup()
+		const ref = { current: null as HTMLDivElement | null }
+		render(
+			<Sheet>
+				<SheetTrigger>Open</SheetTrigger>
+				<SheetContent ref={ref} actionsNode={(container) => <span data-testid='matches' data-matches={container === ref.current} />}>
+					Body
+				</SheetContent>
+			</Sheet>,
+		)
+
+		await user.click(screen.getByText('Open'))
+		expect(ref.current).toBe(document.querySelector('[data-slot="sheet-content"]'))
+		expect(screen.getByTestId('matches')).toHaveAttribute('data-matches', 'true')
+	})
 })
 
 describe('SheetOverlay', () => {

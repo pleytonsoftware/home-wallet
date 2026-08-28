@@ -35,11 +35,40 @@ function DrawerOverlay({ className, ...props }: React.ComponentProps<typeof Draw
 	)
 }
 
-function DrawerContent({ className, children, ...props }: React.ComponentProps<typeof DrawerPrimitive.Content>) {
+function DrawerContent({
+	className,
+	children,
+	actionsNode,
+	ref,
+	...props
+}: React.ComponentPropsWithRef<typeof DrawerPrimitive.Content> & {
+	/**
+	 * Rendered in the content's top-right corner. Accepts a function receiving this drawer's own
+	 * content node — pass it as `container` to any nested Radix popover (dropdown menu, combobox,
+	 * etc.) so it portals inside the drawer instead of `document.body`. Portaling outside the
+	 * drawer is what makes its own outside-interaction detection treat clicks inside that popover
+	 * as "outside", closing the drawer unexpectedly. Mirrors `SheetContent`'s `actionsNode`.
+	 */
+	actionsNode?: React.ReactNode | ((container: HTMLDivElement | null) => React.ReactNode)
+}) {
+	const [container, setContainer] = React.useState<HTMLDivElement | null>(null)
+
+	const setRefs = React.useCallback(
+		(node: HTMLDivElement | null) => {
+			setContainer(node)
+			if (typeof ref === 'function') ref(node)
+			else if (ref) ref.current = node
+		},
+		[ref],
+	)
+
+	const resolvedActionsNode = typeof actionsNode === 'function' ? actionsNode(container) : actionsNode
+
 	return (
 		<DrawerPortal data-slot='drawer-portal'>
 			<DrawerOverlay />
 			<DrawerPrimitive.Content
+				ref={setRefs}
 				data-slot='drawer-content'
 				className={cn(
 					'group/drawer-content fixed z-50 flex h-auto flex-col bg-popover text-sm text-popover-foreground data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:mt-24 data-[vaul-drawer-direction=bottom]:max-h-[80vh] data-[vaul-drawer-direction=bottom]:rounded-t-xl data-[vaul-drawer-direction=bottom]:border-t data-[vaul-drawer-direction=left]:inset-y-0 data-[vaul-drawer-direction=left]:left-0 data-[vaul-drawer-direction=left]:w-3/4 data-[vaul-drawer-direction=left]:rounded-r-xl data-[vaul-drawer-direction=left]:border-r data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:w-3/4 data-[vaul-drawer-direction=right]:rounded-l-xl data-[vaul-drawer-direction=right]:border-l data-[vaul-drawer-direction=top]:inset-x-0 data-[vaul-drawer-direction=top]:top-0 data-[vaul-drawer-direction=top]:mb-24 data-[vaul-drawer-direction=top]:max-h-[80vh] data-[vaul-drawer-direction=top]:rounded-b-xl data-[vaul-drawer-direction=top]:border-b data-[vaul-drawer-direction=left]:sm:max-w-sm data-[vaul-drawer-direction=right]:sm:max-w-sm',
@@ -48,6 +77,7 @@ function DrawerContent({ className, children, ...props }: React.ComponentProps<t
 				{...props}
 			>
 				<div className='mx-auto mt-4 hidden h-1.5 w-25 shrink-0 rounded-full bg-muted group-data-[vaul-drawer-direction=bottom]/drawer-content:block' />
+				{resolvedActionsNode && <div className='absolute top-4 right-4'>{resolvedActionsNode}</div>}
 				{children}
 			</DrawerPrimitive.Content>
 		</DrawerPortal>

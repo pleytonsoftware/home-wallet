@@ -2,11 +2,13 @@
 
 import type { FullErrorResult, ResponseResult } from '@lib/errors/types'
 import type { Prisma } from '@lib/prisma'
+import type { RecurrenceRule } from '@transactions/types'
 import type { $ZodIssue } from 'zod/v4/core'
 
 import { getTranslations } from 'next-intl/server'
 
 import { getActiveMembership } from '@actions/household/active-memberships'
+import { groupBySeriesAnchor, materializeRecurringSeriesForward } from '@actions/transaction/recurrence-materialization'
 import { authorizedSession } from '@lib/auth/utils'
 import { BUDGET_STATUS, BUDGET_TYPE } from '@lib/constants/budget.enum'
 import { BAD_REQUEST, CREATED, FORBIDDEN, INTERNAL_ERROR } from '@lib/errors'
@@ -54,15 +56,21 @@ export async function createPersonalMonthlyBudget(
 		}
 
 		const [createError, monthlyBudget] = await to(
-			prisma.monthlyBudget.create({
-				data: {
-					householdId,
-					householdMemberId: membership.id,
-					month,
-					type: BUDGET_TYPE.PERSONAL,
-					status: BUDGET_STATUS.ACTIVE,
-					targetAmount: validation.data.targetAmount,
-				},
+			prisma.$transaction(async (tx) => {
+				const budget = await tx.monthlyBudget.create({
+					data: {
+						householdId,
+						householdMemberId: membership.id,
+						month,
+						type: BUDGET_TYPE.PERSONAL,
+						status: BUDGET_STATUS.ACTIVE,
+						targetAmount: validation.data.targetAmount,
+					},
+				})
+
+				await materializeRecurringTransactions(tx, { householdId, householdMemberId: membership.id, monthlyBudgetId: budget.id, month })
+
+				return budget
 			}),
 		)
 
@@ -72,5 +80,57 @@ export async function createPersonalMonthlyBudget(
 	} catch (error) {
 		monthlyBudgetLogger.error('[createPersonalMonthlyBudget]: {error}', { error })
 		return INTERNAL_ERROR(error)
+	}
+}
+
+interface MaterializeRecurringTransactionsParams {
+	householdId: string
+	householdMemberId: string
+	monthlyBudgetId: string
+	month: Date
+}
+
+/**
+ * Carries recurring transactions forward into a newly created monthly budget. Looks across
+ * *all* of the member's recurring transactions (not just the previous budget) and keeps only the
+ * latest materialized row per series as the anchor — a YEARLY or `interval > 1` series can
+ * legitimately produce zero occurrences in some months, so scoping the lookup to only the
+ * immediately-preceding budget would silently drop the series the next time it's actually due.
+ */
+async function materializeRecurringTransactions(
+	tx: Prisma.TransactionClient,
+	{ householdId, householdMemberId, monthlyBudgetId, month }: MaterializeRecurringTransactionsParams,
+): Promise<void> {
+	const recurringTransactions = await tx.transaction.findMany({
+		where: { householdId, householdMemberId, isRecurring: true },
+		select: {
+			id: true,
+			name: true,
+			amount: true,
+			type: true,
+			categoryId: true,
+			sourceAccountId: true,
+			note: true,
+			date: true,
+			recurrenceRule: true,
+		},
+	})
+
+	for (const anchor of groupBySeriesAnchor(recurringTransactions).values()) {
+		await materializeRecurringSeriesForward(tx, {
+			householdId,
+			householdMemberId,
+			anchor: {
+				name: anchor.name,
+				amount: anchor.amount,
+				type: anchor.type,
+				categoryId: anchor.categoryId,
+				sourceAccountId: anchor.sourceAccountId,
+				note: anchor.note,
+				date: anchor.date,
+				recurrenceRule: anchor.recurrenceRule as unknown as RecurrenceRule,
+			},
+			targetBudgets: [{ id: monthlyBudgetId, month }],
+		})
 	}
 }

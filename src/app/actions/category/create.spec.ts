@@ -44,11 +44,11 @@ describe('createCategory', () => {
 		vi.mocked(getActiveMembership).mockResolvedValue({ id: 'm1', role: 'member' } as never)
 		vi.mocked(prisma.category.create).mockResolvedValue({ id: 'c1' } as never)
 
-		const result = await createCategory('h1', { name: '  Groceries  ', color: 'green' } as never)
+		const result = await createCategory('h1', { name: '  Groceries  ', color: 'green', icon: 'shopping-cart' } as never)
 
 		expect(result.status).toBe(201)
 		expect(prisma.category.create).toHaveBeenCalledWith({
-			data: { householdId: 'h1', name: 'Groceries', color: 'green', isBase: false },
+			data: { householdId: 'h1', name: 'Groceries', color: 'green', icon: 'shopping-cart', isBase: false },
 		})
 	})
 
@@ -58,7 +58,7 @@ describe('createCategory', () => {
 			new PrismaClientKnownRequestError('Unique constraint failed', { code: 'P2002', clientVersion: '7.8.0' }),
 		)
 
-		const result = await createCategory('h1', { name: 'Groceries', color: 'green' } as never)
+		const result = await createCategory('h1', { name: 'Groceries', color: 'green', icon: 'shopping-cart' } as never)
 
 		expect(result.status).toBe(409)
 		expect(result.success).toBe(false)

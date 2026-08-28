@@ -1,6 +1,6 @@
 import { Skeleton } from '@atoms/skeleton'
 
-export default function HouseholdTransactionsPersonalMonthLoading() {
+export default function HouseholdBudgetsPersonalMonthLoading() {
 	return (
 		<div className='mx-auto flex w-full flex-col gap-6 py-4 px-4 sm:px-0'>
 			<div className='space-y-2'>

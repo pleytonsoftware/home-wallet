@@ -1,5 +1,9 @@
 'use client'
 
+import type { ReactNode } from 'react'
+
+import { useCallback, useState } from 'react'
+
 import { XIcon } from 'lucide-react'
 import { Dialog as SheetPrimitive } from 'radix-ui'
 
@@ -40,15 +44,39 @@ function SheetContent({
 	children,
 	side = 'right',
 	showCloseButton = true,
+	actionsNode,
+	ref,
 	...props
-}: React.ComponentProps<typeof SheetPrimitive.Content> & {
+}: React.ComponentPropsWithRef<typeof SheetPrimitive.Content> & {
 	side?: 'top' | 'right' | 'bottom' | 'left'
 	showCloseButton?: boolean
+	/**
+	 * Rendered next to the close button. Accepts a function receiving this sheet's own content
+	 * node — pass it as `container` to any nested Radix popover (dropdown menu, combobox, etc.)
+	 * so it portals inside the sheet instead of `document.body`. Portaling outside the sheet is
+	 * what makes the sheet's own outside-click/outside-interaction detection treat clicks inside
+	 * that popover as "outside", closing the sheet unexpectedly.
+	 */
+	actionsNode?: ReactNode | ((container: HTMLDivElement | null) => ReactNode)
 }) {
+	const [container, setContainer] = useState<HTMLDivElement | null>(null)
+
+	const setRefs = useCallback(
+		(node: HTMLDivElement | null) => {
+			setContainer(node)
+			if (typeof ref === 'function') ref(node)
+			else if (ref) ref.current = node
+		},
+		[ref],
+	)
+
+	const resolvedActionsNode = typeof actionsNode === 'function' ? actionsNode(container) : actionsNode
+
 	return (
 		<SheetPortal>
 			<SheetOverlay />
 			<SheetPrimitive.Content
+				ref={setRefs}
 				data-slot='sheet-content'
 				data-side={side}
 				className={cn(
@@ -58,13 +86,18 @@ function SheetContent({
 				{...props}
 			>
 				{children}
-				{showCloseButton && (
-					<SheetPrimitive.Close data-slot='sheet-close' asChild>
-						<Button variant='ghost' className='absolute top-4 right-4' size='icon-sm'>
-							<XIcon />
-							<span className='sr-only'>Close</span>
-						</Button>
-					</SheetPrimitive.Close>
+				{(showCloseButton || resolvedActionsNode) && (
+					<div className='flex absolute top-4 right-4'>
+						{resolvedActionsNode}
+						{showCloseButton && (
+							<SheetPrimitive.Close data-slot='sheet-close' asChild>
+								<Button variant='ghost' size='icon-sm'>
+									<XIcon />
+									<span className='sr-only'>Close</span>
+								</Button>
+							</SheetPrimitive.Close>
+						)}
+					</div>
 				)}
 			</SheetPrimitive.Content>
 		</SheetPortal>

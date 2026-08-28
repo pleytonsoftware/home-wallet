@@ -1,6 +1,16 @@
 import { CATEGORY_COLOR } from '@lib/constants/category-color.enum'
+import { CATEGORY_ICON } from '@lib/constants/category-icon.enum'
 
 const CATEGORY_COLORS = Object.values(CATEGORY_COLOR)
+const CATEGORY_ICONS = Object.values(CATEGORY_ICON)
+
+const hashString = (value: string): number => {
+	let hash = 0
+	for (let index = 0; index < value.length; index++) {
+		hash = (hash * 31 + value.charCodeAt(index)) >>> 0
+	}
+	return hash
+}
 
 /**
  * Returns a consistent color for a category name.
@@ -16,10 +26,14 @@ const CATEGORY_COLORS = Object.values(CATEGORY_COLOR)
  * @param name - The category name.
  * @returns A deterministic color from `CATEGORY_COLORS`.
  */
-export const hashCategoryColor = (name: string): CATEGORY_COLOR => {
-	let hash = 0
-	for (let index = 0; index < name.length; index++) {
-		hash = (hash * 31 + name.charCodeAt(index)) >>> 0
-	}
-	return CATEGORY_COLORS[hash % CATEGORY_COLORS.length]
-}
+export const hashCategoryColor = (name: string): CATEGORY_COLOR => CATEGORY_COLORS[hashString(name) % CATEGORY_COLORS.length]
+
+/**
+ * Returns a consistent icon for a category name, using the same deterministic-hash approach as
+ * `hashCategoryColor` — a differently-salted hash so a name's suggested color and icon don't
+ * always land on the same relative index.
+ *
+ * @param name - The category name.
+ * @returns A deterministic icon from `CATEGORY_ICONS`.
+ */
+export const hashCategoryIcon = (name: string): CATEGORY_ICON => CATEGORY_ICONS[hashString(`${name}:icon`) % CATEGORY_ICONS.length]

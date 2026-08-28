@@ -39,6 +39,7 @@
 			"@bank-accounts/*": ["./src/components/bank-accounts/*"],
 			"@monthly-budgets/*": ["./src/components/monthly-budgets/*"],
 			"@categories/*": ["./src/components/categories/*"],
+			"@transactions/*": ["./src/components/transactions/*"],
 			"@common/*": ["./src/components/common/*"]
 		}
 	},

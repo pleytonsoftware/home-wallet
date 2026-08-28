@@ -2,6 +2,7 @@
 
 import type { NavSubItem } from './types'
 
+import { Badge } from '@atoms/badge'
 import { SidebarMenuSubButton, SidebarMenuSubItem } from '@atoms/sidebar'
 import { cn } from '@cn'
 import { Link } from '@navigation'
@@ -18,12 +19,12 @@ type NavSubItemRendererProps = {
  */
 export function NavSubItemRenderer({ item }: NavSubItemRendererProps) {
 	return (
-		<SidebarMenuSubItem>
+		<SidebarMenuSubItem className='relative'>
 			<SidebarMenuSubButton
 				asChild
 				isActive={item.isActive}
 				size={item.size ?? 'md'}
-				className={cn(item.colour && navItemColourMap[item.colour])}
+				className={cn(item.colour && navItemColourMap[item.colour], item.disabled && 'pointer-events-none opacity-50')}
 			>
 				{!isAbsoluteUrl(item.url) ? (
 					<Link href={item.url}>
@@ -37,6 +38,13 @@ export function NavSubItemRenderer({ item }: NavSubItemRendererProps) {
 					</a>
 				)}
 			</SidebarMenuSubButton>
+			{item.badge && (
+				<span className='absolute -bottom-1 right-0'>
+					<Badge className='text-[0.5rem] px-1 py-px' variant='secondary'>
+						{item.badge}
+					</Badge>
+				</span>
+			)}
 		</SidebarMenuSubItem>
 	)
 }

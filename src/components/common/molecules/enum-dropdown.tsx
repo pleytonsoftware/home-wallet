@@ -24,6 +24,7 @@ export interface EnumDropdownProps<V extends string> {
 	disabled?: boolean
 	container?: React.ComponentProps<typeof DropdownMenuContent>['container']
 	modal?: React.ComponentProps<typeof DropdownMenu>['modal']
+	triggerClassName?: string
 }
 
 /**
@@ -42,6 +43,7 @@ export function EnumDropdown<V extends string>({
 	disabled,
 	container,
 	modal,
+	triggerClassName,
 }: EnumDropdownProps<V>) {
 	const isNativeMobile = useIsNativeMobile()
 
@@ -52,7 +54,7 @@ export function EnumDropdown<V extends string>({
 			value={value}
 			disabled={disabled}
 			onChange={(e) => onChange(e.target.value as V)}
-			className={cn(buttonVariants({ variant: 'outline' }), 'w-full appearance-none justify-between pr-8 font-normal')}
+			className={cn(buttonVariants({ variant: 'outline' }), 'w-full appearance-none justify-between pr-8 font-normal', triggerClassName)}
 		>
 			{values.map((option) => (
 				<option key={option} value={option}>
@@ -63,7 +65,12 @@ export function EnumDropdown<V extends string>({
 	) : (
 		<DropdownMenu modal={modal}>
 			<DropdownMenuTrigger asChild>
-				<Button aria-label={getLabel(value)} variant='outline' disabled={disabled} className='w-full justify-between font-normal'>
+				<Button
+					aria-label={getLabel(value)}
+					variant='outline'
+					disabled={disabled}
+					className={cn('w-full justify-between font-normal', triggerClassName)}
+				>
 					<span className='flex min-w-0 items-center gap-2 truncate'>{renderTrigger ? renderTrigger(value) : getLabel(value)}</span>
 					<ChevronDownIcon className='opacity-50' />
 				</Button>

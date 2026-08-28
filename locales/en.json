@@ -53,7 +53,34 @@
 				"create": {
 					"trigger": "Create \"{name}\"",
 					"error": "Something went wrong while creating the category. Please try again."
+				},
+				"search-placeholder": "Search categories...",
+				"base": {
+					"groceries": "Groceries",
+					"rent": "Rent",
+					"utilities": "Utilities",
+					"transport": "Transport",
+					"dining": "Dining",
+					"entertainment": "Entertainment",
+					"health": "Health",
+					"shopping": "Shopping",
+					"subscriptions": "Subscriptions",
+					"income": "Income",
+					"travel": "Travel",
+					"education": "Education",
+					"other": "Other"
 				}
+			},
+			"payment-type": {
+				"expense": "Expense",
+				"income": "Income"
+			},
+			"recurrence-frequency": {
+				"daily": "Daily",
+				"weekly": "Weekly",
+				"biweekly": "Every 2 weeks",
+				"monthly": "Monthly",
+				"yearly": "Yearly"
 			}
 		},
 		"confirm": {
@@ -66,12 +93,18 @@
 			}
 		},
 		"sidebar": {
-			"transactions": "Transactions",
-			"transactionsPersonal": "Personal",
-			"transactionsShared": "Shared",
+			"transactions": {
+				"$": "Transactions",
+				"recurring": "Recurring"
+			},
+			"budgets": {
+				"$": "Budgets",
+				"personal": "Personal",
+				"shared": "Shared"
+			},
 			"settings": "Settings",
 			"households": "My households",
-			"bankAccounts": "Bank Accounts"
+			"wallet": "Wallet"
 		},
 		"error": {
 			"conflict": "Unknown conflict occurred. Please try again later.",
@@ -188,9 +221,80 @@
 						"error": {
 							"required": "Please select a color"
 						}
+					},
+					"icon": {
+						"error": {
+							"required": "Please select an icon"
+						}
+					}
+				}
+			},
+			"transactions": {
+				"create": {
+					"name": {
+						"error": {
+							"required": "Transaction name is required",
+							"max-length": "Name must be less than {max} characters"
+						}
+					},
+					"amount": {
+						"error": {
+							"required": "Enter a valid amount",
+							"positive": "Amount must be greater than zero"
+						}
+					},
+					"type": {
+						"error": {
+							"required": "Please select a type"
+						}
+					},
+					"note": {
+						"error": {
+							"max-length": "Note must be less than {max} characters"
+						}
+					},
+					"date": {
+						"error": {
+							"required": "Please select a date"
+						}
+					},
+					"category": {
+						"error": {
+							"invalid": "Selected category is not available"
+						}
+					},
+					"account": {
+						"error": {
+							"invalid": "Selected account is not available"
+						}
+					},
+					"monthly-budget": {
+						"error": {
+							"not-active": "This month's budget is not active"
+						}
+					},
+					"recurrence": {
+						"frequency": {
+							"error": {
+								"required": "Please select how often this repeats"
+							}
+						},
+						"error": {
+							"end-conflict": "Choose either an end date or a number of occurrences, not both"
+						}
+					},
+					"batch": {
+						"error": {
+							"empty": "Add at least one transaction",
+							"max-rows": "You can save up to {max} transactions at once"
+						}
 					}
 				}
 			}
+		},
+		"others": {
+			"coming-soon": "Coming soon!",
+			"coming-soon-badge": "Soon!"
 		}
 	},
 	"home-page": {
@@ -427,8 +531,8 @@
 	},
 	"bank-accounts-page": {
 		"eyebrow": "Your accounts",
-		"title": "Bank Accounts",
-		"description": "Add and manage the bank, card and cash accounts used across your household.",
+		"title": "Wallet",
+		"description": "Manage your wallet of cards, bank accounts and cash accounts used across your household.",
 		"add-account": {
 			"title": "Add account",
 			"description": "Register a new bank, card or cash account."
@@ -524,6 +628,245 @@
 			},
 			"submit-button": "Create budget",
 			"created": "Monthly budget created.",
+			"error": "Something went wrong. Please try again."
+		},
+		"detail-description": "Track this month's income, expenses, and savings."
+	},
+	"transactions-personal-page": {
+		"row": {
+			"recurring": "Recurring transaction"
+		},
+		"timeline": {
+			"today": "Today",
+			"yesterday": "Yesterday"
+		},
+		"add-transaction": "Add transaction",
+		"empty-state": {
+			"title": "No transactions yet",
+			"description": "Add your first transaction for this month."
+		},
+		"detail": {
+			"title": "Transaction",
+			"actions": "Transaction actions",
+			"edit": "Edit",
+			"date": "Date",
+			"category": "Category",
+			"account": "Account",
+			"recurring": "Recurring",
+			"yes": "Yes",
+			"no": "No",
+			"note": "Note",
+			"none": "—"
+		},
+		"delete": {
+			"trigger": "Delete",
+			"confirm-title": "Delete transaction",
+			"confirm-description": "This permanently deletes “{name}”.",
+			"confirm-button": "Delete",
+			"success": "Transaction deleted.",
+			"error": "Something went wrong while deleting the transaction. Please try again.",
+			"scope": {
+				"occurrence": "Just this occurrence",
+				"series": "This and future occurrences"
+			}
+		},
+		"form": {
+			"create-title": "Add transaction",
+			"create-description": "Log a new expense or income for this month.",
+			"edit-title": "Edit transaction",
+			"edit-description": "Update this transaction's details.",
+			"name": {
+				"label": "Name",
+				"placeholder": "e.g., Groceries, Paycheck"
+			},
+			"amount": {
+				"label": "Amount"
+			},
+			"type": {
+				"label": "Type"
+			},
+			"date": {
+				"label": "Date",
+				"placeholder": "Select a date",
+				"description": "Must fall within this month."
+			},
+			"category": {
+				"label": "Category"
+			},
+			"account": {
+				"label": "Account",
+				"none": "No account"
+			},
+			"note": {
+				"label": "Note",
+				"placeholder": "Optional note"
+			},
+			"recurring": {
+				"label": "Recurring transaction"
+			},
+			"recurrence": {
+				"frequency": {
+					"label": "Repeats"
+				},
+				"interval": {
+					"label": "Every"
+				},
+				"ends": {
+					"label": "Ends",
+					"never": "Never",
+					"on-date": "On date",
+					"after-occurrences": "After N times"
+				},
+				"end-date": {
+					"label": "End date"
+				},
+				"occurrences": {
+					"label": "Number of occurrences"
+				}
+			},
+			"submit-button": {
+				"create": "Add transaction",
+				"edit": "Save changes"
+			},
+			"created": "Transaction added.",
+			"saved": "Transaction updated.",
+			"error": "Something went wrong. Please try again.",
+			"more-options": "More options",
+			"cancel-button": "Cancel",
+			"mode": {
+				"single": "Single",
+				"multiple": "Multiple",
+				"ai": "AI"
+			},
+			"multiple": {
+				"quick-add": {
+					"label": "Quick add mode"
+				},
+				"columns": {
+					"type": "Type",
+					"name": "Name",
+					"amount": "Amount",
+					"category": "Category",
+					"account": "Account",
+					"date": "Date"
+				},
+				"add-row": "Add row",
+				"save-all": "Save all",
+				"transactions-count": "{count, plural, one {# transaction} other {# transactions}}",
+				"total": "Total",
+				"autosave": {
+					"saving": "Saving…",
+					"saved": "Saved",
+					"toggle-label": "Autosave"
+				},
+				"clear-row-confirm": "Press Esc again to discard this row",
+				"row-cleared": "Row discarded",
+				"quick-add-list": {
+					"edit": "Edit",
+					"remove": "Remove",
+					"accept": "Accept",
+					"reject": "Cancel",
+					"empty": "No transactions yet — add your first one below."
+				},
+				"shortcuts": {
+					"trigger-label": "Keyboard shortcuts help",
+					"title": "Keyboard shortcuts",
+					"tab": "Next field",
+					"shift-tab": "Previous field",
+					"enter": "Add / Save row",
+					"cmd-enter": "Save all",
+					"arrows": "Navigate dropdowns",
+					"esc": "Clear row"
+				},
+				"save-success": "{count, plural, one {# transaction saved} other {# transactions saved}}",
+				"clear-draft": "Clear draft",
+				"clear-row": "Clear row",
+				"intro": {
+					"title": "Add several transactions at once",
+					"description": "Multiple mode has two ways of working — pick whichever fits how you want to enter transactions.",
+					"draft-mode": {
+						"label": "Draft mode (default)",
+						"description": "Fill in as many rows as you like — nothing is saved until you press \"Save all\". Your progress is kept locally even if you close this window."
+					},
+					"quick-add-mode": {
+						"label": "Quick add mode",
+						"description": "Turn on the switch in the top-right corner to save each transaction the moment you confirm it — no \"Save all\" step, one at a time."
+					},
+					"tip": "Use Tab to move between fields — reaching the end of the last row adds a new one automatically, and ⌘/Ctrl+Enter saves everything in Draft mode.",
+					"got-it": "Got it"
+				}
+			}
+		}
+	},
+	"transactions-recurring-page": {
+		"eyebrow": "Recurring",
+		"title": "Recurring transactions",
+		"description": "Every recurring series, active or ended — edit its template or stop it going forward.",
+		"empty-state": {
+			"title": "No recurring transactions",
+			"description": "Series you mark as recurring will show up here."
+		},
+		"sections": {
+			"active": "Active",
+			"past": "Past"
+		},
+		"row": {
+			"next-due": "{frequency} · Next {date}",
+			"ended-on": "Ended {date}"
+		},
+		"detail": {
+			"actions": "Series actions",
+			"edit": "Edit",
+			"edit-title": "Edit recurring series",
+			"status": "Status",
+			"status-active": "Active",
+			"status-ended": "Ended",
+			"frequency": "Repeats",
+			"end-date": "Ends on",
+			"occurrences": "Occurrences",
+			"next-due": "Next due",
+			"last-occurrence": "Last occurrence",
+			"account": "Account",
+			"category": "Category",
+			"note": "Note",
+			"none": "—",
+			"end": {
+				"trigger": "End recurring",
+				"confirm-title": "End recurring series",
+				"confirm-description": "“{name}” will no longer be carried into future months. Existing occurrences are kept.",
+				"confirm-button": "End recurring",
+				"success": "Recurring series ended.",
+				"error": "Something went wrong while ending the series. Please try again."
+			}
+		},
+		"form": {
+			"type": {
+				"label": "Type"
+			},
+			"name": {
+				"label": "Name",
+				"placeholder": "e.g., Groceries, Paycheck"
+			},
+			"amount": {
+				"label": "Amount"
+			},
+			"category": {
+				"label": "Category"
+			},
+			"account": {
+				"label": "Account",
+				"none": "No account"
+			},
+			"note": {
+				"label": "Note",
+				"placeholder": "Optional note"
+			},
+			"recurrence": {
+				"label": "Recurrence"
+			},
+			"cancel-button": "Cancel",
+			"submit-button": "Save changes",
+			"saved": "Recurring series updated.",
 			"error": "Something went wrong. Please try again."
 		}
 	}

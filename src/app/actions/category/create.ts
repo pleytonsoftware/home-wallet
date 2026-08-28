@@ -32,11 +32,11 @@ export async function createCategory(householdId: string, input: CreateCategoryI
 		const validation = await createCategorySchema(t).safeParseAsync(input)
 		if (!validation.success) return BAD_REQUEST(validation.error.issues)
 
-		const { name, color } = validation.data
+		const { name, color, icon } = validation.data
 
 		const [createError, category] = await to(
 			prisma.category.create({
-				data: { householdId, name, color, isBase: false },
+				data: { householdId, name, color, icon, isBase: false },
 			}),
 		)
 

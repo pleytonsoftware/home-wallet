@@ -44,7 +44,7 @@ export type NavSubItem = {
 	isActive?: boolean
 	/** Button size — defaults to `'md'`. */
 	size?: 'sm' | 'md'
-} & Pick<NavItem, 'colour' | 'allowedRoles' | 'prefetch'>
+} & Pick<NavItem, 'colour' | 'allowedRoles' | 'prefetch' | 'disabled' | 'badge'>
 
 // ─── Primary item ─────────────────────────────────────────────────────────────
 
@@ -93,6 +93,9 @@ export type NavItem = {
 
 	/** Pre-fetches the route when clicked. */
 	prefetch?: boolean
+
+	/** Disables the item from being interacted with. */
+	disabled?: boolean
 }
 
 // ─── Group action ─────────────────────────────────────────────────────────────

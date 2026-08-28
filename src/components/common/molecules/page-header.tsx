@@ -1,12 +1,12 @@
 import type { LucideIcon } from 'lucide-react'
-import type { FC } from 'react'
+import type { FC, ReactNode } from 'react'
 
 import { Icon } from '@atoms/icon'
 
 interface PageHeaderProps {
 	icon: LucideIcon
 	eyebrow: string
-	title: string
+	title: ReactNode
 	description: string
 }
 
