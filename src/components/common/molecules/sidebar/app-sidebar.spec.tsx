@@ -114,21 +114,21 @@ describe('AppSidebar', () => {
 			const user = userEvent.setup()
 			renderAppSidebar()
 
-			expect(screen.getByText('transactions.$')).toBeInTheDocument()
-			await user.click(screen.getByText('transactions.$'))
+			expect(screen.getByText('sidebar.transactions.$')).toBeInTheDocument()
+			await user.click(screen.getByText('sidebar.transactions.$'))
 
-			expect(screen.getByText('transactions.recurring')).toBeInTheDocument()
+			expect(screen.getByText('sidebar.transactions.recurring')).toBeInTheDocument()
 		})
 
 		it('renders the Budgets nav item with its nested routes once expanded', async () => {
 			const user = userEvent.setup()
 			renderAppSidebar()
 
-			expect(screen.getByText('budgets.$')).toBeInTheDocument()
-			await user.click(screen.getByText('budgets.$'))
+			expect(screen.getByText('sidebar.budgets.$')).toBeInTheDocument()
+			await user.click(screen.getByText('sidebar.budgets.$'))
 
-			expect(screen.getByText('budgets.personal')).toBeInTheDocument()
-			expect(screen.getByText('budgets.shared')).toBeInTheDocument()
+			expect(screen.getByText('sidebar.budgets.personal')).toBeInTheDocument()
+			expect(screen.getByText('sidebar.budgets.shared')).toBeInTheDocument()
 		})
 
 		it('renders the Settings nav item with its nested routes once expanded for an admin', async () => {
@@ -136,8 +136,8 @@ describe('AppSidebar', () => {
 			currentHousehold.value = { ...currentHousehold.value, role: MemberRole.ADMIN }
 			renderAppSidebar()
 
-			expect(screen.getByText('settings')).toBeInTheDocument()
-			await user.click(screen.getByText('settings'))
+			expect(screen.getByText('sidebar.settings')).toBeInTheDocument()
+			await user.click(screen.getByText('sidebar.settings'))
 
 			expect(screen.getByText('sections.general')).toBeInTheDocument()
 			expect(screen.getByText('sections.members')).toBeInTheDocument()
@@ -149,7 +149,7 @@ describe('AppSidebar', () => {
 			currentHousehold.value = { ...currentHousehold.value, role: MemberRole.MEMBER }
 			renderAppSidebar()
 
-			await user.click(screen.getByText('settings'))
+			await user.click(screen.getByText('sidebar.settings'))
 
 			expect(screen.getByText('sections.general')).toBeInTheDocument()
 			expect(screen.getByText('sections.danger')).toBeInTheDocument()
@@ -161,7 +161,7 @@ describe('AppSidebar', () => {
 			renderAppSidebar()
 
 			// Settings auto-expands because a child route is active — no click required.
-			const settingsCollapsible = screen.getByText('settings').closest('[data-slot="collapsible"]')
+			const settingsCollapsible = screen.getByText('sidebar.settings').closest('[data-slot="collapsible"]')
 			expect(settingsCollapsible).toHaveAttribute('data-state', 'open')
 
 			const general = screen.getByRole('link', { name: 'sections.general' }).closest('[data-slot="sidebar-menu-sub-button"]')
