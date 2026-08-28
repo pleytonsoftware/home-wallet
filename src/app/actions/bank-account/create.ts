@@ -6,9 +6,9 @@ import type { $ZodIssue } from 'zod/v4/core'
 
 import { getTranslations } from 'next-intl/server'
 
-import { getActiveMembership } from '@actions/household/active-memberships'
-import { authorizedSession } from '@lib/auth/utils'
-import { BAD_REQUEST, CREATED, FORBIDDEN, INTERNAL_ERROR } from '@lib/errors'
+import { createAction } from '@lib/actions/action-builder'
+import { withActiveMembership, withAuthorizedSession, withErrorBoundary } from '@lib/actions/middlewares'
+import { BAD_REQUEST, CREATED, INTERNAL_ERROR } from '@lib/errors'
 import { bankAccountLogger } from '@lib/logger'
 import { prisma } from '@lib/prisma'
 import { createBankAccountSchema, type CreateBankAccountInput } from '@lib/schemas/bank-account/create-bank-account'
@@ -17,15 +17,11 @@ import { to } from '@lib/utils/to.utils'
 type BankAccountWithShares = Prisma.BankAccountGetPayload<{ include: { sharedWith: true } }>
 export type CreateBankAccountResult = ResponseResult<BankAccountWithShares, $ZodIssue[] | string>
 
-/** Creates a bank account owned by the requester. `sharedMemberIds` must belong to the same household. */
-export async function createBankAccount(householdId: string, input: CreateBankAccountInput): Promise<CreateBankAccountResult | FullErrorResult> {
-	try {
-		const { session, error } = await authorizedSession()
-		if (error) return error
-
-		const membership = await getActiveMembership({ userId: session.user.id, householdId })
-		if (!membership) return FORBIDDEN()
-
+const createBankAccountChain = createAction<{ householdId: string; input: CreateBankAccountInput }>()
+	.use(withErrorBoundary(bankAccountLogger, '[createBankAccount]: {error}'))
+	.use(withAuthorizedSession)
+	.use(withActiveMembership((ctx) => ctx.householdId))
+	.handler(async ({ householdId, input, membership }): Promise<CreateBankAccountResult> => {
 		const t = await getTranslations('common.forms.bank-accounts.create')
 		const validation = await createBankAccountSchema(t).safeParseAsync(input)
 		if (!validation.success) return BAD_REQUEST(validation.error.issues)
@@ -59,8 +55,9 @@ export async function createBankAccount(householdId: string, input: CreateBankAc
 		if (createError) return INTERNAL_ERROR(createError)
 
 		return CREATED(bankAccount)
-	} catch (error) {
-		bankAccountLogger.error('[createBankAccount]: {error}', { error })
-		return INTERNAL_ERROR(error)
-	}
+	})
+
+/** Creates a bank account owned by the requester. `sharedMemberIds` must belong to the same household. */
+export async function createBankAccount(householdId: string, input: CreateBankAccountInput): Promise<CreateBankAccountResult | FullErrorResult> {
+	return createBankAccountChain({ householdId, input })
 }

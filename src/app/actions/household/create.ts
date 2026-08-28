@@ -7,7 +7,8 @@ import type { $ZodIssue } from 'zod/v4/core'
 import { getTranslations } from 'next-intl/server'
 
 import { PrismaClientKnownRequestError } from '@hw-prisma/internal/prismaNamespace'
-import { authorizedSession } from '@lib/auth/utils'
+import { createAction } from '@lib/actions/action-builder'
+import { withAuthorizedSession, withErrorBoundary } from '@lib/actions/middlewares'
 import { PRISMA_ERRORS } from '@lib/constants/prisma-errors.const'
 import { MemberRole } from '@lib/constants/role.enum'
 import { BAD_REQUEST, CONFLICT, CREATED, INTERNAL_ERROR } from '@lib/errors'
@@ -27,14 +28,15 @@ export interface CreateHouseholdConfig {
 	fullAddress?: string
 }
 
-export async function createHousehold(name: string, config?: CreateHouseholdConfig): Promise<CreateHouseholdResult | FullErrorResult> {
-	try {
-		const { session, error } = await authorizedSession()
+interface CreateHouseholdSeed {
+	name: string
+	config?: CreateHouseholdConfig
+}
 
-		if (error) {
-			return error
-		}
-
+const createHouseholdChain = createAction<CreateHouseholdSeed>()
+	.use(withErrorBoundary(householdLogger, '[createHousehold]: {error}'))
+	.use(withAuthorizedSession)
+	.handler(async ({ session, name, config }): Promise<CreateHouseholdResult> => {
 		const [commonTrans, onboardingTrans] = await Promise.all([getTranslations('common.error'), getTranslations('common.forms.households.create')])
 		const validation = await createHouseholdSchema(onboardingTrans).safeParseAsync({ name, ...config })
 
@@ -93,8 +95,8 @@ export async function createHousehold(name: string, config?: CreateHouseholdConf
 		}
 
 		return CREATED(household)
-	} catch (error) {
-		householdLogger.error('[createHousehold]: {error}', { error })
-		return INTERNAL_ERROR(error)
-	}
+	})
+
+export async function createHousehold(name: string, config?: CreateHouseholdConfig): Promise<CreateHouseholdResult | FullErrorResult> {
+	return createHouseholdChain({ name, config })
 }

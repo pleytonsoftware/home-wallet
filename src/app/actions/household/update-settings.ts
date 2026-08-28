@@ -6,9 +6,9 @@ import type { $ZodIssue } from 'zod/v4/core'
 
 import { getTranslations } from 'next-intl/server'
 
-import { isAdminOf } from '@actions/household/active-memberships'
-import { authorizedSession } from '@lib/auth/utils'
-import { BAD_REQUEST, FORBIDDEN, INTERNAL_ERROR, OK } from '@lib/errors'
+import { createAction } from '@lib/actions/action-builder'
+import { withActiveMembership, withAuthorizedSession, withErrorBoundary } from '@lib/actions/middlewares'
+import { BAD_REQUEST, INTERNAL_ERROR, OK } from '@lib/errors'
 import { householdLogger } from '@lib/logger'
 import { prisma } from '@lib/prisma'
 import { updateHouseholdSettingsSchema } from '@lib/schemas/household/update-household-settings'
@@ -16,21 +16,11 @@ import { to } from '@lib/utils/to.utils'
 
 export type UpdateHouseholdSettingsResult = ResponseResult<{ id: string }, $ZodIssue[] | string>
 
-export async function updateHouseholdSettings(
-	householdId: string,
-	input: UpdateHouseholdSettingsInput,
-): Promise<UpdateHouseholdSettingsResult | FullErrorResult> {
-	try {
-		const { session, error } = await authorizedSession()
-
-		if (error) {
-			return error
-		}
-
-		if (!(await isAdminOf({ userId: session.user.id, householdId }))) {
-			return FORBIDDEN()
-		}
-
+const updateHouseholdSettingsChain = createAction<{ householdId: string; input: UpdateHouseholdSettingsInput }>()
+	.use(withErrorBoundary(householdLogger, '[updateHouseholdSettings]: {error}'))
+	.use(withAuthorizedSession)
+	.use(withActiveMembership((ctx) => ctx.householdId, { requireAdmin: true }))
+	.handler(async ({ householdId, input }): Promise<UpdateHouseholdSettingsResult> => {
 		const createTrans = await getTranslations('common.forms.households.create')
 		const validation = await updateHouseholdSettingsSchema(createTrans).safeParseAsync(input)
 
@@ -61,8 +51,11 @@ export async function updateHouseholdSettings(
 		}
 
 		return OK({ id: householdId })
-	} catch (error) {
-		householdLogger.error('[updateHouseholdSettings]: {error}', { error })
-		return INTERNAL_ERROR(error)
-	}
+	})
+
+export async function updateHouseholdSettings(
+	householdId: string,
+	input: UpdateHouseholdSettingsInput,
+): Promise<UpdateHouseholdSettingsResult | FullErrorResult> {
+	return updateHouseholdSettingsChain({ householdId, input })
 }

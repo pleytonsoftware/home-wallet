@@ -4,33 +4,21 @@ import type { FullErrorResult, ResponseResult } from '@lib/errors/types'
 
 import { getTranslations } from 'next-intl/server'
 
-import { isAdminOf } from '@actions/household/active-memberships'
-import { authorizedSession } from '@lib/auth/utils'
+import { createAction } from '@lib/actions/action-builder'
+import { withActiveMembership, withAuthorizedSession, withErrorBoundary } from '@lib/actions/middlewares'
 import { MemberRole, parseMemberRole } from '@lib/constants/role.enum'
-import { BAD_REQUEST, FORBIDDEN, INTERNAL_ERROR, OK } from '@lib/errors'
+import { BAD_REQUEST, INTERNAL_ERROR, OK } from '@lib/errors'
 import { householdLogger } from '@lib/logger'
 import { prisma } from '@lib/prisma'
 import { to } from '@lib/utils/to.utils'
 
 export type UpdateMemberRolesResult = ResponseResult<{ updated: number }, string>
 
-/**
- * Updates household member roles from a `{ memberId -> role }` map.
- * Admin-gated, scoped to the household's own members, and refuses to leave the household
- * without at least one admin.
- */
-export async function updateMemberRoles(householdId: string, roles: Record<string, MemberRole>): Promise<UpdateMemberRolesResult | FullErrorResult> {
-	try {
-		const { session, error } = await authorizedSession()
-
-		if (error) {
-			return error
-		}
-
-		if (!(await isAdminOf({ userId: session.user.id, householdId }))) {
-			return FORBIDDEN()
-		}
-
+const updateMemberRolesChain = createAction<{ householdId: string; roles: Record<string, MemberRole> }>()
+	.use(withErrorBoundary(householdLogger, '[updateMemberRoles]: {error}'))
+	.use(withAuthorizedSession)
+	.use(withActiveMembership((ctx) => ctx.householdId, { requireAdmin: true }))
+	.handler(async ({ householdId, roles }): Promise<UpdateMemberRolesResult> => {
 		const rolesTrans = await getTranslations('settings.members')
 
 		const members = await prisma.householdMember.findMany({
@@ -65,8 +53,13 @@ export async function updateMemberRoles(householdId: string, roles: Record<strin
 		}
 
 		return OK({ updated: changes.length })
-	} catch (error) {
-		householdLogger.error('[updateMemberRoles]: {error}', { error })
-		return INTERNAL_ERROR(error)
-	}
+	})
+
+/**
+ * Updates household member roles from a `{ memberId -> role }` map.
+ * Admin-gated, scoped to the household's own members, and refuses to leave the household
+ * without at least one admin.
+ */
+export async function updateMemberRoles(householdId: string, roles: Record<string, MemberRole>): Promise<UpdateMemberRolesResult | FullErrorResult> {
+	return updateMemberRolesChain({ householdId, roles })
 }

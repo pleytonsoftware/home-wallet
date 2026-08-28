@@ -6,12 +6,12 @@ import type { $ZodIssue } from 'zod/v4/core'
 
 import { getTranslations } from 'next-intl/server'
 
-import { getActiveMembership } from '@actions/household/active-memberships'
 import { materializeRecurringSeriesForward } from '@actions/transaction/recurrence-materialization'
-import { authorizedSession } from '@lib/auth/utils'
+import { createAction } from '@lib/actions/action-builder'
+import { withActiveMembership, withAuthorizedSession, withErrorBoundary, withOwnedResource } from '@lib/actions/middlewares'
 import { BUDGET_TYPE } from '@lib/constants/budget.enum'
 import { PAYMENT_TYPE } from '@lib/constants/payment.enum'
-import { BAD_REQUEST, FORBIDDEN, INTERNAL_ERROR, OK } from '@lib/errors'
+import { BAD_REQUEST, INTERNAL_ERROR, OK } from '@lib/errors'
 import { transactionLogger } from '@lib/logger'
 import { prisma } from '@lib/prisma'
 import { updateTransactionSchema, type UpdateTransactionInput } from '@lib/schemas/transaction/update-transaction'
@@ -22,21 +22,19 @@ import { serializeTransaction } from '@transactions/transforms/transaction'
 
 export type UpdateTransactionResult = ResponseResult<TransactionSummary, $ZodIssue[] | string>
 
-/** Updates a personal transaction. Restricted to its creator/owner. */
-export async function updateTransaction(transactionId: string, input: UpdateTransactionInput): Promise<UpdateTransactionResult | FullErrorResult> {
-	try {
-		const { session, error } = await authorizedSession()
-		if (error) return error
-
-		const transaction = await prisma.transaction.findUnique({
-			where: { id: transactionId },
-			select: { householdId: true, householdMemberId: true, recurrenceRule: true },
-		})
-		if (!transaction) return FORBIDDEN()
-
-		const membership = await getActiveMembership({ userId: session.user.id, householdId: transaction.householdId })
-		if (!membership || membership.id !== transaction.householdMemberId) return FORBIDDEN()
-
+const updateTransactionChain = createAction<{ transactionId: string; input: UpdateTransactionInput }>()
+	.use(withErrorBoundary(transactionLogger, '[updateTransaction]: {error}'))
+	.use(withAuthorizedSession)
+	.use(
+		withOwnedResource(({ transactionId }) =>
+			prisma.transaction.findUnique({
+				where: { id: transactionId },
+				select: { householdId: true, householdMemberId: true, recurrenceRule: true },
+			}),
+		),
+	)
+	.use(withActiveMembership((ctx) => ctx.resource.householdId, { requireOwner: (ctx) => ctx.resource.householdMemberId }))
+	.handler(async ({ transactionId, input, resource: transaction, membership }): Promise<UpdateTransactionResult> => {
 		const t = await getTranslations('common.forms.transactions.create')
 		const validation = await updateTransactionSchema(t).safeParseAsync(input)
 		if (!validation.success) return BAD_REQUEST(validation.error.issues)
@@ -133,8 +131,9 @@ export async function updateTransaction(transactionId: string, input: UpdateTran
 		if (updateError) return INTERNAL_ERROR(updateError)
 
 		return OK(serializeTransaction(updated))
-	} catch (error) {
-		transactionLogger.error('[updateTransaction]: {error}', { error })
-		return INTERNAL_ERROR(error)
-	}
+	})
+
+/** Updates a personal transaction. Restricted to its creator/owner. */
+export async function updateTransaction(transactionId: string, input: UpdateTransactionInput): Promise<UpdateTransactionResult | FullErrorResult> {
+	return updateTransactionChain({ transactionId, input })
 }

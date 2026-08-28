@@ -6,11 +6,11 @@ import type { $ZodIssue } from 'zod/v4/core'
 
 import { getTranslations } from 'next-intl/server'
 
-import { authorizedSession } from '@lib/auth/utils'
+import { createAction } from '@lib/actions/action-builder'
+import { withAuthorizedSession, withErrorBoundary } from '@lib/actions/middlewares'
 import { PRISMA_ERRORS } from '@lib/constants/prisma-errors.const'
 import { MemberRole } from '@lib/constants/role.enum'
 import { BAD_REQUEST, NOT_FOUND, OK } from '@lib/errors'
-import { INTERNAL_ERROR } from '@lib/errors/internal-error'
 import { householdLogger } from '@lib/logger'
 import { prisma, type Prisma } from '@lib/prisma'
 import { joinHouseholdSchema } from '@lib/schemas/household/join-household'
@@ -19,14 +19,10 @@ import { to } from '@lib/utils/to.utils'
 type HouseholdWithMembers = Prisma.HouseholdGetPayload<{ include: { members: true } }>
 export type JoinHouseholdResult = ResponseResult<HouseholdWithMembers, $ZodIssue[] | string>
 
-export async function joinHousehold(code: string): Promise<JoinHouseholdResult> {
-	try {
-		const { session, error } = await authorizedSession()
-
-		if (error) {
-			return error
-		}
-
+const joinHouseholdChain = createAction<{ code: string }>()
+	.use(withErrorBoundary(householdLogger, '[joinHousehold]: {error}'))
+	.use(withAuthorizedSession)
+	.handler(async ({ session, code }): Promise<JoinHouseholdResult> => {
 		const t = await getTranslations('common.error')
 		const validation = await joinHouseholdSchema(await getTranslations('onboarding.join.form')).safeParseAsync({ code })
 
@@ -97,8 +93,8 @@ export async function joinHousehold(code: string): Promise<JoinHouseholdResult> 
 		})
 
 		return OK(household)
-	} catch (error) {
-		householdLogger.error('[joinHousehold]: {error}', { error })
-		return INTERNAL_ERROR(error)
-	}
+	})
+
+export async function joinHousehold(code: string): Promise<JoinHouseholdResult> {
+	return joinHouseholdChain({ code })
 }

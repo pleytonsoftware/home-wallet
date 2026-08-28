@@ -5,9 +5,9 @@ import type { $ZodIssue } from 'zod/v4/core'
 
 import { getTranslations } from 'next-intl/server'
 
-import { getActiveMembership } from '@actions/household/active-memberships'
-import { authorizedSession } from '@lib/auth/utils'
-import { BAD_REQUEST, FORBIDDEN, INTERNAL_ERROR, OK } from '@lib/errors'
+import { createAction } from '@lib/actions/action-builder'
+import { withActiveMembership, withAuthorizedSession, withErrorBoundary, withOwnedResource } from '@lib/actions/middlewares'
+import { BAD_REQUEST, INTERNAL_ERROR, OK } from '@lib/errors'
 import { bankAccountLogger } from '@lib/logger'
 import { prisma } from '@lib/prisma'
 import { updateBankAccountSchema, type UpdateBankAccountInput } from '@lib/schemas/bank-account/update-bank-account'
@@ -15,21 +15,16 @@ import { to } from '@lib/utils/to.utils'
 
 export type UpdateBankAccountResult = ResponseResult<{ id: string }, $ZodIssue[] | string>
 
-/** Updates a bank account. Restricted to its creator/owner. */
-export async function updateBankAccount(bankAccountId: string, input: UpdateBankAccountInput): Promise<UpdateBankAccountResult | FullErrorResult> {
-	try {
-		const { session, error } = await authorizedSession()
-		if (error) return error
-
-		const bankAccount = await prisma.bankAccount.findUnique({
-			where: { id: bankAccountId },
-			select: { householdId: true, householdMemberId: true },
-		})
-		if (!bankAccount) return FORBIDDEN()
-
-		const membership = await getActiveMembership({ userId: session.user.id, householdId: bankAccount.householdId })
-		if (!membership || membership.id !== bankAccount.householdMemberId) return FORBIDDEN()
-
+const updateBankAccountChain = createAction<{ bankAccountId: string; input: UpdateBankAccountInput }>()
+	.use(withErrorBoundary(bankAccountLogger, '[updateBankAccount]: {error}'))
+	.use(withAuthorizedSession)
+	.use(
+		withOwnedResource(({ bankAccountId }) =>
+			prisma.bankAccount.findUnique({ where: { id: bankAccountId }, select: { householdId: true, householdMemberId: true } }),
+		),
+	)
+	.use(withActiveMembership((ctx) => ctx.resource.householdId, { requireOwner: (ctx) => ctx.resource.householdMemberId }))
+	.handler(async ({ bankAccountId, input, resource, membership }): Promise<UpdateBankAccountResult> => {
 		const t = await getTranslations('common.forms.bank-accounts.create')
 		const validation = await updateBankAccountSchema(t).safeParseAsync(input)
 		if (!validation.success) return BAD_REQUEST(validation.error.issues)
@@ -39,7 +34,7 @@ export async function updateBankAccount(bankAccountId: string, input: UpdateBank
 
 		if (uniqueSharedIds.length > 0) {
 			const validMembersCount = await prisma.householdMember.count({
-				where: { id: { in: uniqueSharedIds }, householdId: bankAccount.householdId, removedAt: null },
+				where: { id: { in: uniqueSharedIds }, householdId: resource.householdId, removedAt: null },
 			})
 			if (validMembersCount !== uniqueSharedIds.length) {
 				return BAD_REQUEST(t('shared-members.error.invalid'))
@@ -63,8 +58,9 @@ export async function updateBankAccount(bankAccountId: string, input: UpdateBank
 		if (updateError) return INTERNAL_ERROR(updateError)
 
 		return OK({ id: bankAccountId })
-	} catch (error) {
-		bankAccountLogger.error('[updateBankAccount]: {error}', { error })
-		return INTERNAL_ERROR(error)
-	}
+	})
+
+/** Updates a bank account. Restricted to its creator/owner. */
+export async function updateBankAccount(bankAccountId: string, input: UpdateBankAccountInput): Promise<UpdateBankAccountResult | FullErrorResult> {
+	return updateBankAccountChain({ bankAccountId, input })
 }

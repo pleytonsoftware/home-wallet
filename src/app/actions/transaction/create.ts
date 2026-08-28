@@ -6,12 +6,12 @@ import type { $ZodIssue } from 'zod/v4/core'
 
 import { getTranslations } from 'next-intl/server'
 
-import { getActiveMembership } from '@actions/household/active-memberships'
 import { materializeRecurringSeriesForward } from '@actions/transaction/recurrence-materialization'
-import { authorizedSession } from '@lib/auth/utils'
+import { createAction } from '@lib/actions/action-builder'
+import { withActiveMembership, withAuthorizedSession, withErrorBoundary, withOwnedResource } from '@lib/actions/middlewares'
 import { BUDGET_STATUS, BUDGET_TYPE } from '@lib/constants/budget.enum'
 import { PAYMENT_TYPE } from '@lib/constants/payment.enum'
-import { BAD_REQUEST, CREATED, FORBIDDEN, INTERNAL_ERROR } from '@lib/errors'
+import { BAD_REQUEST, CREATED, INTERNAL_ERROR } from '@lib/errors'
 import { transactionLogger } from '@lib/logger'
 import { prisma } from '@lib/prisma'
 import { createTransactionSchema, type CreateTransactionInput } from '@lib/schemas/transaction/create-transaction'
@@ -22,21 +22,19 @@ import { serializeTransaction } from '@transactions/transforms/transaction'
 
 export type CreateTransactionResult = ResponseResult<TransactionSummary, $ZodIssue[] | string>
 
-/** Creates a personal transaction inside the given (active, own) monthly budget. */
-export async function createTransaction(monthlyBudgetId: string, input: CreateTransactionInput): Promise<CreateTransactionResult | FullErrorResult> {
-	try {
-		const { session, error } = await authorizedSession()
-		if (error) return error
-
-		const monthlyBudget = await prisma.monthlyBudget.findUnique({
-			where: { id: monthlyBudgetId },
-			select: { householdId: true, householdMemberId: true, status: true },
-		})
-		if (!monthlyBudget) return FORBIDDEN()
-
-		const membership = await getActiveMembership({ userId: session.user.id, householdId: monthlyBudget.householdId })
-		if (!membership || membership.id !== monthlyBudget.householdMemberId) return FORBIDDEN()
-
+const createTransactionChain = createAction<{ monthlyBudgetId: string; input: CreateTransactionInput }>()
+	.use(withErrorBoundary(transactionLogger, '[createTransaction]: {error}'))
+	.use(withAuthorizedSession)
+	.use(
+		withOwnedResource(({ monthlyBudgetId }) =>
+			prisma.monthlyBudget.findUnique({
+				where: { id: monthlyBudgetId },
+				select: { householdId: true, householdMemberId: true, status: true },
+			}),
+		),
+	)
+	.use(withActiveMembership((ctx) => ctx.resource.householdId, { requireOwner: (ctx) => ctx.resource.householdMemberId }))
+	.handler(async ({ monthlyBudgetId, input, resource: monthlyBudget, membership }): Promise<CreateTransactionResult> => {
 		const t = await getTranslations('common.forms.transactions.create')
 		if (monthlyBudget.status !== BUDGET_STATUS.ACTIVE) return BAD_REQUEST(t('monthly-budget.error.not-active'))
 
@@ -137,8 +135,9 @@ export async function createTransaction(monthlyBudgetId: string, input: CreateTr
 		if (createError) return INTERNAL_ERROR(createError)
 
 		return CREATED(serializeTransaction(result))
-	} catch (error) {
-		transactionLogger.error('[createTransaction]: {error}', { error })
-		return INTERNAL_ERROR(error)
-	}
+	})
+
+/** Creates a personal transaction inside the given (active, own) monthly budget. */
+export async function createTransaction(monthlyBudgetId: string, input: CreateTransactionInput): Promise<CreateTransactionResult | FullErrorResult> {
+	return createTransactionChain({ monthlyBudgetId, input })
 }

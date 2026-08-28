@@ -5,35 +5,22 @@ import type { FullErrorResult, ResponseResult } from '@lib/errors/types'
 import { getTranslations } from 'next-intl/server'
 
 import { getBankAccountTransferPlan, planToPrismaOps } from '@actions/bank-account/shared/transfer-plan'
-import { getActiveMembership, isAdminOf } from '@actions/household/active-memberships'
-import { authorizedSession } from '@lib/auth/utils'
+import { createAction } from '@lib/actions/action-builder'
+import { withActiveMembership, withAuthorizedSession, withErrorBoundary } from '@lib/actions/middlewares'
 import { MemberRole, parseMemberRole } from '@lib/constants/role.enum'
 import { BAD_REQUEST, FORBIDDEN, INTERNAL_ERROR, OK } from '@lib/errors'
 import { householdLogger } from '@lib/logger'
 import { prisma } from '@lib/prisma'
 import { to } from '@lib/utils/to.utils'
 
-/**
- * Admin-only removal of another household member (soft delete). Use {@link leaveHousehold}
- * to remove yourself instead. Blocks removing the last remaining admin. Bank accounts the
- * target owns are transferred to another shared member or deleted, per {@link getBankAccountTransferPlan}.
- */
-export async function removeMember(
-	householdId: string,
-	targetMembershipId: string,
-): Promise<ResponseResult<{ removed: true }, string> | FullErrorResult> {
-	try {
-		const { session, error } = await authorizedSession()
-		if (error) return error
-
-		if (!(await isAdminOf({ userId: session.user.id, householdId }))) {
-			return FORBIDDEN()
-		}
-
+const removeMemberChain = createAction<{ householdId: string; targetMembershipId: string }>()
+	.use(withErrorBoundary(householdLogger, '[removeMember]: {error}'))
+	.use(withAuthorizedSession)
+	.use(withActiveMembership((ctx) => ctx.householdId, { requireAdmin: true }))
+	.handler(async ({ householdId, targetMembershipId, membership }): Promise<ResponseResult<{ removed: true }, string>> => {
 		const membersTrans = await getTranslations('settings.members')
 
-		const requesterMembership = await getActiveMembership({ userId: session.user.id, householdId })
-		if (requesterMembership?.id === targetMembershipId) {
+		if (membership.id === targetMembershipId) {
 			return BAD_REQUEST(membersTrans('remove.self-error'))
 		}
 
@@ -60,8 +47,16 @@ export async function removeMember(
 		if (updateError) return INTERNAL_ERROR(updateError)
 
 		return OK({ removed: true })
-	} catch (error) {
-		householdLogger.error('[removeMember]: {error}', { error })
-		return INTERNAL_ERROR(error)
-	}
+	})
+
+/**
+ * Admin-only removal of another household member (soft delete). Use {@link leaveHousehold}
+ * to remove yourself instead. Blocks removing the last remaining admin. Bank accounts the
+ * target owns are transferred to another shared member or deleted, per {@link getBankAccountTransferPlan}.
+ */
+export async function removeMember(
+	householdId: string,
+	targetMembershipId: string,
+): Promise<ResponseResult<{ removed: true }, string> | FullErrorResult> {
+	return removeMemberChain({ householdId, targetMembershipId })
 }
